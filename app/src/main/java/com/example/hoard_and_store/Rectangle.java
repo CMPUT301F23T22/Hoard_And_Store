@@ -6,6 +6,8 @@ public class Rectangle extends Shape {
         super(x, y);
     }
 
+    String color = "red";
+
     @Override
     public void draw() {
 
