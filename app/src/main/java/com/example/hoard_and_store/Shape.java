@@ -3,9 +3,8 @@ package com.example.hoard_and_store;
 public abstract class Shape {
     protected int x;
     protected int y;
-    String color = "red";
-
     String color = "blue";
+
 
     public Shape(int x, int y) {
         this.x = x;

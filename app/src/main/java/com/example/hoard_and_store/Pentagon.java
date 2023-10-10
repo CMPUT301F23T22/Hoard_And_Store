@@ -1,5 +1,6 @@
 // extends Shape class, Pentagon class is used to create a pentagon shape branch.
 // A pentagon shape branch is a branch that has 5 sides s.
+package com.example.hoard_and_store;
 
 Class Pentagon extends Shape {
     private int s;
