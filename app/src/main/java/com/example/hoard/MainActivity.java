@@ -1,4 +1,4 @@
-package com.example.hoard_and_store;
+package com.example.hoard;
 
 import androidx.appcompat.app.AppCompatActivity;
 

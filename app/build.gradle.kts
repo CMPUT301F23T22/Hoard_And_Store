@@ -1,13 +1,14 @@
 plugins {
     id("com.android.application")
+    id("com.google.gms.google-services")
 }
 
 android {
-    namespace = "com.example.hoard_and_store"
+    namespace = "com.example.hoard"
     compileSdk = 33
 
     defaultConfig {
-        applicationId = "com.example.hoard_and_store"
+        applicationId = "com.example.hoard"
         minSdk = 30
         targetSdk = 33
         versionCode = 1
@@ -32,7 +33,8 @@ android {
 }
 
 dependencies {
-
+    implementation(platform("com.google.firebase:firebase-bom:32.4.0"))
+    implementation("com.google.firebase:firebase-firestore")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.9.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
