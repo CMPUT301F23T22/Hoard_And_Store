@@ -2,4 +2,8 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="gradientStart">##1E1E1E</color> <!-- Darker than the original #23152C -->
+    <color name="gradientCenter">#78527F</color> <!-- Darker than the original #392642 -->
+    <color name="gradientEnd">#E0E0E0</color> <!-- Slightly off-white, for a more subdued look -->
+    <color name="solid_grad">#E0E0E0</color>
 </resources>
