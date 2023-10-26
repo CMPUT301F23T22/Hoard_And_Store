@@ -6,7 +6,7 @@ import com.google.firebase.firestore.FirebaseFirestoreSettings;
 public class ItemDBConnector {
     private FirebaseFirestore db;
 
-    public void DBConnector() {
+    public ItemDBConnector() {
         db = FirebaseFirestore.getInstance();
 
         // Optionally configure Firestore settings
