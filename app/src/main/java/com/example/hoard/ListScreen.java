@@ -10,6 +10,8 @@ import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.Date;
 
 public class ListScreen extends AppCompatActivity {
@@ -23,7 +25,7 @@ public class ListScreen extends AppCompatActivity {
 
         itemDB = new ItemDB(new ItemDBConnector());
 
-        Button addItemButton = findViewById(R.id.addItemButton);
+        FloatingActionButton addItemButton = findViewById(R.id.addItemButton);
         addItemButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
