@@ -15,14 +15,14 @@
         android:gravity="left"
         />
     <EditText
-        android:id="@+id/date_edit_text"
+        android:id="@+id/dateOfAcquisition"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
         android:inputType="date"
-        android:textAlignment="center"
-        android:gravity="center_horizontal"
+        android:gravity="start"
         android:maxLength="15"
+        android:hint="MM/DD/YYYY"
         >
     </EditText>
     <TextView
@@ -41,7 +41,7 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:inputType="textPersonName"
-        android:gravity="center_horizontal"
+        android:gravity="start"
         >
     </EditText>
     <LinearLayout
@@ -67,7 +67,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:gravity="center_horizontal"
+                android:gravity="start"
                 android:inputType="textPersonName"
                 >
             </EditText>
@@ -84,14 +84,14 @@
                 android:textColor="#808080"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:gravity="left"
+                android:gravity="start"
                 />
             <EditText
                 android:id="@+id/model"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:gravity="center_horizontal"
+                android:gravity="start"
                 android:inputType="textPersonName"
                 >
             </EditText>
@@ -114,7 +114,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:gravity="center_horizontal"
+        android:gravity="start"
         android:inputType="textPersonName"
         >
     </EditText>
@@ -132,7 +132,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:gravity="center_horizontal"
+        android:gravity="start"
         android:digits="0123456789"
         android:inputType="numberDecimal"
         >
@@ -150,7 +150,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:gravity="center_horizontal"
+        android:gravity="start"
         android:inputType="textPersonName"
         android:id="@+id/comment"
         >
