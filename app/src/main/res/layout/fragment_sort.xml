@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:fillViewport="true">
 
     <LinearLayout
@@ -15,28 +15,89 @@
         <TextView
             android:id="@+id/sortLabel"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
+            android:textSize="20dp"
+            android:gravity="center|left"
             android:text="Sort By:" />
 
         <!-- Filter Section -->
 
-        <!-- Specify a fixed height for the ListView, e.g., 200dp -->
         <ListView
             android:id="@+id/sorting"
             android:layout_width="wrap_content"
-            android:layout_height="200dp"
-            tools:ignore="NestedScrolling"></ListView>
+            android:layout_height="80dp"
+            android:focusable="false"
+            android:focusableInTouchMode="false"></ListView>
 
         <TextView
+            android:id="@+id/filterLabel"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
+            android:textSize="20dp"
+            android:gravity="center|left"
             android:text="Filter By:" />
 
-        <EditText
-            android:id="@+id/filterDate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Date" />
+
+            <LinearLayout
+                android:id="@+id/lay_main"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:scrollbarAlwaysDrawVerticalTrack="true">
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Date Range : "></TextView>
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="From"></TextView>
+
+                <DatePicker
+                    android:id="@+id/start_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:calendarViewShown="false"
+                    android:datePickerMode="spinner"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"/>
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="To" />
+
+                <!-- End Date Picker -->
+                <DatePicker
+                    android:id="@+id/end_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:calendarViewShown="false"
+                    android:datePickerMode="spinner"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"/>
+
+                <TextView
+                    android:id="@+id/show_selected_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="10dp"
+                    android:text="Selected Date is : "
+                    android:textSize="18sp" />
+
+                <Button
+                    android:id="@+id/showDateRangePicker"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Pick From Calendar">
+
+                </Button>
+            </LinearLayout>
 
         <EditText
             android:id="@+id/filterKeyword"
