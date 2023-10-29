@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Sort By Section -->
+        <TextView
+            android:id="@+id/sortLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sort By:" />
+
+        <!-- Filter Section -->
+
+        <!-- Specify a fixed height for the ListView, e.g., 200dp -->
+        <ListView
+            android:id="@+id/sorting"
+            android:layout_width="wrap_content"
+            android:layout_height="200dp"
+            tools:ignore="NestedScrolling"></ListView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Filter By:" />
+
+        <EditText
+            android:id="@+id/filterDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Date" />
+
+        <EditText
+            android:id="@+id/filterKeyword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Keyword" />
+
+        <EditText
+            android:id="@+id/filterMake"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Make" />
+
+        <EditText
+            android:id="@+id/filterTags"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Tags" />
+
+        <!-- Blank Space -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+
+        <!-- Result Section -->
+        <LinearLayout
+            android:id="@+id/resultContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <!-- Results will be displayed here -->
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
