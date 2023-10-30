@@ -90,12 +90,7 @@ public class ItemEditDeleteActivity extends Activity {
 
     // Method to edit the selected item's information
     private void editItem() {
-        // Save the edited fields back to the item
-        selectedItem.setDescription(editTextDescription.getText().toString());
-        // ... save other fields
-
-        // Update the item in the database
-        itemDBController.updateItem(selectedItem);
+        // TODO figure out how to call the add item activity
     }
 
     // Method to delete the selected item
