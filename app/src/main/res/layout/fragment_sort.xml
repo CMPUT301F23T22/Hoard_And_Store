@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:fillViewport="true">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="16dp"
         android:orientation="vertical">
 
         <!-- Sort By Section -->
@@ -22,12 +22,11 @@
 
         <!-- Filter Section -->
 
-        <ListView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/sorting"
-            android:layout_width="wrap_content"
-            android:layout_height="80dp"
-            android:focusable="false"
-            android:focusableInTouchMode="false"></ListView>
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            />
 
         <TextView
             android:id="@+id/filterLabel"
@@ -37,98 +36,70 @@
             android:gravity="center|left"
             android:text="Filter By:" />
 
-
-            <LinearLayout
-                android:id="@+id/lay_main"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:scrollbarAlwaysDrawVerticalTrack="true">
-
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Date Range : "></TextView>
-
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:text="From"></TextView>
-
-                <DatePicker
-                    android:id="@+id/start_date"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:calendarViewShown="false"
-                    android:datePickerMode="spinner"
-                    android:focusable="false"
-                    android:focusableInTouchMode="false"/>
-
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:text="To" />
-
-                <!-- End Date Picker -->
-                <DatePicker
-                    android:id="@+id/end_date"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:calendarViewShown="false"
-                    android:datePickerMode="spinner"
-                    android:focusable="false"
-                    android:focusableInTouchMode="false"/>
-
-                <TextView
-                    android:id="@+id/show_selected_date"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="10dp"
-                    android:text="Selected Date is : "
-                    android:textSize="18sp" />
-
-                <Button
-                    android:id="@+id/showDateRangePicker"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="Pick From Calendar">
-
-                </Button>
-            </LinearLayout>
+        <EditText
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="From Start date MM/DD/YYYY"></EditText>
 
         <EditText
-            android:id="@+id/filterKeyword"
-            android:layout_width="match_parent"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:hint="Keyword" />
+            android:hint="To end date MM/DD/YYYY"></EditText>
+
+        <Button
+            android:id="@+id/showDateRangePicker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Pick From Calendar">
+        </Button>
+
+        <TextView
+            android:id="@+id/show_selected_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:text="Selected Date is : "
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/tags"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|start"
+            android:layout_marginTop="10dp"
+            android:text="Selected Date is : "
+            android:textSize="18sp" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="test"/>
+            <!-- Chip items will be added dynamically in code -->
 
         <EditText
-            android:id="@+id/filterMake"
-            android:layout_width="match_parent"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:hint="Make" />
+            android:hint="Make"></EditText>
 
-        <EditText
-            android:id="@+id/filterTags"
-            android:layout_width="match_parent"
+        <Button
+            android:id="@+id/applyFilterSort"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="Tags" />
+            android:layout_gravity="center"
+            android:text="Apply">
+        </Button>
 
-        <!-- Blank Space -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="20dp" />
 
-        <!-- Result Section -->
-        <LinearLayout
-            android:id="@+id/resultContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <!-- Results will be displayed here -->
-        </LinearLayout>
+
     </LinearLayout>
-</ScrollView>
+</androidx.core.widget.NestedScrollView>
+
+
+
+
+
+
+
