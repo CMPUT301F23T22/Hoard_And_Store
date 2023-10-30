@@ -13,19 +13,29 @@ import android.widget.EditText;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.Date;
+import java.util.List;
 
 public class ListScreen extends AppCompatActivity {
 
     private ItemDB itemDB;
-
+    private RecyclerView recyclerView;
+    private ItemAdapter itemAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_screen);
 
+        recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
         itemDB = new ItemDB(new ItemDBConnector());
+
+        loadItems();
 
         FloatingActionButton addItemButton = findViewById(R.id.addItemButton);
         addItemButton.setOnClickListener(new View.OnClickListener() {
@@ -34,6 +44,15 @@ public class ListScreen extends AppCompatActivity {
                 showAddItemDialog();
             }
         });
+    }
+
+    private void loadItems() {
+        List<Item> items = (List<Item>) itemDB.getAllItems();
+
+        if (items != null) {
+            itemAdapter = new ItemAdapter(items, this);
+            recyclerView.setAdapter(itemAdapter);
+        }
     }
 
     private void showAddItemDialog() {
