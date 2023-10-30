@@ -25,6 +25,7 @@ public class ListScreen extends AppCompatActivity {
     private ItemDB itemDB;
     private RecyclerView recyclerView;
     private ItemAdapter itemAdapter;
+    private ItemDBController dbController;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,8 +35,14 @@ public class ListScreen extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         itemDB = new ItemDB(new ItemDBConnector());
-
-        loadItems();
+        dbController = ItemDBController.getInstance();
+        dbController.loadItems(new DataLoadCallback() {
+            @Override
+            public void onDataLoaded(List<Item> items) {
+                itemAdapter = new ItemAdapter(items);
+                recyclerView.setAdapter(itemAdapter);
+            }
+        });
 
         FloatingActionButton addItemButton = findViewById(R.id.addItemButton);
         addItemButton.setOnClickListener(new View.OnClickListener() {
@@ -46,14 +53,6 @@ public class ListScreen extends AppCompatActivity {
         });
     }
 
-    private void loadItems() {
-        List<Item> items = (List<Item>) itemDB.getAllItems();
-
-        if (items != null) {
-            itemAdapter = new ItemAdapter(items, this);
-            recyclerView.setAdapter(itemAdapter);
-        }
-    }
 
     private void showAddItemDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -164,7 +163,9 @@ public class ListScreen extends AppCompatActivity {
                                 commentStr
                         );
 
-                        itemDB.addItem(newItem);
+                        dbController.addItem(newItem);
+                        itemAdapter.addItem(newItem);
+                        itemAdapter.notifyItemChanged(itemAdapter.getsize() - 1);
                         dialog.dismiss();
                     }
                 });

@@ -6,6 +6,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
@@ -13,9 +17,8 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
     private List<Item> itemList;
     private Context context;
 
-    public ItemAdapter(List<Item> itemList, Context context) {
+    public ItemAdapter(List<Item> itemList) {
         this.itemList = itemList;
-        this.context = context;
     }
 
     @NonNull
@@ -29,11 +32,19 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Item item = itemList.get(position);
         holder.briefDescription.setText(item.getBriefDescription());
-        holder.dateOfAcquisition.setText((CharSequence) item.getDateOfAcquisition());
+
+        // Format the date using SimpleDateFormat
+        SimpleDateFormat desiredFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String formattedDate = desiredFormat.format(item.getDateOfAcquisition());
+        holder.dateOfAcquisition.setText(formattedDate);
+
         holder.make.setText(item.getMake());
         holder.model.setText(item.getModel());
         holder.serialNumber.setText(item.getSerialNumber());
-        holder.estimatedValue.setText((int) item.getEstimatedValue());
+
+        // Correct the type mismatch issue by converting the double to a string
+        holder.estimatedValue.setText(String.valueOf(item.getEstimatedValue()));
+
         holder.comment.setText(item.getComment());
 
     }
@@ -63,5 +74,13 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
             estimatedValue = itemView.findViewById(R.id.Value_list);
             comment = itemView.findViewById(R.id.comment_list);
         }
+    }
+
+    public void addItem(Item item) {
+        itemList.add(item);
+    }
+
+    public int getsize(){
+        return itemList.size();
     }
 }
