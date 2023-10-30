@@ -12,6 +12,8 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -19,6 +21,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationBarView;
 
 import java.util.Date;
+import java.util.List;
 
 public class ListScreen extends AppCompatActivity {
 
@@ -28,6 +31,12 @@ public class ListScreen extends AppCompatActivity {
     private FloatingActionButton addItemButton;
     private Sort sortFragment = new Sort();
     private Fragment currentFragment;
+
+    private RecyclerView recyclerView;
+    private ItemAdapter itemAdapter;
+    private ItemDBController dbController;
+
+
 
     
     @Override
@@ -40,6 +49,17 @@ public class ListScreen extends AppCompatActivity {
         addItemButton = findViewById(R.id.addItemButton);
 
         bottomNav = findViewById(R.id.bottomNavigationView);
+
+        recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        dbController = ItemDBController.getInstance();
+        dbController.loadItems(new DataLoadCallback() {
+            @Override
+            public void onDataLoaded(List<Item> items) {
+                itemAdapter = new ItemAdapter(items);
+                recyclerView.setAdapter(itemAdapter);
+            }
+        });
 
         bottomNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
@@ -96,7 +116,10 @@ public class ListScreen extends AppCompatActivity {
                                 comment.getText().toString()
                         );
 
-                        itemDB.addItem(newItem);
+                        dbController.addItem(newItem);
+                        itemAdapter.addItem(newItem);
+                        itemAdapter.notifyItemChanged(itemAdapter.getsize() - 1);
+                        dialog.dismiss();
                     }
                 })
                 .setNegativeButton("Cancel", null)
