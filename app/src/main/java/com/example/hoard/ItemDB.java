@@ -9,9 +9,10 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ItemDB {
     private FirebaseFirestore db;
@@ -45,6 +46,25 @@ public class ItemDB {
                     }
                 });
     }
+    public Task<Void> bulkDeleteItems(ArrayList<Item> items) {
+        List<Task<Void>> deleteTasks = new ArrayList<>();
+
+        for (Item item : items) {
+            // Call the existing deleteItem method for each item
+            deleteTasks.add(deleteItem(item));
+        }
+
+        // Wait for all delete tasks to complete
+        Task<Void> allTasks = Tasks.whenAll(deleteTasks)
+                .addOnSuccessListener(aVoid -> Log.d("Firestore", "All items successfully deleted!"))
+                .addOnFailureListener(e -> Log.w("Firestore", "Error in deleting some items", e));
+
+        return allTasks;
+    }
+
+
+
+
 
     public Task<Void> editItem(Item item) {
         return itemsCollection.document(item.getSerialNumber())
@@ -62,6 +82,7 @@ public class ItemDB {
                     }
                 });
     }
+
 
     // Example method to retrieve all items from Firestore
     public Task<QuerySnapshot> getAllItems() {
