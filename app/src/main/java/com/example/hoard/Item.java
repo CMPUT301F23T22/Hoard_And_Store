@@ -12,7 +12,7 @@ public class Item {
     private double estimatedValue;
     private String comment;
     private ArrayList<Tag> tags;
-
+    private boolean isSelected;
     public Item(Date dateOfAcquisition, String briefDescription, String make, String model, String serialNumber, double estimatedValue, String comment) {
         this.dateOfAcquisition = dateOfAcquisition;
         this.briefDescription = briefDescription;
@@ -21,6 +21,7 @@ public class Item {
         this.serialNumber = serialNumber;
         this.estimatedValue = estimatedValue;
         this.comment = comment;
+        this.isSelected = false;
         tags = new ArrayList<>();
     }
 
@@ -92,4 +93,8 @@ public class Item {
     public ArrayList<Tag> getTags() {
         return tags;
     }
+
+    public boolean isSelected() {return isSelected;}
+
+    public void setSelected(boolean selected) {isSelected = selected;}
 }
