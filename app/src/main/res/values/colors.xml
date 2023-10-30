@@ -6,4 +6,5 @@
     <color name="gradientCenter">#78527F</color>
     <color name="gradientEnd">#E0E0E0</color>
     <color name="solid_grad">#E0E0E0</color>
+    <color name="grey">#808080</color>
 </resources>
