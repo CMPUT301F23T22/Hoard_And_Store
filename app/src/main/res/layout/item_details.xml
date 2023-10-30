@@ -59,7 +59,7 @@
 
             <!-- Date -->
             <TextView
-                android:id="@+id/dateTextView"
+                android:id="@+id/dateOfAcquisitionTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:drawableLeft="@drawable/calendar_month"
@@ -68,7 +68,7 @@
 
             <!-- Description -->
             <TextView
-                android:id="@+id/descriptionTextView"
+                android:id="@+id/briefDescriptionTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:drawableLeft="@drawable/info"
@@ -104,7 +104,7 @@
 
             <!-- Value -->
             <TextView
-                android:id="@+id/valueTextView"
+                android:id="@+id/estimatedValueTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:drawableLeft="@drawable/value"
