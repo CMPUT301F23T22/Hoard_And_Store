@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_home"
+        android:title=""
+        android:checked="false"
+        android:icon="@drawable/home_24px" />
+
+    <item
+        android:id="@+id/nav_sort"
+        android:title=""
+        android:icon="@drawable/filter_alt_24px"/>
+
+
+    <item
+        android:id="@+id/fab"
+        android:title=""
+        android:enabled="false"
+        android:checked="true"/>
+
+
+    <item
+        android:id="@+id/nav_delete"
+        android:title=""
+        android:checked="false"
+        android:icon="@drawable/delete_24px" />
+
+    <item
+        android:id="@+id/nav_tag"
+        android:title=""
+        android:icon="@drawable/tag_24px"
+        android:checked="false"/>
+
+
+</menu>
