@@ -6,7 +6,7 @@
     android:padding="16dp">
 
     <!-- Header -->
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/detailsHeader"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -58,7 +58,7 @@
             android:padding="16dp">
 
             <!-- Date -->
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/dateOfAcquisitionTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -67,7 +67,7 @@
                 android:text="@string/date_of_purchase_placeholder" />
 
             <!-- Description -->
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/briefDescriptionTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -76,7 +76,7 @@
                 android:text="@string/description_placeholder" />
 
             <!-- Make -->
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/makeTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -85,7 +85,7 @@
                 android:text="@string/make_placeholder" />
 
             <!-- Model -->
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/modelTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -94,7 +94,7 @@
                 android:text="@string/model_placeholder" />
 
             <!-- Serial Number -->
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/serialNumberTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -103,7 +103,7 @@
                 android:text="@string/serial_number_placeholder" />
 
             <!-- Value -->
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/estimatedValueTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -112,7 +112,7 @@
                 android:text="@string/estimated_value_placeholder" />
 
             <!-- Comment -->
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/commentTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -124,7 +124,7 @@
     </com.google.android.material.card.MaterialCardView>
 
     <!-- Tags Section -->
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/tagTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

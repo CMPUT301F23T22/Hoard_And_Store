@@ -1,6 +1,5 @@
 package com.example.hoard;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -8,17 +7,16 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class ItemEditDeleteActivity extends Activity {
-
+public class ItemEditDeleteActivity extends AppCompatActivity {
 
     private TextView dateOfAcquisitionTextView, makeTextView, modelTextView, serialNumberTextView, estimatedValueTextView, commentTextView, briefDescriptionTextView;
     private Item selectedItem;
-    private ItemDBController itemDBController;
-    // Other UI elements like ImageView for photos can be defined here
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,33 +31,39 @@ public class ItemEditDeleteActivity extends Activity {
         serialNumberTextView = findViewById(R.id.serialNumberTextView);
         estimatedValueTextView = findViewById(R.id.estimatedValueTextView);
         commentTextView = findViewById(R.id.commentTextView);
-        //TODO: Load photos components
-        //TODO: Load tags in components
+
+        // Check if any of the views are null
+        if (dateOfAcquisitionTextView == null || briefDescriptionTextView == null || makeTextView == null ||
+                modelTextView == null || serialNumberTextView == null || estimatedValueTextView == null || commentTextView == null) {
+            Toast.makeText(this, "Error initializing views", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
 
         Button editButton = findViewById(R.id.editButton);
         Button closeButton = findViewById(R.id.closeButton);
 
-        // Retrieve the selected item ID from the Intent
+        // Check if buttons are null
+        if (editButton == null || closeButton == null) {
+            Toast.makeText(this, "Error initializing buttons", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
+
+        // Retrieve the selected item from the Intent
         Intent intent = getIntent();
-        if (intent != null && intent.hasExtra("SELECTED_ITEM_ID")) {
-            String itemId = intent.getStringExtra("SELECTED_ITEM_ID");
-            // Use the ItemDBController to fetch the Item by its ID
-            selectedItem = itemDBController.getItemById(itemId);
+        if (intent != null && intent.hasExtra("SELECTED_ITEM")) {
+            selectedItem = (Item) intent.getSerializableExtra("SELECTED_ITEM");
             if (selectedItem != null) {
                 displaySelectedItem();
             } else {
-                // Item not found with the given ID
                 Toast.makeText(this, "Item not found", Toast.LENGTH_LONG).show();
-                finish(); // Close the activity
+                finish();
             }
         } else {
-            // No item ID was passed in the intent
-            Toast.makeText(this, "No item ID provided", Toast.LENGTH_LONG).show();
-            finish(); // Close the activity
+            Toast.makeText(this, "No item provided", Toast.LENGTH_LONG).show();
+            finish();
         }
-
-        // Display the item's properties
-        displaySelectedItem();
 
         // Set up the button listeners
         editButton.setOnClickListener(new View.OnClickListener() {
@@ -72,37 +76,33 @@ public class ItemEditDeleteActivity extends Activity {
         closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                btnClose();
+                finish();
             }
         });
     }
 
-    // Method to display the selected item's info
     private void displaySelectedItem() {
-        // Assuming selectedItem has getters for each property
         // Format the date
         Date date = selectedItem.getDateOfAcquisition();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         String formattedDate = sdf.format(date);
+        formattedDate = getResources().getString(R.string.date_of_purchase_placeholder, formattedDate);
         dateOfAcquisitionTextView.setText(formattedDate);
-        briefDescriptionTextView.setText(selectedItem.getBriefDescription());
-        makeTextView.setText(selectedItem.getMake());
-        modelTextView.setText(selectedItem.getModel());
-        serialNumberTextView.setText(selectedItem.getSerialNumber());
-        estimatedValueTextView.setText(String.valueOf(selectedItem.getEstimatedValue()));
-        commentTextView.setText(selectedItem.getComment());
-        //TODO: Load photos into ImageView or a gallery view
-        //TODO: Load tags
+        String briefDescription = getResources().getString(R.string.description_placeholder, selectedItem.getBriefDescription());
+        briefDescriptionTextView.setText(briefDescription);
+        String make = getResources().getString(R.string.make_placeholder, selectedItem.getMake());
+        makeTextView.setText(make);
+        String model = getResources().getString(R.string.model_placeholder, selectedItem.getModel());
+        modelTextView.setText(model);
+        String serialNumber = getResources().getString(R.string.serial_number_placeholder, selectedItem.getSerialNumber());
+        serialNumberTextView.setText(serialNumber);
+        String estimatedValue = getResources().getString(R.string.estimated_value_placeholder, selectedItem.getEstimatedValue());
+        estimatedValueTextView.setText(estimatedValue);
+        String comment = getResources().getString(R.string.comment_placeholder, selectedItem.getComment());
+        commentTextView.setText(comment);
     }
 
-    // Method to edit the selected item's information
     private void editItem() {
-        // TODO figure out how to call the add item activity
-    }
-
-    // Method to delete the selected item
-    private void btnClose() {
-
-        finish();
+        // TODO: implement the edit item functionality
     }
 }
