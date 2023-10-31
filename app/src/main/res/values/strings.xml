@@ -1,5 +1,18 @@
 <resources>
     <string name="app_name">Hoard_And_Store</string>
+    <string name="details_placeholder">Details</string>
+    <string name="date_of_purchase_placeholder">Date Of Purchase:</string>
+    <string name="description_placeholder">Description:</string>
+    <string name="make_placeholder">Make:</string>
+    <string name="model_placeholder">Model:</string>
+    <string name="serial_number_placeholder">Serial Number:</string>
+    <string name="estimated_value_placeholder">Estimated value:</string>
+    <string name="comment_placeholder">Comment :</string>
+    <string name="tags">Tags</string>
+    <string name="edit_text">EDIT</string>
+    <string name="close_text">X</string>
+    <string name="content_des_item">Image of the Item</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>
