@@ -13,7 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class ItemEditDeleteActivity extends AppCompatActivity {
+public class ItemDetailsActivity extends AppCompatActivity {
 
     private TextView dateOfAcquisitionTextView, makeTextView, modelTextView, serialNumberTextView, estimatedValueTextView, commentTextView, briefDescriptionTextView;
     private Item selectedItem;
@@ -103,6 +103,8 @@ public class ItemEditDeleteActivity extends AppCompatActivity {
     }
 
     private void editItem() {
-        // TODO: implement the edit item functionality
+        Intent intent = new Intent(ItemDetailsActivity.this, AddEditItem.class);
+        intent.putExtra("item_to_edit", selectedItem);
+        startActivity(intent);
     }
 }

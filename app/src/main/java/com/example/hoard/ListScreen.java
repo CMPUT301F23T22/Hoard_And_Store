@@ -1,21 +1,21 @@
 package com.example.hoard;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 
+
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationBarView;
@@ -23,11 +23,10 @@ import com.google.android.material.navigation.NavigationBarView;
 import java.util.Date;
 import java.util.List;
 
-public class ListScreen extends AppCompatActivity {
+public class ListScreen extends AppCompatActivity{
 
-    private ItemDB itemDB;
     private BottomNavigationView bottomNav;
-    private BottomAppBar bottomAppBar;
+
     private FloatingActionButton addItemButton;
     private Sort sortFragment = new Sort();
     private Fragment currentFragment;
@@ -36,15 +35,12 @@ public class ListScreen extends AppCompatActivity {
     private ItemAdapter itemAdapter;
     private ItemDBController dbController;
 
+    private ActivityResultLauncher<Intent> addEditActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleAddEditResult);
 
-
-    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_screen);
-
-        itemDB = new ItemDB(new ItemDBConnector());
 
         addItemButton = findViewById(R.id.addItemButton);
 
@@ -80,49 +76,28 @@ public class ListScreen extends AppCompatActivity {
             }
         });
 
-
-
         addItemButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showAddItemDialog();
+                Intent intent = new Intent(ListScreen.this, AddEditItem.class);
+                addEditActivityResultLauncher.launch(intent);
             }
         });
     }
 
-    private void showAddItemDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = this.getLayoutInflater();
-        View view = inflater.inflate(R.layout.dialog_add_item, null);
-
-        EditText briefDescription = view.findViewById(R.id.briefDescription);
-        EditText make = view.findViewById(R.id.make);
-        EditText model = view.findViewById(R.id.model);
-        EditText serialNumber = view.findViewById(R.id.serialNumber);
-        EditText estimatedValue = view.findViewById(R.id.estimatedValue);
-        EditText comment = view.findViewById(R.id.comment);
-
-        builder.setView(view)
-                .setPositiveButton("Save", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Item newItem = new Item(
-                                new Date(),
-                                briefDescription.getText().toString(),
-                                make.getText().toString(),
-                                model.getText().toString(),
-                                serialNumber.getText().toString(),
-                                Double.parseDouble(estimatedValue.getText().toString()),
-                                comment.getText().toString()
-                        );
-
-                        dbController.addItem(newItem);
-                        itemAdapter.addItem(newItem);
-                        itemAdapter.notifyItemChanged(itemAdapter.getsize() - 1);
-                        dialog.dismiss();
-                    }
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
+    private void handleAddEditResult(ActivityResult result) {
+        if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+            Item returnedItem = (Item) result.getData().getSerializableExtra("itemData");
+            boolean wasUpdated = result.getData().getBooleanExtra("wasEdited", false);
+            if (returnedItem != null) {
+                if (wasUpdated) {
+                    dbController.editItem(returnedItem);
+                } else {
+                    dbController.addItem(returnedItem);
+                    itemAdapter.addItem(returnedItem);
+                    itemAdapter.notifyItemChanged(itemAdapter.getsize() - 1);
+                }
+            }
+        }
     }
 }
