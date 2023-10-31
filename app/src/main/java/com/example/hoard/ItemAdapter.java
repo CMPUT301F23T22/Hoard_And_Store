@@ -1,15 +1,15 @@
 package com.example.hoard;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
@@ -32,21 +32,23 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Item item = itemList.get(position);
         holder.briefDescription.setText(item.getBriefDescription());
-
         // Format the date using SimpleDateFormat
         SimpleDateFormat desiredFormat = new SimpleDateFormat("yyyy-MM-dd");
         String formattedDate = desiredFormat.format(item.getDateOfAcquisition());
         holder.dateOfAcquisition.setText(formattedDate);
-
-        holder.make.setText(item.getMake());
-        holder.model.setText(item.getModel());
-        holder.serialNumber.setText(item.getSerialNumber());
-
         // Correct the type mismatch issue by converting the double to a string
         holder.estimatedValue.setText(String.valueOf(item.getEstimatedValue()));
-
-        holder.comment.setText(item.getComment());
-
+        // add on click to see details of an Item
+        holder.detailsArrow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Your code for handling the item click
+                context = holder.itemView.getContext();
+                Intent intent = new Intent(context, ItemEditDeleteActivity.class);
+                intent.putExtra("SELECTED_ITEM", item);
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -57,22 +59,15 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView briefDescription;
         public TextView dateOfAcquisition;
-        public TextView make;
-        public TextView model;
-        public TextView serialNumber;
         public TextView estimatedValue;
-        public TextView comment;
-
+        public ImageView detailsArrow;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            briefDescription = itemView.findViewById(R.id.description_list);
-            dateOfAcquisition = itemView.findViewById(R.id.date_list);
-            make = itemView.findViewById(R.id.make_list);
-            model = itemView.findViewById(R.id.model_list);
-            serialNumber = itemView.findViewById(R.id.SN_list);
-            estimatedValue = itemView.findViewById(R.id.Value_list);
-            comment = itemView.findViewById(R.id.comment_list);
+            briefDescription = itemView.findViewById(R.id.descriptionList);
+            dateOfAcquisition = itemView.findViewById(R.id.dateOfAcquisitionList);
+            estimatedValue = itemView.findViewById(R.id.estimatedValueList);
+            detailsArrow = itemView.findViewById(R.id.detailsArrow);
         }
     }
 
