@@ -35,9 +35,7 @@ public class ListScreen extends AppCompatActivity {
     private Sort sortFragment = new Sort();
     private Fragment currentFragment;
 
-
-
-
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,13 +51,13 @@ public class ListScreen extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
-                if (id == R.id.nav_tag) {
+                if (id == R.id.nav_home) {
                     if (currentFragment != null) {
                         getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
                         currentFragment = null;
                     }
                     return true;
-                } else if (id == R.id.sort) {
+                } else if (id == R.id.nav_sort) {
                     currentFragment = sortFragment;
                     getSupportFragmentManager().beginTransaction().replace(R.id.frame_layout, sortFragment).commit();
                     return true;

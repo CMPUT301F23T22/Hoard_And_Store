@@ -11,6 +11,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
@@ -23,25 +25,26 @@ import java.util.List;
 
 public class Sort extends Fragment {
     private ArrayList<String> dataList;
-    ArrayAdapter<String> cityAdapter;
+    private RecyclerView recyclerView;
+    private CityAdapter cityAdapter;
+    private RecyclerView.LayoutManager layoutManager;
     private Button showDatePicker;
-    private TextView selectedDateText;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_sort, container, false);
 
-        // Find the ListView in your layout
-        ListView listView = view.findViewById(R.id.sorting);
+        recyclerView = view.findViewById(R.id.sorting);
+        recyclerView.setHasFixedSize(true);
 
-        String[] cities = {"Edmonton", "Vancouver", "Moscow", "Sydney"};
+        String[] cities = {"Edmonton", "Vancouver", "Moscow", "Sydney", "Edmonton", "Vancouver", "Moscow", "Sydney"};
         dataList = new ArrayList<>(Arrays.asList(cities));
 
-        // Create an ArrayAdapter to populate the ListView with the data from dataList
-        cityAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, dataList);
+        cityAdapter = new CityAdapter(dataList);
 
-        // Set the adapter for the ListView
-        listView.setAdapter(cityAdapter);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext());
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(cityAdapter);
 
         TextView selectedDateText = view.findViewById(R.id.show_selected_date);
         showDatePicker = view.findViewById(R.id.showDateRangePicker);
