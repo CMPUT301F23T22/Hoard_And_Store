@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 
@@ -29,13 +30,15 @@ public class Sort extends Fragment {
     private CityAdapter cityAdapter;
     private RecyclerView.LayoutManager layoutManager;
     private Button showDatePicker;
+    private BottomNavigationView bottomNav;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_sort, container, false);
-
+        bottomNav = view.findViewById(R.id.bottomNavigationView);
         recyclerView = view.findViewById(R.id.sorting);
         recyclerView.setHasFixedSize(true);
+
 
         String[] cities = {"Edmonton", "Vancouver", "Moscow", "Sydney", "Edmonton", "Vancouver", "Moscow", "Sydney"};
         dataList = new ArrayList<>(Arrays.asList(cities));

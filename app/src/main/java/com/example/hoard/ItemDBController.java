@@ -73,4 +73,6 @@ public class ItemDBController {
         itemDB.addItem(item);
     }
 
+    public void deleteItem(Item item) {itemDB.deleteItem(item);}
+
 }
