@@ -154,19 +154,40 @@ public class ListScreen extends AppCompatActivity {
 
         @Override
         public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-            Snackbar snackbar = Snackbar.make(findViewById(R.id.frame_layout), R.string.text_label, Snackbar.LENGTH_LONG);
+            Snackbar snackbar = Snackbar
+                                    .make(findViewById(R.id.frame_layout), R.string.text_label, Snackbar.LENGTH_LONG)
+            .setAction("Undo", new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    //itemToDelete = itemAdapter.getItem(viewHolder.getAdapterPosition());
+                    itemAdapter.notifyItemChanged(itemAdapter.getsize() - 1);
+                }
+            });
+            snackbar.addCallback(new Snackbar.Callback() {
+
+                @Override
+                public void onDismissed(Snackbar snackbar, int event) {
+                    if (event == Snackbar.Callback.DISMISS_EVENT_TIMEOUT || event == Snackbar.Callback.DISMISS_EVENT_SWIPE) {
+                        // Snackbar closed on its own
+                        itemToDelete = itemAdapter.getItem(viewHolder.getAdapterPosition());
+                        if (itemToDelete != null) {
+                            itemAdapter.removeItem(viewHolder.getAdapterPosition());
+                            itemAdapter.notifyItemChanged(itemAdapter.getsize() - 1);
+                            dbController.deleteItem(itemToDelete);
+                        } else {
+                            // Handle the case where the position is out of bounds or the item is not found
+                        }
+                    }
+
+                }
+
+                @Override
+                public void onShown(Snackbar snackbar) {
+
+                }
+            });
+
             snackbar.show();
-
-            itemToDelete = itemAdapter.getItem(viewHolder.getAdapterPosition());
-            if (itemToDelete != null) {
-                itemAdapter.removeItem(viewHolder.getAdapterPosition());
-                itemAdapter.notifyItemChanged(itemAdapter.getsize() - 1);
-                dbController.deleteItem(itemToDelete);
-            } else {
-                // Handle the case where the position is out of bounds or the item is not found
-            }
-
-
 
         }
     };
