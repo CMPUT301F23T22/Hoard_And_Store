@@ -14,14 +14,17 @@
         android:textStyle="bold"/>
 
     <!-- Tag Name input -->
-    <EditText
+    <AutoCompleteTextView
         android:id="@+id/editTagName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:hint="New Tag Name"
         android:padding="10dp"
-        android:background="@android:drawable/editbox_background"/>
+        android:background="@android:drawable/editbox_background"
+        android:completionThreshold="1"
+        android:dropDownHeight="wrap_content" />
+
 
     <!-- Tag color heading -->
     <TextView
@@ -62,7 +65,10 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:backgroundTint="#FFFFFF"
-            android:drawableRight="@android:drawable/ic_input_add"/>
+            android:drawableRight="@android:drawable/ic_input_add"
+
+
+            />
     </GridLayout>
 
     <!-- Cancel and Create buttons -->
@@ -70,7 +76,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:gravity="right"
+        android:gravity="center_horizontal"
         android:orientation="horizontal">
 
         <Button
@@ -83,7 +89,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Create"
+
             android:layout_marginLeft="8dp"
-            android:backgroundTint="@android:color/holo_blue_light"/>
+            />
     </LinearLayout>
 </LinearLayout>
