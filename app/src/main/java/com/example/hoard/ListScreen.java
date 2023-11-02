@@ -155,14 +155,15 @@ public class ListScreen extends AppCompatActivity {
         @Override
         public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
             Snackbar snackbar = Snackbar
-                                    .make(findViewById(R.id.frame_layout), R.string.text_label, Snackbar.LENGTH_LONG)
-            .setAction("Undo", new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    //itemToDelete = itemAdapter.getItem(viewHolder.getAdapterPosition());
-                    itemAdapter.notifyItemChanged(itemAdapter.getsize() - 1);
-                }
-            });
+                .make(findViewById(R.id.coordinate_layout), R.string.text_label, Snackbar.LENGTH_LONG)
+                .setText("Deleting " + itemAdapter.getItem(viewHolder.getAdapterPosition()).getMake())
+                .setAction("Undo", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        //itemToDelete = itemAdapter.getItem(viewHolder.getAdapterPosition());
+                        itemAdapter.notifyItemChanged(itemAdapter.getsize() - 1);
+                    }
+                });
             snackbar.addCallback(new Snackbar.Callback() {
 
                 @Override

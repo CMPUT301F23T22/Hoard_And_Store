@@ -25,7 +25,7 @@ import java.util.Arrays;
 public class SortActivity extends AppCompatActivity {
     private ArrayList<String> dataList;
     private RecyclerView recyclerView;
-    private CityAdapter cityAdapter;
+    private SortAdapter sortAdapter;
     private LinearLayoutManager layoutManager;
     private Button showDatePicker;
     private BottomNavigationView bottomNav;
@@ -49,11 +49,11 @@ public class SortActivity extends AppCompatActivity {
         String[] cities = {"Edmonton", "Vancouver", "Moscow", "Sydney", "Edmonton", "Vancouver", "Moscow", "Sydney"};
         dataList = new ArrayList<>(Arrays.asList(cities));
 
-        cityAdapter = new CityAdapter(dataList);
+        sortAdapter = new SortAdapter(dataList);
 
         layoutManager = new LinearLayoutManager(this); // Use 'this' as context
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(cityAdapter);
+        recyclerView.setAdapter(sortAdapter);
 
         bottomNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
