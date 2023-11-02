@@ -1,5 +1,6 @@
 package com.example.hoard;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,6 +13,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -26,6 +31,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -44,8 +50,9 @@ public class ListScreen extends AppCompatActivity {
     private Menu bottomMenu;
     private MenuItem sort;
     private MenuItem home;
-
+    private FilterCriteria filterCriteria;
     private Item itemToDelete = null;
+    private final int sortingRequestCode = 1;
 
 
     
@@ -53,7 +60,7 @@ public class ListScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_screen);
-
+        filterCriteria = null;
         itemDB = new ItemDB(new ItemDBConnector());
 
         addItemButton = findViewById(R.id.addItemButton);
@@ -74,7 +81,7 @@ public class ListScreen extends AppCompatActivity {
                 itemAdapter = new ItemAdapter(items);
                 recyclerView.setAdapter(itemAdapter);
             }
-        });
+        }, filterCriteria);
 
         ItemTouchHelper helper = new ItemTouchHelper(simpleCallback);
         helper.attachToRecyclerView(recyclerView);
@@ -91,8 +98,11 @@ public class ListScreen extends AppCompatActivity {
                     home.setEnabled(false);
                     home.setChecked(false);
                     sort.setEnabled(true);
+
                     Intent sortIntent = new Intent(getApplicationContext(), SortActivity.class);
-                    startActivity(sortIntent);
+                    sortIntent.putExtra("filterCriteria", filterCriteria);
+                    filterActivityResultLauncher.launch(sortIntent);
+
 
 
                 }
@@ -109,6 +119,8 @@ public class ListScreen extends AppCompatActivity {
             }
         });
     }
+
+
 
     private void showAddItemDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -192,4 +204,32 @@ public class ListScreen extends AppCompatActivity {
 
         }
     };
+
+    ActivityResultLauncher<Intent> filterActivityResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Intent data = result.getData();
+                        if (data != null) {
+                            FilterCriteria updatedFilterCriteria  = (FilterCriteria) data.getSerializableExtra("filterCriteria");
+                            if (updatedFilterCriteria != null) {
+                                // Update the filterCriteria with the updated filter criteria
+                                filterCriteria = updatedFilterCriteria;
+                                // You can then use the updated filterCriteria as needed
+                                // For example, refresh your data with the new filter criteria
+                                dbController.loadItems(new DataLoadCallback() {
+                                    @Override
+                                    public void onDataLoaded(List<Item> items) {
+                                        itemAdapter = new ItemAdapter(items);
+                                        recyclerView.setAdapter(itemAdapter);
+                                    }
+                                }, filterCriteria);
+
+                            }
+                        }
+                    }
+                }
+            });
 }

@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,6 +21,7 @@ import com.google.android.material.navigation.NavigationBarView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 
 public class SortActivity extends AppCompatActivity {
@@ -32,6 +34,9 @@ public class SortActivity extends AppCompatActivity {
     private Menu bottomMenu;
     private MenuItem sort;
     private MenuItem home;
+    private EditText makeTextField;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +60,10 @@ public class SortActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(sortAdapter);
 
+        FilterCriteria filterCriteria = new FilterCriteria();
+        List<String> makes = Arrays.asList(new String[]{"Logan"});
+        filterCriteria.setMakes(makes);
+
         bottomNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -63,12 +72,18 @@ public class SortActivity extends AppCompatActivity {
 
                 } else if (id == R.id.nav_home) {
                     // Replace the fragment container with the SortFragment
-                    Intent sortIntent = new Intent(getApplicationContext(), ListScreen.class);
-                    startActivity(sortIntent);
+
+                    Intent returnIntent = new Intent(getApplicationContext(), ListScreen.class);
+                    returnIntent.putExtra("filterCriteria", filterCriteria);
+
+                    setResult(RESULT_OK, returnIntent);
+                    finish();
+                    return true;
 
                 }
                 return true;
             }
+
         });
 
         showDatePicker = findViewById(R.id.showDateRangePicker);

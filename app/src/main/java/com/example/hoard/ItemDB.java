@@ -92,5 +92,22 @@ public class ItemDB {
     public Task<QuerySnapshot> getAllItems() {
         return itemsCollection.get();
     }
+    public Task<QuerySnapshot> filter(FilterCriteria filterCriteria) {
+        Query query = constructDynamicQuery(filterCriteria);
+        return query.get();
+    }
 
+    public Query constructDynamicQuery(FilterCriteria filterCriteria) {
+        Query query = itemsCollection; // Start with the base query
+
+        if (filterCriteria != null) {
+            if(filterCriteria.getMakes() != null) {
+                for(String make: filterCriteria.getMakes()) {
+                    query = query.whereEqualTo("make", make.toLowerCase());
+                }
+            }
+
+        }
+        return query;
+    }
 }
