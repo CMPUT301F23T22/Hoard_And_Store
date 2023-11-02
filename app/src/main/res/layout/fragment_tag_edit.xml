@@ -42,30 +42,132 @@
         android:layout_marginTop="8dp">
 
         <!-- Add your color buttons here. I'll add a few for the demonstration. -->
+        <!-- Color 1: Red -->
         <Button
-            android:layout_width="24dp"
+            android:layout_width="0dp"
             android:layout_height="24dp"
-            android:backgroundTint="#FF0000"/>
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
+            android:layout_gravity="fill_horizontal"
+            android:backgroundTint="#F44336"/>
+
+        <!-- Color 1: Red -->
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="24dp"
+            android:layout_margin="4dp"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill_horizontal"
+            android:backgroundTint="#E91E63"/>
+
+        <!-- Color 1: Red -->
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="24dp"
+            android:layout_margin="4dp"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill_horizontal"
+            android:backgroundTint="#9C27B0"/>
+        <!-- Color 1: Red -->
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="24dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
+            android:layout_gravity="fill_horizontal"
+            android:backgroundTint="#673AB7"/>
+        <!-- Color 1: Red -->
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="24dp"
+            android:layout_margin="4dp"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill_horizontal"
+            android:backgroundTint="#3F51B5"/>
+        <!-- Color 1: Red -->
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="24dp"
+            android:layout_margin="4dp"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill_horizontal"
+            android:backgroundTint="#2287D6"/>
+        <!-- Color 1: Red -->
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="24dp"
+            android:layout_margin="4dp"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill_horizontal"
+            android:backgroundTint="#03A9F4"/>
+
+        <!-- Color 1: Red -->
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="24dp"
+            android:layout_margin="4dp"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill_horizontal"
+            android:backgroundTint="#00BCD4"/>
 
         <Button
-            android:layout_width="24dp"
+            android:layout_width="0dp"
             android:layout_height="24dp"
-
-            android:backgroundTint="@color/white"
-            />
-
-        <!-- ... add more colors ... -->
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
+            android:layout_gravity="fill_horizontal"
+            android:backgroundTint="#009688"/>
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="24dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
+            android:layout_gravity="fill_horizontal"
+            android:backgroundTint="#4CAF50"/>
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="24dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
+            android:layout_gravity="fill_horizontal"
+            android:backgroundTint="#8BC34A"/>
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="24dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
+            android:layout_gravity="fill_horizontal"
+            android:backgroundTint="#CDDC39"/>
 
         <Button
-            android:layout_width="24dp"
+            android:layout_width="0dp"
             android:layout_height="24dp"
-            android:backgroundTint="#800080"/>
-
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
+            android:layout_gravity="fill_horizontal"
+            android:backgroundTint="#FFEB3B"/>
         <Button
-            android:layout_width="24dp"
+            android:layout_width="0dp"
             android:layout_height="24dp"
-            android:backgroundTint="#FFFFFF"
-            android:drawableRight="@android:drawable/ic_input_add"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
+            android:layout_gravity="fill_horizontal"
+            android:backgroundTint="#FFC107"/>
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="24dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
+            android:layout_gravity="fill_horizontal"
+            android:backgroundTint="#FF5722"/>
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="24dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
+            android:layout_gravity="fill_horizontal"
+            android:backgroundTint="#F44336"/>
+
 
 
             />
@@ -93,4 +195,7 @@
             android:layout_marginLeft="8dp"
             />
     </LinearLayout>
+
+
+
 </LinearLayout>
