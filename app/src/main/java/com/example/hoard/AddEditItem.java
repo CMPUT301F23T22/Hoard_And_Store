@@ -8,6 +8,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -16,7 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class AddEditItem extends AppCompatActivity implements CustomDatePicker.DatePickListener{
+public class AddEditItem extends AppCompatActivity implements CustomDatePicker.DatePickListener, TagEditFragment.TagAddListener {
 
     private EditText descriptionInput;
     private EditText makeInput;
@@ -88,6 +90,12 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
 
         Button cancelButton = findViewById(R.id.closeButton);
         cancelButton.setOnClickListener(v -> finish());
+
+        Button AddtagBtn = findViewById(R.id.AddTagButton);
+        AddtagBtn.setOnClickListener(view -> {
+            new TagEditFragment().show(getSupportFragmentManager(), "ADD_TAG");
+        });
+
     }
 
     private void saveItem() {
@@ -128,5 +136,12 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         dateInput.setText(sdf.format(newdate));
         selectedDateObject = newdate;
+    }
+
+
+    @Override
+    public void onTagAdded(Tag newTag) {
+        // Handle the new tag here.
+        // #TODO
     }
 }

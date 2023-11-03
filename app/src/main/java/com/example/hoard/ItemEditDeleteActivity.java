@@ -10,9 +10,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class ItemEditDeleteActivity extends AppCompatActivity implements TagEditFragment.TagAddListener {
+public class ItemEditDeleteActivity extends AppCompatActivity {
 
-    private TextView dateOfAcquisitionTextView, makeTextView, modelTextView, serialNumberTextView, estimatedValueTextView, commentTextView, briefDescriptionTextView;
+    private TextView dateOfAcquisitionTextView, makeTextView, modelTextView, serialNumberTextView, estimatedValueTextView, commentTextView, briefDescriptionTextView ,AddtagView;
     private Item selectedItem;
 
     @Override
@@ -39,7 +39,6 @@ public class ItemEditDeleteActivity extends AppCompatActivity implements TagEdit
 
         Button editButton = findViewById(R.id.editButton);
         Button closeButton = findViewById(R.id.closeButton);
-
         // Check if buttons are null
         if (editButton == null || closeButton == null) {
             Toast.makeText(this, "Error initializing buttons", Toast.LENGTH_LONG).show();
@@ -69,6 +68,7 @@ public class ItemEditDeleteActivity extends AppCompatActivity implements TagEdit
                 finish();
             }
         });
+
     }
 
     private void displaySelectedItem() {
@@ -90,13 +90,6 @@ public class ItemEditDeleteActivity extends AppCompatActivity implements TagEdit
         estimatedValueTextView.setText(estimatedValue);
         String comment = getResources().getString(R.string.comment_placeholder, selectedItem.getComment());
         commentTextView.setText(comment);
-    }
-
-
-    @Override
-    public void onTagAdded(Tag newTag) {
-        // Handle the new tag here.
-        // For example: Add the tag to a list or display it on the screen.
     }
 
 }

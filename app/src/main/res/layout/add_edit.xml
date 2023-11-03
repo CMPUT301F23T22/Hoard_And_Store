@@ -131,64 +131,79 @@
 
     </LinearLayout>
 
-    <!-- Serial Number -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/serialNumberInputLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:hint="Serial Number"
-        app:endIconDrawable="@drawable/photo_camera"
-        app:endIconMode="custom"
-        app:hintEnabled="true"
-        app:hintAnimationEnabled="true"
-        app:boxBackgroundMode="outline">
+            <!-- Serial Number -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/serialNumberInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:hint="Serial Number"
+                app:endIconDrawable="@drawable/photo_camera"
+                app:endIconMode="custom"
+                app:hintEnabled="true"
+                app:hintAnimationEnabled="true"
+                app:boxBackgroundMode="outline">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/serialNumberInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/serialNumberInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
 
-    </com.google.android.material.textfield.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Estimated Value -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/valueInputLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:hint="Estimated Value"
-        app:hintEnabled="true"
-        app:hintAnimationEnabled="true"
-        app:boxBackgroundMode="outline">
+            <!-- Estimated Value -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/valueInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:hint="Estimated Value"
+                app:hintEnabled="true"
+                app:hintAnimationEnabled="true"
+                app:boxBackgroundMode="outline">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/valueInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/valueInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
 
-    </com.google.android.material.textfield.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>
+            <!-- Comments -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/commentInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:hint="Comments"
+                app:hintEnabled="true"
+                app:hintAnimationEnabled="true"
+                app:boxBackgroundMode="outline">
 
-    <!-- Comments -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/commentInputLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:hint="Comments"
-        app:hintEnabled="true"
-        app:hintAnimationEnabled="true"
-        app:boxBackgroundMode="outline">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/commentInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/commentInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            </com.google.android.material.textfield.TextInputLayout>
+            <!-- Add Tag Button with Icon -->
+            <!-- Tags Section -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/AddTagButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:drawableRight="@drawable/tag"
+                android:drawablePadding="8dp"
+                android:gravity="center"
+                android:text="Add Tag"
+                app:backgroundTint="#888A9A"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/detailsCardView" />
 
-    </com.google.android.material.textfield.TextInputLayout>
 
 </LinearLayout>
 
@@ -204,5 +219,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/inputCardView" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

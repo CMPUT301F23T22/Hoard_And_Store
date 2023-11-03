@@ -1,16 +1,15 @@
 package com.example.hoard;
 
+import android.content.Context;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.GridLayout;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
+import androidx.fragment.app.DialogFragment;
 
 import android.widget.AutoCompleteTextView;
 
@@ -19,7 +18,7 @@ A fragment that provides the UI for creating a new tag or editing an existing on
 This could be a dialog fragment or a full-screen fragment, depending on the design.
 */
 
-public class TagEditFragment extends Fragment {
+public class TagEditFragment extends DialogFragment {
     private String TagColor ;
     private String TagName;
     // Declare a private listener variable to hold a reference to the callback method.
