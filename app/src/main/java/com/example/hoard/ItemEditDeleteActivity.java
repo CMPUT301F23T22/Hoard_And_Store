@@ -92,17 +92,11 @@ public class ItemEditDeleteActivity extends AppCompatActivity implements TagEdit
         commentTextView.setText(comment);
     }
 
-<<<<<<< HEAD:app/src/main/java/com/example/hoard/ItemDetailsActivity.java
-    private void editItem() {
-        Intent intent = new Intent(ItemDetailsActivity.this, AddEditItem.class);
-        intent.putExtra("item_to_edit", selectedItem);
-        startActivity(intent);
-=======
+
     @Override
     public void onTagAdded(Tag newTag) {
         // Handle the new tag here.
         // For example: Add the tag to a list or display it on the screen.
->>>>>>> 13bc72c (add the fragement fucntionality):app/src/main/java/com/example/hoard/ItemEditDeleteActivity.java
     }
 
 }
