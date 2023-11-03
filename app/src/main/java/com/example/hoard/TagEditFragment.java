@@ -78,7 +78,7 @@ public class TagEditFragment extends DialogFragment {
                             TagColor = "#" + Integer.toHexString(colorStateList.getDefaultColor()).substring(2).toUpperCase();
                         }
 
-                        // TODO Optionally, you can update the UI to indicate which color was selected.
+                        // TODO: nice to have,  update the UI to indicate which color was selected.
                     }
                 });
             }
