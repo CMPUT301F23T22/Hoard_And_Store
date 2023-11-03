@@ -72,6 +72,7 @@ public class ListScreen extends AppCompatActivity {
         home = bottomMenu.findItem(R.id.nav_home);
 
         home.setChecked(true);
+
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         dbController = ItemDBController.getInstance();

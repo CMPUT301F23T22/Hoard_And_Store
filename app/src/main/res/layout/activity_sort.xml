@@ -106,11 +106,27 @@
                 android:text="test"/>
             <!-- Chip items will be added dynamically in code -->
 
-            <EditText
-                android:layout_width="fill_parent"
+            <TextView
+                android:id="@+id/make_filter_text_view"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/filter_make_edit_text"
-                android:hint="Make"></EditText>
+                android:layout_gravity="center|start"
+                android:layout_marginTop="10dp"
+                android:text="Make "
+                android:textSize="18sp" />
+
+            <androidx.appcompat.widget.AppCompatAutoCompleteTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/filter_make_search">
+
+            </androidx.appcompat.widget.AppCompatAutoCompleteTextView>
+
+<!--            <EditText-->
+<!--                android:layout_width="fill_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:id="@+id/filter_make_edit_text"-->
+<!--                android:hint="Make"></EditText>-->
 
             <Button
                 android:id="@+id/apply_filter_sort_button"
