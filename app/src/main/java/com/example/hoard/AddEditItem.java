@@ -8,6 +8,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -91,10 +92,22 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         Button cancelButton = findViewById(R.id.closeButton);
         cancelButton.setOnClickListener(v -> finish());
 
-        Button AddtagBtn = findViewById(R.id.AddTagButton);
-        AddtagBtn.setOnClickListener(view -> {
-            new TagEditFragment().show(getSupportFragmentManager(), "ADD_TAG");
+        Button addTagBtn = findViewById(R.id.AddTagButton);
+        addTagBtn.setOnClickListener(view -> {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+            Fragment tagEditFragment = new TagEditFragment();
+
+            // If you're replacing an existing fragment that fills the whole activity
+            transaction.replace(android.R.id.content, tagEditFragment, "ADD_TAG");
+
+            // Alternatively, if you have a container where the fragment should be placed
+            // transaction.replace(R.id.fragment_container, tagEditFragment, "ADD_TAG");
+
+            transaction.addToBackStack(null); // if you want to add the transaction to the back stack
+            transaction.commit();
         });
+
 
     }
 

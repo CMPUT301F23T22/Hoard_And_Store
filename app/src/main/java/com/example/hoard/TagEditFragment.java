@@ -84,6 +84,32 @@ public class TagEditFragment extends DialogFragment {
             }
         }
 
+        // Find the 'Cancel' button and set its click listener
+        Button cancelButton = tagview.findViewById(R.id.cancelbtnTagsfrag);  // Replace with your button's ID
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dismiss();  // Dismisses the dialog
+            }
+        });
+
+        // Find the 'Create' button and set its click listener
+        Button createButton = tagview.findViewById(R.id.CreateTag);  // Replace with your button's ID
+        createButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TagName = autoCompleteTextView.getText().toString().trim();
+
+                if (!TagName.isEmpty() && TagColor != null) {
+                    createAndSendTag(TagName, TagColor);
+                    dismiss();  // Optionally, dismiss the dialog after creating the tag
+                } else {
+                    // TODO Handle the error. For example, show a toast to inform the user.
+                }
+            }
+        });
+
+
         // Return the fully constructed view for this fragment.
         return tagview;
     }
