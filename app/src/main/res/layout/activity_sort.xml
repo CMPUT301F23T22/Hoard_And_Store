@@ -66,12 +66,7 @@
             <EditText
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:hint="From Start date MM/DD/YYYY"></EditText>
-
-            <EditText
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:hint="To end date MM/DD/YYYY"></EditText>
+                android:hint="Date Range"></EditText>
 
             <Button
                 android:id="@+id/showDateRangePicker"
@@ -80,15 +75,6 @@
                 android:layout_gravity="center"
                 android:text="Pick From Calendar">
             </Button>
-
-            <TextView
-                android:id="@+id/show_selected_date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="10dp"
-                android:text="Selected Date is : "
-                android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/tags"
@@ -114,13 +100,27 @@
                 android:layout_marginTop="10dp"
                 android:text="Make "
                 android:textSize="18sp" />
-
-            <androidx.appcompat.widget.AppCompatAutoCompleteTextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/filter_make_search">
+                android:orientation="horizontal">
 
-            </androidx.appcompat.widget.AppCompatAutoCompleteTextView>
+                <androidx.appcompat.widget.AppCompatAutoCompleteTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/filter_make_search"
+                    android:layout_weight="1">
+                </androidx.appcompat.widget.AppCompatAutoCompleteTextView>
+
+                <Button
+                    android:id="@+id/add_more_make_filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Add"
+                    android:textColor="@color/add_new_filter"
+                    android:background="@android:color/transparent" />
+            </LinearLayout>
 
 <!--            <EditText-->
 <!--                android:layout_width="fill_parent"-->

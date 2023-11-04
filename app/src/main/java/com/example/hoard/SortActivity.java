@@ -47,6 +47,7 @@ public class SortActivity extends AppCompatActivity {
     private List<String> makes;
     private FloatingActionButton fab;
     private Button applyButton;
+    private Button addMoreFilters;
     private List<String> appliedMakes;
     private FilterCriteria filterCriteria;
 
@@ -72,8 +73,8 @@ public class SortActivity extends AppCompatActivity {
         itemMakes = new ArrayAdapter<>(this, android.R.layout.select_dialog_item);
         search = findViewById(R.id.filter_make_search);
         search.setThreshold(1);
-        String[] cities = {"Edmonton", "Vancouver", "Moscow", "Sydney", "Edmonton", "Vancouver", "Moscow", "Sydney"};
-        dataList = new ArrayList<>(Arrays.asList(cities));
+        String[] sortOptions = {"Date", "Make", "Estimated Value", "Description", "Edmonton", "Tags" };
+        dataList = new ArrayList<>(Arrays.asList(sortOptions));
         sortAdapter = new SortAdapter(dataList);
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
@@ -81,6 +82,8 @@ public class SortActivity extends AppCompatActivity {
         dbController = ItemDBController.getInstance();
         fab = findViewById(R.id.addItemButton);
         applyButton = findViewById(R.id.apply_filter_sort_button);
+        addMoreFilters = findViewById(R.id.add_more_make_filter);
+        addMoreFilters.setVisibility(View.INVISIBLE);
 
         // Load items and populate the AutoCompleteTextView
         dbController.loadItems(new DataLoadCallback() {
@@ -99,14 +102,14 @@ public class SortActivity extends AppCompatActivity {
                 String enteredMake = search.getText().toString();
                 if (!enteredMake.isEmpty()) {
                     appliedMakes.add(enteredMake);
-                    filterCriteria.setMakes(appliedMakes);
-
-                    // Create an intent and send filter criteria back to the ListScreen activity
-                    Intent returnIntent = new Intent(getApplicationContext(), ListScreen.class);
-                    returnIntent.putExtra("filterCriteria", filterCriteria);
-                    setResult(RESULT_OK, returnIntent);
-                    finish();
                 }
+                filterCriteria.setMakes(appliedMakes);
+
+                // Create an intent and send filter criteria back to the ListScreen activity
+                Intent returnIntent = new Intent(getApplicationContext(), ListScreen.class);
+                returnIntent.putExtra("filterCriteria", filterCriteria);
+                setResult(RESULT_OK, returnIntent);
+                finish();
             }
         });
 
@@ -155,6 +158,7 @@ public class SortActivity extends AppCompatActivity {
             public void onClick(View view) {
                 MaterialDatePicker<Pair<Long, Long>> materialDatePicker = createMaterialDatePicker();
                 materialDatePicker.show(getSupportFragmentManager(), "DATE_PICKER_TAG");
+
             }
         });
 
@@ -170,8 +174,21 @@ public class SortActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
+                addMoreFilters.setVisibility(View.VISIBLE);
                 String filterText = s.toString();
                 itemMakes.getFilter().filter(filterText);
+
+                //grab the first option if not completed?
+                addMoreFilters.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        String enteredMake = search.getText().toString();
+                        if (!enteredMake.isEmpty()) {
+                            appliedMakes.add(enteredMake);
+                            search.setText("");
+                        }
+                    }
+                });
             }
         });
     }
