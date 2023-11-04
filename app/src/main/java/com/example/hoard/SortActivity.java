@@ -65,8 +65,8 @@ public class SortActivity extends AppCompatActivity {
 
                 } else if (id == R.id.nav_home) {
                     // Replace the fragment container with the SortFragment
-//                    Intent sortIntent = new Intent(getApplicationContext(), ListScreen.class);
-//                    startActivity(sortIntent);
+                    Intent sortIntent = new Intent(getApplicationContext(), ListScreen.class);
+                    startActivity(sortIntent);
 
                 }
                 return true;
