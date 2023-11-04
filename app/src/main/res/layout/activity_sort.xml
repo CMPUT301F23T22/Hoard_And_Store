@@ -100,27 +100,48 @@
                 android:layout_marginTop="10dp"
                 android:text="Make "
                 android:textSize="18sp" />
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_height="wrap_content">
 
                 <androidx.appcompat.widget.AppCompatAutoCompleteTextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:id="@+id/filter_make_search"
-                    android:layout_weight="1">
-                </androidx.appcompat.widget.AppCompatAutoCompleteTextView>
+                    android:layout_weight="1"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/buttonLayout"
+                    app:layout_constraintHeight_default="wrap"
+                    app:layout_constraintHorizontal_chainStyle="packed" />
 
-                <Button
-                    android:id="@+id/add_more_make_filter"
+                <LinearLayout
+                    android:id="@+id/buttonLayout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="Add"
-                    android:textColor="@color/add_new_filter"
-                    android:background="@android:color/transparent" />
-            </LinearLayout>
+                    android:orientation="horizontal"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintHorizontal_chainStyle="packed">
+
+                    <Button
+                        android:id="@+id/add_more_make_filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Add"
+                        android:textColor="@color/add_new_filter"
+                        android:background="@android:color/transparent" />
+
+                    <Button
+                        android:id="@+id/reset_make_filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Reset"
+                        android:textColor="@color/add_new_filter"
+                        android:background="@android:color/transparent" />
+                </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
 <!--            <EditText-->
 <!--                android:layout_width="fill_parent"-->

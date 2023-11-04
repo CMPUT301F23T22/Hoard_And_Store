@@ -1,26 +1,41 @@
 package com.example.hoard;
 
+import com.example.hoard.Tag;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.Dictionary;
 import java.util.List;
 
-public class FilterCriteria implements Serializable {
-    public List<String> makes;
-    public List<String> descriptionKeyWords;
-    public List<Tag> tags;
-    public Date startDate;
-    public Date endDate;
+public class FilterCriteria {
+    private List<String> makes;
+    private List<String> descriptionKeyWords;
+    private List<Tag> tags;
+    private Date startDate;
+    private Date endDate;
 
-    public FilterCriteria() {
+    private static FilterCriteria instance;
+
+    private FilterCriteria() {
+        // Initialize the fields as needed
+    }
+
+    public static FilterCriteria getInstance() {
+        if (instance == null) {
+            instance = new FilterCriteria();
+        }
+        return instance;
     }
 
     public List<String> getMakes() {
         return makes;
     }
 
-    public void setMakes(List<String> makes) {
-        this.makes = makes;
+    public void setMakes(List<String> newMakes) {
+        if (makes == null) {
+            makes = new ArrayList<>();
+        }
+        makes.addAll(newMakes);
     }
 
     public List<String> getDescriptionKeyWords() {
@@ -35,8 +50,11 @@ public class FilterCriteria implements Serializable {
         return tags;
     }
 
-    public void setTags(List<Tag> tags) {
-        this.tags = tags;
+    public void setTags(List<Tag> newTags) {
+        if (tags == null) {
+            tags = new ArrayList<>();
+        }
+        tags.addAll(newTags);
     }
 
     public Date getStartDate() {
@@ -54,4 +72,10 @@ public class FilterCriteria implements Serializable {
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
+
+    public void clearMakes() {
+        makes.clear();
+    }
 }
+
+

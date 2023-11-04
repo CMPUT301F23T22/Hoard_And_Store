@@ -50,8 +50,9 @@ public class ListScreen extends AppCompatActivity {
     private Menu bottomMenu;
     private MenuItem sort;
     private MenuItem home;
-    private FilterCriteria filterCriteria;
     private Item itemToDelete = null;
+    private FilterCriteria filterCriteria;
+
     private final int sortingRequestCode = 1;
 
 
@@ -60,7 +61,9 @@ public class ListScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_screen);
-        filterCriteria = null;
+
+        filterCriteria = FilterCriteria.getInstance();
+
         itemDB = new ItemDB(new ItemDBConnector());
 
         addItemButton = findViewById(R.id.addItemButton);
@@ -95,14 +98,17 @@ public class ListScreen extends AppCompatActivity {
                 if (id == R.id.nav_home) {
 
                 } else if (id == R.id.nav_sort) {
-                    // Replace the fragment container with the SortFragment
-                    home.setEnabled(false);
-                    home.setChecked(false);
-                    sort.setEnabled(true);
+//                    // Replace the fragment container with the SortFragment
+//                    home.setEnabled(false);
+//                    home.setChecked(false);
+//                    sort.setEnabled(true);
+//
+//                    Intent sortIntent = new Intent(getApplicationContext(), SortActivity.class);
+//                    sortIntent.putExtra("filterCriteria", filterCriteria);
+//                    filterActivityResultLauncher.launch(sortIntent);
 
-                    Intent sortIntent = new Intent(getApplicationContext(), SortActivity.class);
-                    sortIntent.putExtra("filterCriteria", filterCriteria);
-                    filterActivityResultLauncher.launch(sortIntent);
+                        Intent sortIntent = new Intent(getApplicationContext(), SortActivity.class);
+                        startActivity(sortIntent);
 
 
 
@@ -206,31 +212,31 @@ public class ListScreen extends AppCompatActivity {
         }
     };
 
-    ActivityResultLauncher<Intent> filterActivityResultLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            new ActivityResultCallback<ActivityResult>() {
-                @Override
-                public void onActivityResult(ActivityResult result) {
-                    if (result.getResultCode() == Activity.RESULT_OK) {
-                        Intent data = result.getData();
-                        if (data != null) {
-                            FilterCriteria updatedFilterCriteria  = (FilterCriteria) data.getSerializableExtra("filterCriteria");
-                            if (updatedFilterCriteria != null) {
-                                // Update the filterCriteria with the updated filter criteria
-                                filterCriteria = updatedFilterCriteria;
-                                // You can then use the updated filterCriteria as needed
-                                // For example, refresh your data with the new filter criteria
-                                dbController.loadItems(new DataLoadCallback() {
-                                    @Override
-                                    public void onDataLoaded(List<Item> items) {
-                                        itemAdapter = new ItemAdapter(items);
-                                        recyclerView.setAdapter(itemAdapter);
-                                    }
-                                }, filterCriteria);
-
-                            }
-                        }
-                    }
-                }
-            });
+//    ActivityResultLauncher<Intent> filterActivityResultLauncher = registerForActivityResult(
+//            new ActivityResultContracts.StartActivityForResult(),
+//            new ActivityResultCallback<ActivityResult>() {
+//                @Override
+//                public void onActivityResult(ActivityResult result) {
+//                    if (result.getResultCode() == Activity.RESULT_OK) {
+//                        Intent data = result.getData();
+//                        if (data != null) {
+//                            FilterCriteria updatedFilterCriteria  = (FilterCriteria) data.getSerializableExtra("filterCriteria");
+//                            if (updatedFilterCriteria != null) {
+//                                // Update the filterCriteria with the updated filter criteria
+//                                filterCriteria = updatedFilterCriteria;
+//                                // You can then use the updated filterCriteria as needed
+//                                // For example, refresh your data with the new filter criteria
+//                                dbController.loadItems(new DataLoadCallback() {
+//                                    @Override
+//                                    public void onDataLoaded(List<Item> items) {
+//                                        itemAdapter = new ItemAdapter(items);
+//                                        recyclerView.setAdapter(itemAdapter);
+//                                    }
+//                                }, filterCriteria);
+//
+//                            }
+//                        }
+//                    }
+//                }
+//            });
 }

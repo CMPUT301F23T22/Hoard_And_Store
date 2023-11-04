@@ -98,9 +98,7 @@ public class ItemDBController {
         }
     }
 
-    private void filter(List<Item> items, FilterCriteria filterCriteria) {
 
-    }
 
     public void addItem(Item item){
         itemDB.addItem(item);
