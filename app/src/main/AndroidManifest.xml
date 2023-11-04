@@ -21,7 +21,13 @@
         <activity
             android:name=".ItemEditDeleteActivity"
             android:exported="false" />
+
+        <activity android:name=".AddEditItem"
+            android:exported="false"/>
+
         <activity
+
+
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
