@@ -54,7 +54,7 @@ public class ListScreen extends AppCompatActivity{
     private ActivityResultLauncher<Intent> addEditActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleAddEditResult);
 
 
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,11 +91,6 @@ public class ListScreen extends AppCompatActivity{
                 if (id == R.id.nav_home) {
 
                 } else if (id == R.id.nav_sort) {
-                    // Replace the fragment container with the SortFragment
-                    home.setEnabled(false);
-                    home.setChecked(false);
-                    sort.setEnabled(true);
-
                     Intent sortIntent = new Intent(getApplicationContext(), SortActivity.class);
                     startActivity(sortIntent);
                 }
@@ -122,14 +117,22 @@ public class ListScreen extends AppCompatActivity{
 
         @Override
         public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+            // Save the item before it's deleted
+            final int deletedItemPosition = viewHolder.getAdapterPosition();
+            final Item deletedItem = itemAdapter.getItem(deletedItemPosition);
+
+            // Remove the item from the list
+            itemAdapter.removeItem(deletedItemPosition);
+            itemAdapter.notifyItemChanged(deletedItemPosition);
+
             Snackbar snackbar = Snackbar
                     .make(findViewById(R.id.coordinate_layout), R.string.text_label, Snackbar.LENGTH_LONG)
-                    .setText("Deleting " + itemAdapter.getItem(viewHolder.getAdapterPosition()).getMake())
+                    .setText("Deleting " + deletedItem.getMake())
                     .setAction("Undo", new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            //itemToDelete = itemAdapter.getItem(viewHolder.getAdapterPosition());
-                            itemAdapter.notifyItemChanged(itemAdapter.getsize() - 1);
+                            itemAdapter.addItem(deletedItem);
+                            itemAdapter.notifyItemInserted(deletedItemPosition);
                         }
                     });
             snackbar.addCallback(new Snackbar.Callback() {
@@ -138,13 +141,9 @@ public class ListScreen extends AppCompatActivity{
                 public void onDismissed(Snackbar snackbar, int event) {
                     if (event == Snackbar.Callback.DISMISS_EVENT_TIMEOUT || event == Snackbar.Callback.DISMISS_EVENT_SWIPE) {
                         // Snackbar closed on its own
-                        itemToDelete = itemAdapter.getItem(viewHolder.getAdapterPosition());
+                        itemToDelete = deletedItem;
                         if (itemToDelete != null) {
-                            itemAdapter.removeItem(viewHolder.getAdapterPosition());
-                            itemAdapter.notifyItemChanged(itemAdapter.getsize() - 1);
                             dbController.deleteItem(itemToDelete);
-                        } else {
-                            // Handle the case where the position is out of bounds or the item is not found
                         }
                     }
 
