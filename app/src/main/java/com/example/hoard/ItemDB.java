@@ -2,6 +2,9 @@ package com.example.hoard;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -29,21 +32,43 @@ public class ItemDB {
         return newItemRef.set(item); // item should be a Map or a custom class
     }
 
-    public Task<Void> deleteItem(Item item) {
-        return itemsCollection.document(item.getSerialNumber())
-                .delete()
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
+
+    public void deleteItemByField(CollectionReference collectionReference, String fieldName, Object fieldValue) {
+        // Create a query to find the item based on a field and its value
+        collectionReference.whereEqualTo(fieldName, fieldValue)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("Firestore", "DocumentSnapshot successfully deleted!");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(Exception e) {
-                        Log.w("Firestore", "Error deleting document", e);
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                // Get the document ID of the item
+                                String documentId = document.getId();
+
+                                // Delete the item by using the document ID
+                                collectionReference.document(documentId)
+                                        .delete()
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                Log.d("Firestore", "DocumentSnapshot successfully deleted!");
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(Exception e) {
+                                                Log.w("Firestore", "Error deleting document", e);
+                                            }
+                                        });
+                            }
+                        } else {
+                            Log.e("Firestore", "Query failed: " + task.getException());
+                        }
                     }
                 });
+    }
+    public void deleteItem(Item item) {
+        deleteItemByField(itemsCollection, "serialNumber", item.getSerialNumber());
     }
 
     public Task<Void> editItem(Item item) {
@@ -67,4 +92,5 @@ public class ItemDB {
     public Task<QuerySnapshot> getAllItems() {
         return itemsCollection.get();
     }
+
 }
