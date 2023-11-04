@@ -16,6 +16,8 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.List;
+
 public class ItemDB {
     private FirebaseFirestore db;
     private CollectionReference itemsCollection;
@@ -101,12 +103,13 @@ public class ItemDB {
         Query query = itemsCollection; // Start with the base query
 
         if (filterCriteria != null) {
-            if(filterCriteria.getMakes() != null) {
-                for(String make: filterCriteria.getMakes()) {
-                    query = query.whereEqualTo("make", make.toLowerCase());
-                }
-            }
+            if (filterCriteria.getMakes() != null && !filterCriteria.getMakes().isEmpty()) {
+                // Create a list of makes to filter on
+                List<String> makes = filterCriteria.getMakes();
 
+                // Use the "whereIn" method to create an "OR" condition
+                query = query.whereIn("make", makes);
+            }
         }
         return query;
     }
