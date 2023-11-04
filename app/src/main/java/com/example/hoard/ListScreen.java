@@ -49,6 +49,7 @@ public class ListScreen extends AppCompatActivity{
     private Menu bottomMenu;
     private MenuItem sort;
     private MenuItem home;
+    private Item itemToDelete = null;
 
     private ActivityResultLauncher<Intent> addEditActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleAddEditResult);
 
@@ -88,20 +89,15 @@ public class ListScreen extends AppCompatActivity{
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
                 if (id == R.id.nav_home) {
-                    if (currentFragment != null) {
-                        getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
-                        currentFragment = null;
-                    }
-                    return true;
+
                 } else if (id == R.id.nav_sort) {
                     // Replace the fragment container with the SortFragment
                     home.setEnabled(false);
                     home.setChecked(false);
                     sort.setEnabled(true);
+
                     Intent sortIntent = new Intent(getApplicationContext(), SortActivity.class);
                     startActivity(sortIntent);
-
-
                 }
                 return true;
             }
@@ -117,6 +113,54 @@ public class ListScreen extends AppCompatActivity{
             }
         });
     }
+
+    ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+        @Override
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+            return false;
+        }
+
+        @Override
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+            Snackbar snackbar = Snackbar
+                    .make(findViewById(R.id.coordinate_layout), R.string.text_label, Snackbar.LENGTH_LONG)
+                    .setText("Deleting " + itemAdapter.getItem(viewHolder.getAdapterPosition()).getMake())
+                    .setAction("Undo", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            //itemToDelete = itemAdapter.getItem(viewHolder.getAdapterPosition());
+                            itemAdapter.notifyItemChanged(itemAdapter.getsize() - 1);
+                        }
+                    });
+            snackbar.addCallback(new Snackbar.Callback() {
+
+                @Override
+                public void onDismissed(Snackbar snackbar, int event) {
+                    if (event == Snackbar.Callback.DISMISS_EVENT_TIMEOUT || event == Snackbar.Callback.DISMISS_EVENT_SWIPE) {
+                        // Snackbar closed on its own
+                        itemToDelete = itemAdapter.getItem(viewHolder.getAdapterPosition());
+                        if (itemToDelete != null) {
+                            itemAdapter.removeItem(viewHolder.getAdapterPosition());
+                            itemAdapter.notifyItemChanged(itemAdapter.getsize() - 1);
+                            dbController.deleteItem(itemToDelete);
+                        } else {
+                            // Handle the case where the position is out of bounds or the item is not found
+                        }
+                    }
+
+                }
+
+                @Override
+                public void onShown(Snackbar snackbar) {
+
+                }
+            });
+
+            snackbar.show();
+
+        }
+    };
+
 
     private void handleAddEditResult(ActivityResult result) {
         if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {

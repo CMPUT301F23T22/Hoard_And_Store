@@ -21,6 +21,8 @@
 
         <activity android:name=".AddEditItem"
             android:exported="false"/>
+        <activity android:name=".SortActivity"
+            android:exported="false"/>
 
         <activity
             android:name=".MainActivity"

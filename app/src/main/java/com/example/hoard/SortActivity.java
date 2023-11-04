@@ -60,11 +60,13 @@ public class SortActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
                 if (id == R.id.nav_sort) {
+                    Intent sortIntent = new Intent(getApplicationContext(), SortActivity.class);
+                    startActivity(sortIntent);
 
                 } else if (id == R.id.nav_home) {
                     // Replace the fragment container with the SortFragment
-                    Intent sortIntent = new Intent(getApplicationContext(), ListScreen.class);
-                    startActivity(sortIntent);
+//                    Intent sortIntent = new Intent(getApplicationContext(), ListScreen.class);
+//                    startActivity(sortIntent);
 
                 }
                 return true;
