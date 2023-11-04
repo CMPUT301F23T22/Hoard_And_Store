@@ -75,4 +75,7 @@ public class ItemDBController {
 
     public void deleteItem(Item item) {itemDB.deleteItem(item);}
 
+    public void editItem(Item item){
+        itemDB.editItem(item);
+    }
 }

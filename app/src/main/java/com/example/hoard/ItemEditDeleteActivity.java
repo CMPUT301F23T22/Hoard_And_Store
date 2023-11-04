@@ -1,21 +1,18 @@
 package com.example.hoard;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
 public class ItemEditDeleteActivity extends AppCompatActivity {
 
-    private TextView dateOfAcquisitionTextView, makeTextView, modelTextView, serialNumberTextView, estimatedValueTextView, commentTextView, briefDescriptionTextView;
+    private TextView dateOfAcquisitionTextView, makeTextView, modelTextView, serialNumberTextView, estimatedValueTextView, commentTextView, briefDescriptionTextView ,AddtagView;
     private Item selectedItem;
 
     @Override
@@ -42,7 +39,6 @@ public class ItemEditDeleteActivity extends AppCompatActivity {
 
         Button editButton = findViewById(R.id.editButton);
         Button closeButton = findViewById(R.id.closeButton);
-
         // Check if buttons are null
         if (editButton == null || closeButton == null) {
             Toast.makeText(this, "Error initializing buttons", Toast.LENGTH_LONG).show();
@@ -65,13 +61,6 @@ public class ItemEditDeleteActivity extends AppCompatActivity {
             finish();
         }
 
-        // Set up the button listeners
-        editButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editItem();
-            }
-        });
 
         closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,6 +68,7 @@ public class ItemEditDeleteActivity extends AppCompatActivity {
                 finish();
             }
         });
+
     }
 
     private void displaySelectedItem() {
@@ -102,7 +92,4 @@ public class ItemEditDeleteActivity extends AppCompatActivity {
         commentTextView.setText(comment);
     }
 
-    private void editItem() {
-        // TODO: implement the edit item functionality
-    }
 }
