@@ -17,5 +17,6 @@
     <string name="arrow_description">arrow to open details of an item</string>
     <string name="text_label">Item Deleted</string>
     <string name="sort_method_name">Sort by Name</string>
+    <string name="close_selection_mode">Close selection mode</string>
 
 </resources>

@@ -33,6 +33,12 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
         return itemList;
     }
 
+    public void clearSelections() {
+        for (Item item : itemList) {
+            item.setSelected(false);
+        }
+        notifyDataSetChanged();
+    }
     public List<Item> getSelectedItems() {
         List<Item> selectedItems = new ArrayList<>();
         for (Item item : itemList) {
@@ -42,6 +48,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
         }
         return selectedItems;
     }
+
 
     public ItemAdapter(List<Item> itemList) {
         this.itemList = itemList;
