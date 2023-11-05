@@ -8,13 +8,12 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
 
 public class ItemDB {
     private FirebaseFirestore db;
@@ -27,11 +26,44 @@ public class ItemDB {
 
     // Methods to interact with Firestore for items
     // Example method to add an item to Firestore
-    public Task<Void> addItem(Item item) {
+    public void addItem(Item item, OnCompleteListener<Void> onCompleteListener) {
+        // Create a new document with a generated ID in the "items" collection
         DocumentReference newItemRef = itemsCollection.document();
-        return newItemRef.set(item); // item should be a Map or a custom class
+        // Set the data for the new document based on the item object
+        newItemRef.set(item).addOnCompleteListener(onCompleteListener);
     }
 
+    public void editItem(String itemId, Item item, OnCompleteListener<QuerySnapshot> onCompleteListener) {
+        itemsCollection.whereEqualTo("itemID", itemId)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            String documentId = document.getId();
+                            itemsCollection.document(documentId)
+                                    .set(item, SetOptions.merge())
+                                    .addOnSuccessListener(aVoid -> {
+                                        Log.d("Firestore", "Item successfully edited: " + itemId);
+                                        // Call the onCompleteListener if provided
+                                        if (onCompleteListener != null) {
+                                            onCompleteListener.onComplete(task); // Pass the original task as it's now successful
+                                        }
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Log.w("Firestore", "Error editing document", e);
+                                        if (onCompleteListener != null) {
+                                            onCompleteListener.onComplete(task); // The task will carry the exception
+                                        }
+                                    });
+                        }
+                    } else {
+                        Log.e("Firestore", "Query failed: ", task.getException());
+                        if (onCompleteListener != null) {
+                            onCompleteListener.onComplete(task); // The task will carry the exception
+                        }
+                    }
+                });
+    }
 
     public void deleteItemByField(CollectionReference collectionReference, String fieldName, Object fieldValue) {
         // Create a query to find the item based on a field and its value
@@ -68,24 +100,7 @@ public class ItemDB {
                 });
     }
     public void deleteItem(Item item) {
-        deleteItemByField(itemsCollection, "serialNumber", item.getSerialNumber());
-    }
-
-    public Task<Void> editItem(Item item) {
-        return itemsCollection.document(item.getSerialNumber())
-                .set(item) // Overwrites the document with the new data
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("Firestore", "DocumentSnapshot successfully updated!");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(Exception e) {
-                        Log.w("Firestore", "Error updating document", e);
-                    }
-                });
+        deleteItemByField(itemsCollection, "serialNumber", item.getItemID());
     }
 
     // Example method to retrieve all items from Firestore

@@ -3,49 +3,41 @@ package com.example.hoard;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 
-public class AddEditItem extends AppCompatActivity implements CustomDatePicker.DatePickListener, TagEditFragment.TagAddListener {
+public class AddEditItem extends AppCompatActivity implements CustomDatePicker.DatePickListener {
 
-    private EditText descriptionInput;
-    private EditText makeInput;
-    private EditText modelInput;
-    private EditText serialNumberInput;
-    private EditText valueInput;
-    private EditText commentInput;
-
-    private EditText dateInput;
-
+    private final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+    private EditText descriptionInput, makeInput, modelInput, serialNumberInput, valueInput, commentInput, dateInput;
     private TextInputLayout dateInputLayout;
-
     private TextView addEditHeader;
-
     private Date selectedDateObject;
-
     private Item currentItem; // Item to edit
-
-    private boolean wasEdited;
-
-    CustomDatePicker customDatePicker;
+    private boolean isEdit; // To identify whether it's an edit operation
+    private ItemDBController dbController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_edit);
+
+        dbController = ItemDBController.getInstance();
+
+        // Initialize views
         descriptionInput = findViewById(R.id.descriptionInput);
         makeInput = findViewById(R.id.makeInput);
         modelInput = findViewById(R.id.modelInput);
@@ -56,104 +48,148 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         dateInputLayout = findViewById(R.id.dateInputLayout);
         addEditHeader = findViewById(R.id.addEditHeader);
 
-        // If you're passing an Item to edit via Intent
+        // Check if editing
         Intent intent = getIntent();
-        if(intent.hasExtra("item_to_edit")) {
-            currentItem = (Item) intent.getSerializableExtra("item_to_edit");
+        if (intent.hasExtra("ITEM_TO_EDIT")) {
+            isEdit = true;
+            currentItem = (Item) intent.getSerializableExtra("ITEM_TO_EDIT");
+            populateFields(currentItem);
+        } else {
+            isEdit = false;
         }
 
-        if(currentItem != null) {
-            addEditHeader.setText("EDIT");
-            descriptionInput.setText(currentItem.getBriefDescription());
-            makeInput.setText(currentItem.getMake());
-            modelInput.setText(currentItem.getModel());
-            serialNumberInput.setText(currentItem.getSerialNumber());
-            valueInput.setText(String.valueOf(currentItem.getEstimatedValue()));
-            commentInput.setText(currentItem.getComment());
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-            dateInput.setText(sdf.format(currentItem.getDateOfAcquisition()));
-        }
+        // Listener for the date picker
+        dateInput.setOnClickListener(v -> showDatePicker());
+        dateInputLayout.setEndIconOnClickListener(v -> showDatePicker());
 
-        // Create an instance of the CustomDatePicker
-        customDatePicker = new CustomDatePicker(this, this);
-
-        dateInput.setOnClickListener(v -> {
-            customDatePicker.showDatePicker();
-            });
-
-        dateInputLayout.setEndIconOnClickListener(v -> {
-            customDatePicker.showDatePicker();
+        // Save button listener
+        Button saveButton = findViewById(R.id.submitButton);
+        saveButton.setOnClickListener(v -> {
+            try {
+                saveItem();
+            } catch (ParseException e) {
+                e.printStackTrace();
+                Toast.makeText(this, "Error parsing date", Toast.LENGTH_SHORT).show();
+            }
         });
 
-        Button saveButton = findViewById(R.id.submitButton);
-        saveButton.setOnClickListener(v -> saveItem());
-
+        // Cancel button listener
         Button cancelButton = findViewById(R.id.closeButton);
         cancelButton.setOnClickListener(v -> finish());
+    }
 
-        Button addTagBtn = findViewById(R.id.AddTagButton);
-        addTagBtn.setOnClickListener(view -> {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
-            Fragment tagEditFragment = new TagEditFragment();
-
-            // If you're replacing an existing fragment that fills the whole activity
-            transaction.replace(android.R.id.content, tagEditFragment, "ADD_TAG");
-
-            // Alternatively, if you have a container where the fragment should be placed
-            // transaction.replace(R.id.fragment_container, tagEditFragment, "ADD_TAG");
-
-            transaction.addToBackStack(null); // if you want to add the transaction to the back stack
-            transaction.commit();
-        });
-
+    private void showDatePicker() {
+        // Create an instance of the CustomDatePicker
+        CustomDatePicker customDatePicker = new CustomDatePicker(this, this);
+        customDatePicker.showDatePicker();
 
     }
 
-    private void saveItem() {
-        Intent returnIntent = new Intent();
-        if(currentItem == null) {
-            // Create new
-            wasEdited = false;
-            Item item = new Item(
-                    selectedDateObject,
-                    descriptionInput.getText().toString(),
-                    makeInput.getText().toString(),
-                    modelInput.getText().toString(),
-                    serialNumberInput.getText().toString(),
-                    Double.parseDouble(valueInput.getText().toString()),
-                    commentInput.getText().toString()
-            );
-            returnIntent.putExtra("itemData", item);
+    private void populateFields(Item item) {
+        addEditHeader.setText("EDIT");
+        descriptionInput.setText(item.getBriefDescription());
+        makeInput.setText(item.getMake());
+        modelInput.setText(item.getModel());
+        serialNumberInput.setText(item.getSerialNumber());
+        valueInput.setText(String.valueOf(item.getEstimatedValue()));
+        commentInput.setText(item.getComment());
+        dateInput.setText(sdf.format(item.getDateOfAcquisition()));
+    }
+
+    private void saveItem() throws ParseException {
+        if (isEdit) {
+            updateItem();
         } else {
-            // Update existing
-            wasEdited = true;
-            currentItem.setBriefDescription(descriptionInput.getText().toString());
-            currentItem.setMake(makeInput.getText().toString());
-            currentItem.setModel(modelInput.getText().toString());
-            currentItem.setSerialNumber(serialNumberInput.getText().toString());
-            currentItem.setEstimatedValue(Double.parseDouble(valueInput.getText().toString()));
-            currentItem.setComment(commentInput.getText().toString());
-            currentItem.setDateOfAcquisition(selectedDateObject);
-            returnIntent.putExtra("itemData", currentItem);
+            createNewItem();
         }
-        returnIntent.putExtra("wasEdited", wasEdited);
-        setResult(Activity.RESULT_OK, returnIntent);
-        finish();
+    }
+
+    private void createNewItem() throws ParseException {
+        Item newItem = getItemFromFields();
+        dbController.addItem(newItem, task -> {
+            if (task.isSuccessful()) {
+                // Log success
+                Log.i("AddItem", "Item added successfully");
+
+                Toast.makeText(this, "Item added successfully", Toast.LENGTH_SHORT).show();
+                Intent resultIntent = new Intent();
+
+                resultIntent.putExtra("newItem", newItem);
+                setResult(Activity.RESULT_OK, resultIntent);
+                finish();
+            } else {
+                // This block handles the failure case
+                Exception e = task.getException();
+                // Log failure
+                Log.e("AddItem", "Failed to add item", e);
+
+                Toast.makeText(this, "Failed to add item" + (e != null ? ": " + e.getMessage() : ""), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void updateItem() throws ParseException {
+        Item updatedItem = getItemFromFields();
+
+        dbController.editItem(updatedItem.getItemID(), updatedItem, task -> {
+            if (task.isSuccessful()) {
+                // Log success
+                Log.i("EditItem", "Item updated successfully");
+
+                Toast.makeText(this, "Item updated successfully", Toast.LENGTH_SHORT).show();
+                Intent resultIntent = new Intent();
+
+                resultIntent.putExtra("updatedItem", updatedItem);
+                setResult(Activity.RESULT_OK, resultIntent);
+                finish();
+            } else {
+                // This block handles the failure case
+                Exception e = task.getException();
+                // Log failure
+                Log.e("EditItem", "Failed to update item", e);
+
+                Toast.makeText(this, "Failed to update item" + (e != null ? ": " + e.getMessage() : ""), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+    private Item getItemFromFields() throws ParseException {
+        String description = descriptionInput.getText().toString();
+        String make = makeInput.getText().toString();
+        String model = modelInput.getText().toString();
+        String serialNumber = serialNumberInput.getText().toString();
+        double value = Double.parseDouble(valueInput.getText().toString());
+        String comment = commentInput.getText().toString();
+        Date acquisitionDate = sdf.parse(dateInput.getText().toString());
+
+        if (currentItem != null) {
+            // If this is an edit, update the existing item's fields
+            currentItem.setBriefDescription(description);
+            currentItem.setMake(make);
+            currentItem.setModel(model);
+            currentItem.setSerialNumber(serialNumber);
+            currentItem.setEstimatedValue(value);
+            currentItem.setComment(comment);
+            currentItem.setDateOfAcquisition(acquisitionDate);
+            return currentItem;
+        }
+
+        // otherwise return the old item
+        return new Item(
+                acquisitionDate,
+                description,
+                make,
+                model,
+                serialNumber,
+                value,
+                comment);
+
     }
 
     @Override
-    public void onDatePicked(Date newdate) {
-        // Handle the picked date here
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-        dateInput.setText(sdf.format(newdate));
-        selectedDateObject = newdate;
-    }
-
-
-    @Override
-    public void onTagAdded(Tag newTag) {
-        // Handle the new tag here.
-        // #TODO
+    public void onDatePicked(int year, int month, int day) {
+        selectedDateObject = new GregorianCalendar(year, month, day).getTime();
+        dateInput.setText(sdf.format(selectedDateObject));
     }
 }

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -15,6 +16,7 @@ public class Item implements Serializable {
     private String serialNumber;
     private double estimatedValue;
     private String comment;
+    private String itemID;
     private ArrayList<Tag> tags;
 
     public Item(Date dateOfAcquisition, String briefDescription, String make, String model, String serialNumber, double estimatedValue, String comment) {
@@ -48,6 +50,18 @@ public class Item implements Serializable {
         this.serialNumber = serialNumber;
         this.estimatedValue = estimatedValue;
         this.comment = comment;
+        this.itemID = UUID.randomUUID().toString();
+    }
+
+    public Item(Date dateOfAcquisition, String briefDescription, String make, String model, String serialNumber, double estimatedValue, String comment, String itemID) {
+        this.dateOfAcquisition = dateOfAcquisition;
+        this.briefDescription = briefDescription;
+        this.make = make;
+        this.model = model;
+        this.serialNumber = serialNumber;
+        this.estimatedValue = estimatedValue;
+        this.comment = comment;
+        this.itemID = itemID;
     }
 
     public static boolean isValidDate(Date date) {
@@ -98,6 +112,10 @@ public class Item implements Serializable {
 
     public void setBriefDescription(String briefDescription) {
         this.briefDescription = briefDescription;
+    }
+
+    public String getItemID() {
+        return itemID;
     }
 
     public String getMake() {
