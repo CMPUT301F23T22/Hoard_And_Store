@@ -1,12 +1,13 @@
 package com.example.hoard;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
-public class Item {
+public class Item implements Serializable {
     private Date dateOfAcquisition;
     private String briefDescription;
     private String make;
