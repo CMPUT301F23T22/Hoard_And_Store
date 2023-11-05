@@ -50,7 +50,7 @@ public class Item implements Serializable {
         this.tags = new ArrayList<Tag>(); //#TODO insure this works correctly
     }
 
-    public Item(Date dateOfAcquisition, String briefDescription, String make, String model, String serialNumber, double estimatedValue, String comment, String itemID, ) {
+    public Item(Date dateOfAcquisition, String briefDescription, String make, String model, String serialNumber, double estimatedValue, String comment, String itemID,ArrayList<Tag> TagsLists) {
         this.dateOfAcquisition = dateOfAcquisition;
         this.briefDescription = briefDescription;
         this.make = make;
@@ -59,7 +59,7 @@ public class Item implements Serializable {
         this.estimatedValue = estimatedValue;
         this.comment = comment;
         this.itemID = itemID;
-        this.tags = new ArrayList<Tag>(); //#TODO insure this works correctly
+        this.tags = TagsLists; //#TODO insure this works correctly
     }
 
     public static boolean isValidDate(Date date) {

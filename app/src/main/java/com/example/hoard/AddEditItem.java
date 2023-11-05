@@ -196,7 +196,7 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         Date acquisitionDate = sdf.parse(dateInput.getText().toString());
 
         if (currentItem != null) {
-            // If this is an edit, update the existing item's fields
+           // If this is an edit, update the existing item's fields
             currentItem.setBriefDescription(description);
             currentItem.setMake(make);
             currentItem.setModel(model);
