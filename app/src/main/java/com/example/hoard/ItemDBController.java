@@ -74,7 +74,7 @@ public class ItemDBController {
     }
 
     public void deleteItem(Item item) {itemDB.deleteItem(item);}
-
+    public Task<Void> bulkDeleteItems(List<Item> items) { return itemDB.bulkDeleteItems(items);}
     public void editItem(Item item){
         itemDB.editItem(item);
     }

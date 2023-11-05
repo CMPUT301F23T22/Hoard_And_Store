@@ -1,54 +1,15 @@
 package com.example.hoard;
 
-//import android.app.AlertDialog;
-//import android.content.Context;
-//import android.content.DialogInterface;
-//import android.graphics.Color;
-//import android.graphics.drawable.Drawable;
-//import android.app.Activity;
-//import android.content.Intent;
-//import android.content.Intent;
-//import android.os.Bundle;
-//import android.view.LayoutInflater;
-//import android.view.MenuItem;
-//import android.view.Menu;
-//import android.view.View;
-//import android.widget.Button;
-//import android.widget.EditText;
-//import android.widget.FrameLayout;
-//import android.app.AlertDialog;
-//import android.content.DialogInterface;
-//
-//import androidx.annotation.ColorInt;
-//import androidx.annotation.NonNull;
-//import androidx.appcompat.app.AppCompatActivity;
-//import androidx.core.content.ContextCompat;
-//import androidx.core.graphics.drawable.DrawableCompat;
-//import androidx.activity.result.ActivityResult;
-//import androidx.activity.result.ActivityResultLauncher;
-//import androidx.activity.result.contract.ActivityResultContracts;
-//import androidx.annotation.NonNull;
-//import androidx.appcompat.app.AppCompatActivity;
-//import androidx.coordinatorlayout.widget.CoordinatorLayout;
-//import androidx.fragment.app.Fragment;
-//import androidx.recyclerview.widget.ItemTouchHelper;
-//import androidx.recyclerview.widget.LinearLayoutManager;
-//import androidx.recyclerview.widget.RecyclerView;
-//
-//import com.google.android.material.bottomappbar.BottomAppBar;
-//import com.google.android.material.bottomnavigation.BottomNavigationView;
-//import com.google.android.material.floatingactionbutton.FloatingActionButton;
-//import com.google.android.material.navigation.NavigationBarView;
-//import com.google.android.material.snackbar.Snackbar;
-//
-//
-//import java.text.ParseException;
-//import java.text.SimpleDateFormat;
-//import androidx.appcompat.app.AppCompatActivity;
-//import com.google.android.material.floatingactionbutton.FloatingActionButton;
-//
-//import java.util.Date;
-//import java.util.List;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -64,7 +25,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -153,17 +118,33 @@ public class ListScreen extends AppCompatActivity{
                     return true;
                 } else if (id == R.id.nav_delete) {
                     if (itemAdapter.getSelectionMode()) {
-                        itemDB.bulkDeleteItems(itemAdapter.getSelectedItems());
-                        itemAdapter.setSelectionMode(false);
-                        itemAdapter.notifyDataSetChanged();
-                        DrawableCompat.setTint(wrappedIcon, ContextCompat.getColor(getApplicationContext(), R.color.white)); // Attempt to revert to default styling
-                    } else if (!itemAdapter.getSelectionMode()) {
+                        List<Item> selectedItems = itemAdapter.getSelectedItems();
+                        Task<Void> deleteTask = dbController.bulkDeleteItems(selectedItems);
+
+                        deleteTask.addOnSuccessListener(aVoid -> {
+                            // After successful deletion from Firestore, remove items from the adapter list.
+                            for (Item selectedItem : selectedItems) {
+                                int index = itemAdapter.getItemList().indexOf(selectedItem);
+                                if (index != -1) {
+                                    itemAdapter.removeItem(index);
+                                }
+                            }
+
+                            // Update the UI after items have been removed from the adapter.
+                            itemAdapter.setSelectionMode(false);
+                            DrawableCompat.setTint(wrappedIcon, ContextCompat.getColor(getApplicationContext(), R.color.white)); // Revert to default styling
+                        }).addOnFailureListener(e -> {
+                            // Handle the failure scenario, perhaps by showing a message to the user.
+                            Toast.makeText(ListScreen.this, "Error while deleting items.", Toast.LENGTH_SHORT).show();
+                        });
+                    } else {
+                        // Turn on selection mode and change the UI accordingly
                         itemAdapter.setSelectionMode(true);
                         DrawableCompat.setTint(wrappedIcon, ContextCompat.getColor(getApplicationContext(), R.color.purple));
                     }
                     return true;
-
                 }
+
                 return true;
             }
         });

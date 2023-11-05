@@ -13,6 +13,7 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -63,7 +64,6 @@ public class ItemDB {
         return taskCompletionSource.getTask();
     }
 
-    }
     public Task<Void> deleteItem(Item item) {
         // Assuming deleteItemByField returns a Task<Void>
         return deleteItemByField(itemsCollection, "serialNumber", item.getSerialNumber());

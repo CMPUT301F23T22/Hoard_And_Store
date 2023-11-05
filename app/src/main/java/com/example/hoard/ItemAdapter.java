@@ -28,6 +28,11 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
     public boolean getSelectionMode() {
         return isSelectionMode;
     }
+
+    public List<Item> getItemList() {
+        return itemList;
+    }
+
     public List<Item> getSelectedItems() {
         List<Item> selectedItems = new ArrayList<>();
         for (Item item : itemList) {
