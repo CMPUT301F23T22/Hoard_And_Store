@@ -39,7 +39,6 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
     private Item currentItem; // Item to edit
 
     private boolean wasEdited;
-    private ItemDBController dbController;
 
     CustomDatePicker customDatePicker;
 
@@ -47,7 +46,6 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_edit);
-        dbController = ItemDBController.getInstance();
         descriptionInput = findViewById(R.id.descriptionInput);
         makeInput = findViewById(R.id.makeInput);
         modelInput = findViewById(R.id.modelInput);
@@ -126,7 +124,6 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
                     Double.parseDouble(valueInput.getText().toString()),
                     commentInput.getText().toString()
             );
-            dbController.addItem(item);
             returnIntent.putExtra("itemData", item);
         } else {
             // Update existing
