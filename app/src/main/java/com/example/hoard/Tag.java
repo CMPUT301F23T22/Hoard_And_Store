@@ -1,13 +1,27 @@
 package com.example.hoard;
 
+import java.util.UUID;
+
 public class Tag {
     private String tagName;
     private String tagColor;
 
+    private String tagID;
 
     public Tag(String tagName, String tagColor) {
         this.tagName = tagName;
         this.tagColor = tagColor;
+        this.tagID = UUID.randomUUID().toString();
+    }
+
+    public Tag(String tagName, String tagColor, String tagID) {
+        this.tagName = tagName;
+        this.tagColor = tagColor;
+        this.tagID = tagID;
+    }
+
+    public String getTagID() {
+        return tagID;
     }
 
     public String getTagName() {
