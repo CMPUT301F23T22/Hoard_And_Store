@@ -16,7 +16,7 @@
             android:name=".ListScreen"
             android:exported="false" />
 
-        <activity android:name=".ItemEditDeleteActivity"
+        <activity android:name=".DetailsActivity"
             android:exported="false"/>
 
         <activity android:name=".AddEditItem"

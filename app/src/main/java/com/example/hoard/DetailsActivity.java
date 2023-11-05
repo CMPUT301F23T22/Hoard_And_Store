@@ -15,7 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class ItemEditDeleteActivity extends AppCompatActivity {
+public class DetailsActivity extends AppCompatActivity {
 
     private TextView dateOfAcquisitionTextView, makeTextView, modelTextView, serialNumberTextView, estimatedValueTextView, commentTextView, briefDescriptionTextView ,AddtagView;
     private Item selectedItem;
@@ -79,7 +79,7 @@ public class ItemEditDeleteActivity extends AppCompatActivity {
         editButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ItemEditDeleteActivity.this, AddEditItem.class);
+                Intent intent = new Intent(DetailsActivity.this, AddEditItem.class);
                 intent.putExtra("ITEM_TO_EDIT", selectedItem);
                 editActivityResultLauncher.launch(intent);
             }
