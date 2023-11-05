@@ -17,5 +17,7 @@
     <string name="arrow_description">arrow to open details of an item</string>
     <string name="text_label">Item Deleted</string>
     <string name="sort_method_name">Sort by Name</string>
+    <string name="tag_name_placeholder">Tag Name</string>
+    <string name="submit_button_text">SUBMIT</string>
 
 </resources>

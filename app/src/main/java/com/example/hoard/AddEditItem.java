@@ -33,7 +33,7 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.add_edit);
+        setContentView(R.layout.item_add_edit);
 
         dbController = ItemDBController.getInstance();
 

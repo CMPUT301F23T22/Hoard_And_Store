@@ -49,7 +49,7 @@ public class TagEditFragment extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         // Inflate the fragment's layout (fragment_tag_edit) and assign it to the 'view' variable.
-        View tagview = inflater.inflate(R.layout.fragment_tag_edit, container, false);
+        View tagview = inflater.inflate(R.layout.tag_create, container, false);
 
         // Instantiate the AutoCompleteTextView
         AutoCompleteTextView autoCompleteTextView = tagview.findViewById(R.id.editTagName);
