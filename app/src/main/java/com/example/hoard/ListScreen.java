@@ -2,17 +2,11 @@ package com.example.hoard;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.Menu;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
@@ -36,7 +30,6 @@ import java.util.List;
 
 public class ListScreen extends AppCompatActivity{
 
-    private ItemDB itemDB;
     private BottomNavigationView bottomNav;
     private BottomAppBar bottomAppBar;
     private FloatingActionButton addItemButton;
@@ -51,7 +44,7 @@ public class ListScreen extends AppCompatActivity{
     private MenuItem home;
     private Item itemToDelete = null;
 
-    private ActivityResultLauncher<Intent> addEditActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleAddEditResult);
+    private ActivityResultLauncher<Intent> addActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleAddResult);
 
 
 
@@ -98,13 +91,11 @@ public class ListScreen extends AppCompatActivity{
             }
         });
 
-
-
         addItemButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ListScreen.this, AddEditItem.class);
-                addEditActivityResultLauncher.launch(intent);
+                addActivityResultLauncher.launch(intent);
             }
         });
     }
@@ -160,20 +151,24 @@ public class ListScreen extends AppCompatActivity{
         }
     };
 
+    protected void onResume() {
+        super.onResume();
+        dbController.loadItems(new DataLoadCallback() {
+            @Override
+            public void onDataLoaded(List<Item> items) {
+                itemAdapter = new ItemAdapter(items);
+                recyclerView.setAdapter(itemAdapter);
+            }
+        });
+    }
 
-    private void handleAddEditResult(ActivityResult result) {
+    private void handleAddResult(ActivityResult result) {
         if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-            Item returnedItem = (Item) result.getData().getSerializableExtra("itemData");
-            boolean wasUpdated = result.getData().getBooleanExtra("wasEdited", false);
+            Item returnedItem = (Item) result.getData().getSerializableExtra("newItem");
             if (returnedItem != null) {
-                if (wasUpdated) {
-                    dbController.editItem(returnedItem);
-                } else {
-                    dbController.addItem(returnedItem);
                     itemAdapter.addItem(returnedItem);
                     itemAdapter.notifyItemChanged(itemAdapter.getsize() - 1);
                 }
             }
         }
-    }
 }

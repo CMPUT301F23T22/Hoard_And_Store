@@ -44,7 +44,7 @@ public class ItemDBController {
                 if (task.isSuccessful()) {
 
                     for (QueryDocumentSnapshot document : task.getResult()) {
-//                        String iteml = document.getId();
+                        // String item = document.getId();
                         Map<String, Object> data = document.getData();
                         double estimatedValue = (double) data.get("estimatedValue");
                         Timestamp timestamp = (Timestamp) data.get("dateOfAcquisition");
@@ -54,8 +54,9 @@ public class ItemDBController {
                         String model = (String) data.get("model");
                         String make = (String) data.get("make");
                         String briefDescription = (String) data.get("briefDescription");
+                        String itemID = (String) data.get("itemID");
 
-                        Item item = new Item(dateOfAcquisition, briefDescription, make, model, serialNumber, estimatedValue, comment);
+                        Item item = new Item(dateOfAcquisition, briefDescription, make, model, serialNumber, estimatedValue, comment,itemID);
                         items.add(item);
                     }
 
@@ -69,13 +70,13 @@ public class ItemDBController {
         });
     }
 
-    public void addItem(Item item){
-        itemDB.addItem(item);
+    public void addItem(Item item,OnCompleteListener<Void> onCompleteListener){
+        itemDB.addItem(item,onCompleteListener);
     }
 
     public void deleteItem(Item item) {itemDB.deleteItem(item);}
 
-    public void editItem(Item item){
-        itemDB.editItem(item);
+    public void editItem(String itemID, Item item,OnCompleteListener<QuerySnapshot> onCompleteListener){
+        itemDB.editItem(itemID, item,onCompleteListener);
     }
 }
