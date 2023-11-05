@@ -175,7 +175,7 @@ public class ListScreen extends AppCompatActivity{
                     return true;
                 } else if (id == R.id.nav_delete) {
                     enterSelectionMode();
-                    return true;
+                    return false;
                 }
 
                 return true;
