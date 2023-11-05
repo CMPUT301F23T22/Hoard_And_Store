@@ -54,7 +54,7 @@ public class TagAddEditFragment extends DialogFragment {
         // Instantiate the AutoCompleteTextView
         AutoCompleteTextView autoCompleteTextView = tagview.findViewById(R.id.editTagName);
 
-        // Now you can work with autoCompleteTextView, for example:
+        // TODO figure  a way to get a list of the tags :
         autoCompleteTextView.setHint("Enter tag name");
 
         // Find the GridLayout named 'tag_colorPicker' from the inflated view.
