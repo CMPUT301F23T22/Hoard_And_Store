@@ -11,6 +11,6 @@ public class StringViewHolder extends RecyclerView.ViewHolder {
 
     public StringViewHolder(View view) {
         super(view);
-        textView = view.findViewById(R.id.cityNameTextView); // Replace with your TextView ID
+        textView = view.findViewById(R.id.sortTextView); // Replace with your TextView ID
     }
 }

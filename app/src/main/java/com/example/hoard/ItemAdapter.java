@@ -123,7 +123,21 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
         itemList.add(item);
     }
 
+    public void removeItem(int position) {
+        if (position >= 0 && position < itemList.size()) {
+            itemList.remove(position);
+            notifyItemRemoved(position);
+        }
+    }
+
     public int getsize(){
         return itemList.size();
+    }
+
+    public Item getItem(int position) {
+        if (position >= 0 && position < itemList.size()) {
+            return itemList.get(position);
+        }
+        return null; // Return null or handle the out-of-bounds case as needed
     }
 }

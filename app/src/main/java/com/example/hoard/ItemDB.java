@@ -2,9 +2,13 @@ package com.example.hoard;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -30,27 +34,46 @@ public class ItemDB {
         return newItemRef.set(item); // item should be a Map or a custom class
     }
 
-    public Task<Void> deleteItem(Item item) {
-        return itemsCollection.document(item.getSerialNumber())
-                .delete()
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("Firestore", "DocumentSnapshot successfully deleted!");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(Exception e) {
-                        Log.w("Firestore", "Error deleting document", e);
+
+    public Task<Void> deleteItemByField(CollectionReference collectionReference, String fieldName, Object fieldValue) {
+        // Create a TaskCompletionSource that you can use to manually set the result of the Task
+        TaskCompletionSource<Void> taskCompletionSource = new TaskCompletionSource<>();
+
+        // Create a query to find the item based on a field and its value
+        collectionReference.whereEqualTo(fieldName, fieldValue)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        List<Task<Void>> deletionTasks = new ArrayList<>();
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            // Delete the item by using the document ID
+                            Task<Void> deleteTask = collectionReference.document(document.getId()).delete();
+                            deletionTasks.add(deleteTask);
+                        }
+                        // When all delete tasks are successful, set the TaskCompletionSource result to null
+                        Tasks.whenAll(deletionTasks)
+                                .addOnSuccessListener(aVoid -> taskCompletionSource.setResult(null))
+                                .addOnFailureListener(e -> taskCompletionSource.setException(e));
+                    } else {
+                        taskCompletionSource.setException(task.getException());
                     }
                 });
+
+        // Return the Task from the TaskCompletionSource
+        return taskCompletionSource.getTask();
     }
+
+    }
+    public Task<Void> deleteItem(Item item) {
+        // Assuming deleteItemByField returns a Task<Void>
+        return deleteItemByField(itemsCollection, "serialNumber", item.getSerialNumber());
+    }
+
     public Task<Void> bulkDeleteItems(List<Item> items) {
         List<Task<Void>> deleteTasks = new ArrayList<>();
 
         for (Item item : items) {
-            // Call the existing deleteItem method for each item
+            // Add the Task<Void> returned by deleteItem to the list
             deleteTasks.add(deleteItem(item));
         }
 
@@ -61,6 +84,7 @@ public class ItemDB {
 
         return allTasks;
     }
+
 
 
 
@@ -88,4 +112,5 @@ public class ItemDB {
     public Task<QuerySnapshot> getAllItems() {
         return itemsCollection.get();
     }
+
 }
