@@ -100,7 +100,7 @@ public class ItemDB {
                 });
     }
     public void deleteItem(Item item) {
-        deleteItemByField(itemsCollection, "serialNumber", item.getItemID());
+        deleteItemByField(itemsCollection, "itemID", item.getItemID());
     }
 
     // Example method to retrieve all items from Firestore
