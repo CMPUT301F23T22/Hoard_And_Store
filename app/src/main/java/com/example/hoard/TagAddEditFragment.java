@@ -18,7 +18,7 @@ A fragment that provides the UI for creating a new tag or editing an existing on
 This could be a dialog fragment or a full-screen fragment, depending on the design.
 */
 
-public class TagEditFragment extends DialogFragment {
+public class TagAddEditFragment extends DialogFragment {
     private String TagColor ;
     private String TagName;
     // Declare a private listener variable to hold a reference to the callback method.
@@ -54,7 +54,7 @@ public class TagEditFragment extends DialogFragment {
         // Instantiate the AutoCompleteTextView
         AutoCompleteTextView autoCompleteTextView = tagview.findViewById(R.id.editTagName);
 
-        // Now you can work with autoCompleteTextView, for example:
+        // TODO figure  a way to get a list of the tags :
         autoCompleteTextView.setHint("Enter tag name");
 
         // Find the GridLayout named 'tag_colorPicker' from the inflated view.
@@ -102,7 +102,7 @@ public class TagEditFragment extends DialogFragment {
 
                 if (!TagName.isEmpty() && TagColor != null) {
                     createAndSendTag(TagName, TagColor);
-                    dismiss();  // Optionally, dismiss the dialog after creating the tag
+                    dismiss();  // dismiss the dialog after creating the tag
                 } else {
                     // TODO Handle the error. For example, show a toast to inform the user.
                 }
