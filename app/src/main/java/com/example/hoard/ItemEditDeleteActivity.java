@@ -1,10 +1,15 @@
 package com.example.hoard;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -14,6 +19,8 @@ public class ItemEditDeleteActivity extends AppCompatActivity {
 
     private TextView dateOfAcquisitionTextView, makeTextView, modelTextView, serialNumberTextView, estimatedValueTextView, commentTextView, briefDescriptionTextView ,AddtagView;
     private Item selectedItem;
+
+    private ActivityResultLauncher<Intent> editActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleEditResult);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +76,24 @@ public class ItemEditDeleteActivity extends AppCompatActivity {
             }
         });
 
+        editButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ItemEditDeleteActivity.this, AddEditItem.class);
+                intent.putExtra("ITEM_TO_EDIT", selectedItem);
+                editActivityResultLauncher.launch(intent);
+            }
+        });
+    }
+
+    private void handleEditResult(ActivityResult result) {
+        if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+            Item returnedItem = (Item) result.getData().getSerializableExtra("updatedItem");
+            if (returnedItem != null) {
+                selectedItem = returnedItem;
+                displaySelectedItem();
+            }
+        }
     }
 
     private void displaySelectedItem() {

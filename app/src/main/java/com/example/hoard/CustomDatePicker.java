@@ -5,14 +5,13 @@ import androidx.fragment.app.FragmentActivity;
 import com.google.android.material.datepicker.MaterialDatePicker;
 
 import java.util.Calendar;
-import java.util.Date;
 
 public class CustomDatePicker {
     private Context context;
     private DatePickListener listener;
 
     public interface DatePickListener {
-        void onDatePicked(Date date);
+        void onDatePicked(int year,int month,int day);
     }
 
     public CustomDatePicker(Context context, DatePickListener listener) {
@@ -28,9 +27,12 @@ public class CustomDatePicker {
         materialDatePicker.addOnPositiveButtonClickListener(selection -> {
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(selection);
-            Date selectedDate = calendar.getTime();
+            int year = calendar.get(Calendar.YEAR);
+            int month = calendar.get(Calendar.MONTH); // Note: January is 0, December is 11
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
+
             if (listener != null) {
-                listener.onDatePicked(selectedDate);
+                listener.onDatePicked(year, month, day);
             }
         });
     }
