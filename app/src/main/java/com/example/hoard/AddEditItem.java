@@ -3,8 +3,10 @@ package com.example.hoard;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,22 +14,19 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.text.SimpleDateFormat;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
-public class AddEditItem extends AppCompatActivity implements CustomDatePicker.DatePickListener, TagEditFragment.TagAddListener {
+public class AddEditItem extends AppCompatActivity implements CustomDatePicker.DatePickListener, TagAddEditFragment.TagAddListener {
 
-    private EditText descriptionInput;
-    private EditText makeInput;
-    private EditText modelInput;
-    private EditText serialNumberInput;
-    private EditText valueInput;
-    private EditText commentInput;
-
+    private EditText descriptionInput , makeInput , modelInput , serialNumberInput, valueInput ,commentInput;
     private EditText dateInput;
 
     private TextInputLayout dateInputLayout;
@@ -41,7 +40,10 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
     private boolean wasEdited;
 
     CustomDatePicker customDatePicker;
+    private ArrayList<Tag> tagList; // Your list of tags
+    private ArrayAdapter<Tag> tagAdapter; // Adapter for ListView or use a RecyclerView.Adapter for RecyclerView
 
+    private ChipGroup chipGroupTags;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,6 +75,9 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
             commentInput.setText(currentItem.getComment());
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
             dateInput.setText(sdf.format(currentItem.getDateOfAcquisition()));
+
+
+
         }
 
         // Create an instance of the CustomDatePicker
@@ -96,19 +101,23 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         addTagBtn.setOnClickListener(view -> {
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction transaction = fragmentManager.beginTransaction();
-            Fragment tagEditFragment = new TagEditFragment();
+            Fragment tagEditFragment = new TagAddEditFragment();
 
-            // If you're replacing an existing fragment that fills the whole activity
+            // fills the whole activity
             transaction.replace(android.R.id.content, tagEditFragment, "ADD_TAG");
-
-            // Alternatively, if you have a container where the fragment should be placed
-            // transaction.replace(R.id.fragment_container, tagEditFragment, "ADD_TAG");
-
             transaction.addToBackStack(null); // if you want to add the transaction to the back stack
             transaction.commit();
         });
 
+        // Initialization of tagList and tagAdapter
+        tagList = new ArrayList<>();
+        ListView tagListView = findViewById(R.id.tag_list_view);
+        tagAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, tagList);
+        tagListView.setAdapter(tagAdapter);
 
+
+        chipGroupTags = findViewById(R.id.chip_group_tags);
+    }
     }
 
     private void saveItem() {
@@ -154,7 +163,29 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
 
     @Override
     public void onTagAdded(Tag newTag) {
-        // Handle the new tag here.
-        // #TODO
+        // Update the UI
+        tagList.add(newTag);
+        tagAdapter.notifyDataSetChanged();
+
+        // Create a new Chip for the newTag
+        Chip chip = new Chip(this);
+        chip.setText(newTag.getName()); // Assuming Tag has a getName method.
+        chip.setChipIconResource(R.drawable.ic_tag); // Optional icon.
+        chip.setCloseIconVisible(true);
+        chip.setOnCloseIconClickListener(view -> {
+            // Handle the close icon click listener
+            chipGroupTags.removeView(chip);
+            // TODO to remove the tag from the data source.
+        });
+
+        // Add the Chip to the ChipGroup
+        chipGroupTags.addView(chip);
+
+        // Persist the tag (see previous example for saving the tag).
+        saveTag(newTag);
     }
+
+
+
+}
 }

@@ -9,12 +9,8 @@ import java.util.regex.Matcher;
 
 public class Item implements Serializable {
     private Date dateOfAcquisition;
-    private String briefDescription;
-    private String make;
-    private String model;
-    private String serialNumber;
+    private String briefDescription ,make, model, serialNumber , comment;
     private double estimatedValue;
-    private String comment;
     private ArrayList<Tag> tags;
 
     public Item(Date dateOfAcquisition, String briefDescription, String make, String model, String serialNumber, double estimatedValue, String comment) {
@@ -48,6 +44,8 @@ public class Item implements Serializable {
         this.serialNumber = serialNumber;
         this.estimatedValue = estimatedValue;
         this.comment = comment;
+        this.tags = new ArrayList<Tag>();
+
     }
 
     public static boolean isValidDate(Date date) {
@@ -141,14 +139,20 @@ public class Item implements Serializable {
     }
 
     public void addTag(Tag tag) {
-        tags.add(tag);
+        if (tags != null) {
+            tags.add(tag);
+        }else{
+            //#TODO error message
+        }
     }
 
     public void removeTag(Tag tag) {
-        tags.remove(tag);
+        if (tags != null) {
+            tags.remove(tag);
+        }
     }
 
     public ArrayList<Tag> getTags() {
-        return tags;
+        return this.tags;
     }
 }
