@@ -46,7 +46,7 @@ public class ItemDB {
                     }
                 });
     }
-    public Task<Void> bulkDeleteItems(ArrayList<Item> items) {
+    public Task<Void> bulkDeleteItems(List<Item> items) {
         List<Task<Void>> deleteTasks = new ArrayList<>();
 
         for (Item item : items) {
