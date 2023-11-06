@@ -36,7 +36,7 @@ public class ItemDBController {
         return instance;
     }
 
-    public void loadItems(final DataLoadCallback callback) {
+    public void loadItems(final DataLoadCallbackItem callback) {
         List<Item> items = new ArrayList<>();
         itemDB.getAllItems().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
@@ -55,8 +55,20 @@ public class ItemDBController {
                         String make = (String) data.get("make");
                         String briefDescription = (String) data.get("briefDescription");
                         String itemID = (String) data.get("itemID");
+                        ArrayList<Tag> tags = new ArrayList<Tag>();
+                        // convert tags from hash map to tag objects
+                        if (document.contains("tags")) {
+                            List<Map<String, Object>> tagsList = (List<Map<String, Object>>) document.getData().get("tags");
+                            for (Map<String, Object> tagMap : tagsList) {
+                                String tagName = (String) tagMap.get("tagName");
+                                String tagColor = (String) tagMap.get("tagColor");
+                                String tagID = (String) tagMap.get("tagID");
+                                Tag tag = new Tag(tagName,tagColor,tagID);
+                                tags.add(tag);
+                            }
+                        }
 
-                        Item item = new Item(dateOfAcquisition, briefDescription, make, model, serialNumber, estimatedValue, comment,itemID);
+                        Item item = new Item(dateOfAcquisition, briefDescription, make, model, serialNumber, estimatedValue, comment,itemID,tags);
                         items.add(item);
                     }
 

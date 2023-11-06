@@ -1,6 +1,8 @@
 package com.example.hoard;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -11,14 +13,21 @@ import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
+
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
-public class ItemEditDeleteActivity extends AppCompatActivity {
+public class DetailsActivity extends AppCompatActivity {
 
-    private TextView dateOfAcquisitionTextView, makeTextView, modelTextView, serialNumberTextView, estimatedValueTextView, commentTextView, briefDescriptionTextView ,AddtagView;
+    private TextView dateOfAcquisitionTextView, makeTextView, modelTextView, serialNumberTextView, estimatedValueTextView, commentTextView, briefDescriptionTextView;
     private Item selectedItem;
+
+    ChipGroup chipGroup;
 
     private ActivityResultLauncher<Intent> editActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleEditResult);
 
@@ -35,6 +44,7 @@ public class ItemEditDeleteActivity extends AppCompatActivity {
         serialNumberTextView = findViewById(R.id.serialNumberTextView);
         estimatedValueTextView = findViewById(R.id.estimatedValueTextView);
         commentTextView = findViewById(R.id.commentTextView);
+        chipGroup = findViewById(R.id.chipGroup);
 
         // Check if any of the views are null
         if (dateOfAcquisitionTextView == null || briefDescriptionTextView == null || makeTextView == null ||
@@ -79,7 +89,7 @@ public class ItemEditDeleteActivity extends AppCompatActivity {
         editButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ItemEditDeleteActivity.this, AddEditItem.class);
+                Intent intent = new Intent(DetailsActivity.this, AddEditItem.class);
                 intent.putExtra("ITEM_TO_EDIT", selectedItem);
                 editActivityResultLauncher.launch(intent);
             }
@@ -115,6 +125,16 @@ public class ItemEditDeleteActivity extends AppCompatActivity {
         estimatedValueTextView.setText(estimatedValue);
         String comment = getResources().getString(R.string.comment_placeholder, selectedItem.getComment());
         commentTextView.setText(comment);
+        ArrayList<Tag> tags = selectedItem.getTags();
+        // create a chips from tags
+        chipGroup.removeAllViews();
+        for (Tag tag : tags) {
+            Chip chip = new Chip(DetailsActivity.this);
+            chip.setText(tag.getTagName());
+            chip.setChipBackgroundColor(ColorStateList.valueOf(Color.parseColor(tag.getTagColor())));
+            // Add the chip to the ChipGroup
+            chipGroup.addView(chip);
+        }
     }
 
 }

@@ -189,15 +189,28 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/materialTextViewWithIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/tag"
+                android:drawablePadding="8dp"
+                android:text="Select Tags To Apply"
+                android:layout_gravity="center"/>
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="horizontal">
             <com.google.android.material.chip.ChipGroup
-                android:id="@+id/chip_group_tags"
+                android:id="@+id/tagChipGroup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="16dp">
                 <!-- Chips will be added here dynamically -->
             </com.google.android.material.chip.ChipGroup>
-            <!-- Add Tag Button with Icon -->
-            <!-- Tags Section -->
+            </HorizontalScrollView>
+            <!-- Create Tag Button with Icon -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/AddTagButton"
                 android:layout_width="match_parent"
@@ -206,7 +219,7 @@
                 android:drawableRight="@drawable/tag"
                 android:drawablePadding="8dp"
                 android:gravity="center"
-                android:text="Add Tag"
+                android:text="@string/create_new_tag_placeholder"
                 app:backgroundTint="#888A9A"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -223,7 +236,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="SUBMIT"
+        android:text="@string/submit_button_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/inputCardView" />

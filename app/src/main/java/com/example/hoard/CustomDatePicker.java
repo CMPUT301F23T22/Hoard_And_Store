@@ -28,8 +28,8 @@ public class CustomDatePicker {
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(selection);
             int year = calendar.get(Calendar.YEAR);
-            int month = calendar.get(Calendar.MONTH); // Note: January is 0, December is 11
-            int day = calendar.get(Calendar.DAY_OF_MONTH);
+            int month = calendar.get(Calendar.MONTH);
+            int day = calendar.get(Calendar.DAY_OF_MONTH) +1 ;
 
             if (listener != null) {
                 listener.onDatePicked(year, month, day);

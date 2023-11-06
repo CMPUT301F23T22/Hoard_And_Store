@@ -16,14 +16,15 @@
             android:name=".ListScreen"
             android:exported="false" />
 
-        <activity android:name=".ItemEditDeleteActivity"
+        <activity android:name=".DetailsActivity"
             android:exported="false"/>
 
         <activity android:name=".AddEditItem"
             android:exported="false"/>
         <activity android:name=".SortActivity"
             android:exported="false"/>
-
+        <activity android:name=".TagAddEdit"
+            android:exported="false"/>
         <activity
             android:name=".MainActivity"
             android:exported="true">

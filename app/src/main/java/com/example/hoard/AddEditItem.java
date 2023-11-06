@@ -2,19 +2,19 @@ package com.example.hoard;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -26,9 +26,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Locale;
 
-public class AddEditItem extends AppCompatActivity implements CustomDatePicker.DatePickListener, TagAddEditFragment.TagAddListener {
+public class AddEditItem extends AppCompatActivity implements CustomDatePicker.DatePickListener {
 
     private EditText descriptionInput, makeInput, modelInput, serialNumberInput, valueInput, commentInput, dateInput;
     private final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
@@ -38,18 +39,25 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
     private Date selectedDateObject;
     private Item currentItem; // Item to edit
     private boolean isEdit; // To identify whether it's an edit operation
-    private ItemDBController dbController;
+    private ItemDBController itemDBController;
 
-    private ArrayList<Tag> NewTagsList;
-    private ArrayAdapter<Tag> tagAdapter; // Adapter for ListView or use a RecyclerView.Adapter for RecyclerView
-    private ChipGroup chipGroupTags;
+    private TagDBController tagDBController;
+
+    private ActivityResultLauncher<Intent> addTagResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleAddTagResult);
+
+    private ArrayList<Tag> selectedTagList;
+
+    ChipGroup chipGroupTags;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.add_edit);
+        setContentView(R.layout.item_add_edit);
 
-        dbController = ItemDBController.getInstance();
+        selectedTagList = new ArrayList<Tag>();
+
+        itemDBController = ItemDBController.getInstance();
+        tagDBController = TagDBController.getInstance();
 
         // Initialize views
         descriptionInput = findViewById(R.id.descriptionInput);
@@ -61,16 +69,39 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         dateInput = findViewById(R.id.dateInput);
         dateInputLayout = findViewById(R.id.dateInputLayout);
         addEditHeader = findViewById(R.id.addEditHeader);
+        chipGroupTags = findViewById(R.id.tagChipGroup);
 
         // Check if editing
         Intent intent = getIntent();
         if (intent.hasExtra("ITEM_TO_EDIT")) {
             isEdit = true;
             currentItem = (Item) intent.getSerializableExtra("ITEM_TO_EDIT");
-            populateFields(currentItem);
+            populateFields();
         } else {
             isEdit = false;
         }
+
+        tagDBController.loadTags(new DataLoadCallBackTag() {
+            @Override
+            public void onDataLoaded(List<Tag> tags) {
+                // Iterate through the items, creating a chip for each one
+                for (Tag tag : tags) {
+                    Chip chip = new Chip(AddEditItem.this);
+                    chip.setText(tag.getTagName());
+                    chip.setChipBackgroundColor(ColorStateList.valueOf(Color.parseColor(tag.getTagColor())));
+                    chip.setCheckedIconVisible(true);
+                    chip.setCheckable(true);
+                    chip.setTag(tag);
+                    // Add the chip to the ChipGroup
+                    chipGroupTags.addView(chip);
+                }
+                if (isEdit) {
+                    // select the tags from before
+                    selectTags();
+                }
+
+            }
+        });
 
         // Listener for the date picker
         dateInput.setOnClickListener(v -> showDatePicker());
@@ -91,22 +122,13 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         Button cancelButton = findViewById(R.id.closeButton);
         cancelButton.setOnClickListener(v -> finish());
 
-
-
         Button addTagBtn = findViewById(R.id.AddTagButton);
         addTagBtn.setOnClickListener(view -> {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
-            Fragment tagEditFragment = new TagAddEditFragment();
-
-            // fills the whole activity
-            transaction.replace(android.R.id.content, tagEditFragment, "ADD_TAG");
-            transaction.addToBackStack(null); // if you want to add the transaction to the back stack
-            transaction.commit();
+            // Create an intent that will start the TagAddEditActivity.
+            Intent tagIntent = new Intent(this, TagAddEdit.class);
+            // Start the new activity.
+            addTagResultLauncher.launch(tagIntent);
         });
-
-        chipGroupTags = findViewById(R.id.chip_group_tags);
-
     }
 
     private void showDatePicker() {
@@ -116,15 +138,32 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
 
     }
 
-    private void populateFields(Item item) {
+    private void populateFields() {
         addEditHeader.setText("EDIT");
-        descriptionInput.setText(item.getBriefDescription());
-        makeInput.setText(item.getMake());
-        modelInput.setText(item.getModel());
-        serialNumberInput.setText(item.getSerialNumber());
-        valueInput.setText(String.valueOf(item.getEstimatedValue()));
-        commentInput.setText(item.getComment());
-        dateInput.setText(sdf.format(item.getDateOfAcquisition()));
+        descriptionInput.setText(currentItem.getBriefDescription());
+        makeInput.setText(currentItem.getMake());
+        modelInput.setText(currentItem.getModel());
+        serialNumberInput.setText(currentItem.getSerialNumber());
+        valueInput.setText(String.valueOf(currentItem.getEstimatedValue()));
+        commentInput.setText(currentItem.getComment());
+        dateInput.setText(sdf.format(currentItem.getDateOfAcquisition()));
+    }
+
+    private void selectTags(){
+        ArrayList<Tag> tags = currentItem.getTags();
+        for (int i = 0; i < chipGroupTags.getChildCount(); i++) {
+            Chip chip = (Chip) chipGroupTags.getChildAt(i);
+            // Assuming each chip's tag has been set with a Tag object
+            Tag chipTag = (Tag) chip.getTag();
+            if (chipTag != null) {
+                // Loop through list of tags to check if the chip's tag ID is present
+                for (Tag tag : tags) {
+                    if (tag.getTagID().equals(chipTag.getTagID())) {
+                        chip.setChecked(true);
+                    }
+                }
+            }
+        }
     }
 
     private void saveItem() throws ParseException {
@@ -137,11 +176,10 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
 
     private void createNewItem() throws ParseException {
         Item newItem = getItemFromFields();
-        dbController.addItem(newItem, task -> {
+        itemDBController.addItem(newItem, task -> {
             if (task.isSuccessful()) {
                 // Log success
                 Log.i("AddItem", "Item added successfully");
-
 
                 Toast.makeText(this, "Item added successfully", Toast.LENGTH_SHORT).show();
                 Intent resultIntent = new Intent();
@@ -163,7 +201,7 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
     private void updateItem() throws ParseException {
         Item updatedItem = getItemFromFields();
 
-        dbController.editItem(updatedItem.getItemID(), updatedItem, task -> {
+        itemDBController.editItem(updatedItem.getItemID(), updatedItem, task -> {
             if (task.isSuccessful()) {
                 // Log success
                 Log.i("EditItem", "Item updated successfully");
@@ -185,7 +223,6 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         });
     }
 
-
     private Item getItemFromFields() throws ParseException {
         String description = descriptionInput.getText().toString();
         String make = makeInput.getText().toString();
@@ -194,6 +231,15 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         double value = Double.parseDouble(valueInput.getText().toString());
         String comment = commentInput.getText().toString();
         Date acquisitionDate = sdf.parse(dateInput.getText().toString());
+
+        // get selected tag
+        for (int i = 0; i < chipGroupTags.getChildCount(); i++) {
+            Chip chip = (Chip) chipGroupTags.getChildAt(i);
+            if (chip.isChecked()) {
+                Tag selectedtag = (Tag) chip.getTag();
+                selectedTagList.add(selectedtag);
+            }
+        }
 
         if (currentItem != null) {
            // If this is an edit, update the existing item's fields
@@ -204,14 +250,10 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
             currentItem.setEstimatedValue(value);
             currentItem.setComment(comment);
             currentItem.setDateOfAcquisition(acquisitionDate);
-            for(Tag tag : NewTagsList) {
-                currentItem.addTag(tag);
-            }
-
+            currentItem.setTags(selectedTagList);
             return currentItem;
         }
 
-        // otherwise return the old item #TODO check if tags was added
         return new Item(
                 acquisitionDate,
                 description,
@@ -219,7 +261,8 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
                 model,
                 serialNumber,
                 value,
-                comment);
+                comment,
+                selectedTagList);
 
     }
 
@@ -229,39 +272,21 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         dateInput.setText(sdf.format(selectedDateObject));
     }
 
-    @Override
-    public void onTagAdded(Tag newTag) {
-        // Update the UI
-
-        if(currentItem != null) {
-            currentItem.addTag(newTag);
-        }else {
-
-            NewTagsList.add(newTag);
-        }
-
-        tagAdapter.notifyDataSetChanged();
-
-        // Create a new Chip for the newTag
-        Chip chip = new Chip(this);
-        chip.setText(newTag.getTagName()); // Assuming Tag has a getName method.
-        chip.setChipIconResource(R.drawable.tag); // Optional icon.
-        chip.setCloseIconVisible(true);
-        chip.setOnCloseIconClickListener(view -> {
-            // Handle the close icon click listener
-            chipGroupTags.removeView(chip);
-            // remove the tag from the data source.
-
-            if(currentItem != null) {
-                currentItem.removeTag(newTag);
-            }else {
-
-                NewTagsList.remove(newTag);
+    private void handleAddTagResult(ActivityResult result) {
+        if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+            Tag returnedTag = (Tag) result.getData().getSerializableExtra("newTag");
+            if (returnedTag != null) {
+                Chip chip = new Chip(AddEditItem.this);
+                chip.setText(returnedTag.getTagName());
+                chip.setChipBackgroundColor(ColorStateList.valueOf(Color.parseColor(returnedTag.getTagColor())));
+                chip.setCheckedIconVisible(true);
+                chip.setCheckable(true);
+                chip.setTag(returnedTag);
+                // make it so that new created tag is selected
+                chip.setChecked(true);
+                // Add the chip to the ChipGroup
+                chipGroupTags.addView(chip);
             }
-        });
-
-        // Add the Chip to the ChipGroup
-        chipGroupTags.addView(chip);
-
+        }
     }
 }

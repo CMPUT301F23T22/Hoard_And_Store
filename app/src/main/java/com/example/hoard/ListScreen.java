@@ -13,7 +13,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -25,7 +24,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.snackbar.Snackbar;
 
-import java.util.Date;
 import java.util.List;
 
 public class ListScreen extends AppCompatActivity{
@@ -65,7 +63,7 @@ public class ListScreen extends AppCompatActivity{
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         dbController = ItemDBController.getInstance();
-        dbController.loadItems(new DataLoadCallback() {
+        dbController.loadItems(new DataLoadCallbackItem() {
             @Override
             public void onDataLoaded(List<Item> items) {
                 itemAdapter = new ItemAdapter(items);
@@ -153,7 +151,7 @@ public class ListScreen extends AppCompatActivity{
 
     protected void onResume() {
         super.onResume();
-        dbController.loadItems(new DataLoadCallback() {
+        dbController.loadItems(new DataLoadCallbackItem() {
             @Override
             public void onDataLoaded(List<Item> items) {
                 itemAdapter = new ItemAdapter(items);

@@ -15,7 +15,7 @@ public class Item implements Serializable {
     private String itemID;
     private ArrayList<Tag> tags;
 
-    public Item(Date dateOfAcquisition, String briefDescription, String make, String model, String serialNumber, double estimatedValue, String comment) {
+    public Item(Date dateOfAcquisition, String briefDescription, String make, String model, String serialNumber, double estimatedValue, String comment, ArrayList<Tag> tagsList) {
 
         if (!isValidDate(dateOfAcquisition)) {
             throw new IllegalArgumentException("Invalid date format.");
@@ -47,10 +47,10 @@ public class Item implements Serializable {
         this.estimatedValue = estimatedValue;
         this.comment = comment;
         this.itemID = UUID.randomUUID().toString();
-        this.tags = new ArrayList<Tag>(); //#TODO insure this works correctly
+        this.tags = tagsList;
     }
 
-    public Item(Date dateOfAcquisition, String briefDescription, String make, String model, String serialNumber, double estimatedValue, String comment, String itemID,ArrayList<Tag> TagsLists) {
+    public Item(Date dateOfAcquisition, String briefDescription, String make, String model, String serialNumber, double estimatedValue, String comment, String itemID,ArrayList<Tag> tagsList) {
         this.dateOfAcquisition = dateOfAcquisition;
         this.briefDescription = briefDescription;
         this.make = make;
@@ -59,7 +59,7 @@ public class Item implements Serializable {
         this.estimatedValue = estimatedValue;
         this.comment = comment;
         this.itemID = itemID;
-        this.tags = TagsLists; //#TODO insure this works correctly
+        this.tags = tagsList;
     }
 
     public static boolean isValidDate(Date date) {
@@ -164,6 +164,9 @@ public class Item implements Serializable {
         }
     }
 
+    public void setTags(ArrayList<Tag> tags) {
+        this.tags = tags;
+    }
     public void removeTag(Tag tag) {
         if (tags != null) {
             tags.remove(tag);
