@@ -7,6 +7,7 @@ import android.view.MenuItem;
 import android.view.Menu;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
@@ -18,6 +19,8 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -25,6 +28,8 @@ import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.function.Consumer;
 
 public class ListScreen extends AppCompatActivity{
 
@@ -32,6 +37,7 @@ public class ListScreen extends AppCompatActivity{
     private BottomAppBar bottomAppBar;
     private FloatingActionButton addItemButton;
     private Sort sortFragment = new Sort();
+    private TextView tvTotalValue;
     private Fragment currentFragment;
     FrameLayout listScreenFrame;
     private RecyclerView recyclerView;
@@ -52,6 +58,7 @@ public class ListScreen extends AppCompatActivity{
         setContentView(R.layout.activity_list_screen);
 
         addItemButton = findViewById(R.id.addItemButton);
+        tvTotalValue = findViewById(R.id.tvTotalValueAmount);
 
         bottomNav = findViewById(R.id.bottomNavigationView);
 
@@ -88,6 +95,7 @@ public class ListScreen extends AppCompatActivity{
                 return true;
             }
         });
+        updateTotalValue();
 
         addItemButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -129,13 +137,31 @@ public class ListScreen extends AppCompatActivity{
                 @Override
                 public void onDismissed(Snackbar snackbar, int event) {
                     if (event == Snackbar.Callback.DISMISS_EVENT_TIMEOUT || event == Snackbar.Callback.DISMISS_EVENT_SWIPE) {
-                        // Snackbar closed on its own
-                        itemToDelete = deletedItem;
+                        Item itemToDelete = deletedItem;
                         if (itemToDelete != null) {
-                            dbController.deleteItem(itemToDelete);
+                            dbController.deleteItem(itemToDelete, new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            updateTotalValue();
+                                        }
+                                    });
+                                }
+                            }, new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Snackbar.make(findViewById(R.id.coordinate_layout), "Failed to delete item. Please try again.", Snackbar.LENGTH_LONG).show();
+                                    itemAdapter.addItem(deletedItem);
+                                    itemAdapter.notifyItemInserted(deletedItemPosition);
+                                    updateTotalValue();
+                                }
+                            });
                         }
+                    } else if (event == Snackbar.Callback.DISMISS_EVENT_ACTION) {
+                        // TODO: Handle action
                     }
-
                 }
 
                 @Override
@@ -156,10 +182,20 @@ public class ListScreen extends AppCompatActivity{
             public void onDataLoaded(List<Item> items) {
                 itemAdapter = new ItemAdapter(items);
                 recyclerView.setAdapter(itemAdapter);
+                updateTotalValue();
             }
         });
     }
-
+    private void updateTotalValue() {
+        dbController.getTotalValue(new Consumer<Double>() {
+            @Override
+            public void accept(Double totalValue) {
+                // Here, update your TextView with the total value
+                TextView totalValueTextView = findViewById(R.id.tvTotalValueAmount); // Assuming you have a TextView with this ID
+                totalValueTextView.setText(String.format(Locale.getDefault(), "%.2f", totalValue));
+            }
+        });
+    }
     private void handleAddResult(ActivityResult result) {
         if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
             Item returnedItem = (Item) result.getData().getSerializableExtra("newItem");
@@ -167,6 +203,7 @@ public class ListScreen extends AppCompatActivity{
                     itemAdapter.addItem(returnedItem);
                     itemAdapter.notifyItemChanged(itemAdapter.getsize() - 1);
                 }
+            updateTotalValue();
             }
         }
 }
