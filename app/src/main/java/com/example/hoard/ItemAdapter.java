@@ -108,6 +108,15 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
     public int getItemCount() {
         return itemList.size();
     }
+    public int getSelectedItemCount() {
+        int count = 0;
+        for (Item item : itemList) {
+            if (item.isSelected()) {
+                count++;
+            }
+        }
+        return count;
+    }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView briefDescription;

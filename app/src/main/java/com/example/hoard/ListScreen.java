@@ -6,6 +6,7 @@ import com.google.android.gms.tasks.Task;
 
 import android.app.Activity;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -64,11 +65,11 @@ public class ListScreen extends AppCompatActivity{
         bottomAppBar.setVisibility(View.GONE);
         addItemButton.setVisibility(View.GONE);
 
-        // Show the "Delete All" button
+        // Show "Delete All" button
         Button deleteAllButton = findViewById(R.id.deleteAllButton);
         deleteAllButton.setVisibility(View.VISIBLE);
 
-        // Change the title
+        // Change title
         toolbar.setTitle("Select items to delete");
 
         itemAdapter.setSelectionMode(true);
@@ -89,23 +90,42 @@ public class ListScreen extends AppCompatActivity{
         });
         // Set an OnClickListener for the "Delete All" button
         deleteAllButton.setOnClickListener(v -> {
-            List<Item> selectedItems = itemAdapter.getSelectedItems();
-            Task<Void> deleteTask = dbController.bulkDeleteItems(selectedItems);
+            if (itemAdapter.getSelectedItemCount() == 0) {
+                Toast.makeText(ListScreen.this, "No items selected.", Toast.LENGTH_SHORT).show();
+                return;
+            } else {
+                // Create an AlertDialog Builder
+                new AlertDialog.Builder(ListScreen.this, R.style.PurpleAlertDialog)
+                        .setTitle("Confirm Delete")
+                        .setMessage("Are you sure you want to delete all selected items?") // Set the dialog message
+                        .setPositiveButton("Yes", (dialog, which) -> {
+                            // Positive button clicked, proceed with the deletion
+                            List<Item> selectedItems = itemAdapter.getSelectedItems();
+                            Task<Void> deleteTask = dbController.bulkDeleteItems(selectedItems);
 
-            deleteTask.addOnSuccessListener(aVoid -> {
-                // After successful deletion from Firestore, remove items from the adapter list.
-                for (Item selectedItem : selectedItems) {
-                    int index = itemAdapter.getItemList().indexOf(selectedItem);
-                    if (index != -1) {
-                        itemAdapter.removeItem(index);
-                    }
-                }
-                itemAdapter.clearSelections();
-                exitSelectionMode();
-            }).addOnFailureListener(e -> {
-                // Handle the failure scenario, perhaps by showing a message to the user.
-                Toast.makeText(ListScreen.this, "Error while deleting items.", Toast.LENGTH_SHORT).show();
-            });
+                            deleteTask.addOnSuccessListener(aVoid -> {
+                                // After successful deletion from Firestore, remove items from the adapter list.
+                                for (Item selectedItem : selectedItems) {
+                                    int index = itemAdapter.getItemList().indexOf(selectedItem);
+                                    if (index != -1) {
+                                        itemAdapter.removeItem(index);
+                                    }
+                                }
+                                itemAdapter.clearSelections();
+                                exitSelectionMode();
+                                Toast.makeText(ListScreen.this, "Items deleted successfully.", Toast.LENGTH_SHORT).show();
+                            }).addOnFailureListener(e -> {
+                                // Handle failure
+                                Toast.makeText(ListScreen.this, "Error while deleting items.", Toast.LENGTH_SHORT).show();
+                            });
+                        })
+                        .setNegativeButton("No", (dialog, which) -> {
+                            // Negative button clicked, do nothing
+                            dialog.dismiss();
+                        })
+                        .setIcon(android.R.drawable.ic_dialog_alert) // Set an icon for the dialog
+                        .show();
+            }
         });
     }
     private void exitSelectionMode() {
