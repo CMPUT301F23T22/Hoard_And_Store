@@ -1,8 +1,9 @@
 package com.example.hoard;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class Tag {
+public class Tag implements Serializable {
     private String tagName;
     private String tagColor;
 

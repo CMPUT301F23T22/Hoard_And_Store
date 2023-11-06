@@ -63,25 +63,42 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Serial Number -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tagColorInputLayout"
+            <!-- Color Picker -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
-                android:hint="Color Hex Code"
-                app:endIconDrawable="@drawable/palette"
-                app:endIconMode="custom"
-                app:hintEnabled="true"
-                app:hintAnimationEnabled="true"
-                app:boxBackgroundMode="outline">
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/tagColorInput"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tagColorInputLayout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="Color Hex Code"
+                    app:endIconDrawable="@drawable/palette"
+                    app:endIconMode="custom"
+                    app:hintEnabled="true"
+                    app:hintAnimationEnabled="true"
+                    app:boxBackgroundMode="outline">
 
-            </com.google.android.material.textfield.TextInputLayout>
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/tagColorInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Color Indicator View -->
+                <View
+                    android:id="@+id/colorIndicator"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@android:color/darker_gray"/>
+            </LinearLayout>
+
         </LinearLayout>
 
     </com.google.android.material.card.MaterialCardView>

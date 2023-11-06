@@ -23,7 +23,8 @@
             android:exported="false"/>
         <activity android:name=".SortActivity"
             android:exported="false"/>
-
+        <activity android:name=".TagAddEdit"
+            android:exported="false"/>
         <activity
             android:name=".MainActivity"
             android:exported="true">
