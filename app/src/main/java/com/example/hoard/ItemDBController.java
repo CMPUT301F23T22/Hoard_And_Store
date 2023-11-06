@@ -3,6 +3,8 @@ package com.example.hoard;
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -12,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class ItemDBController {
     private static ItemDBController instance;
@@ -81,14 +84,41 @@ public class ItemDBController {
 
         });
     }
-
+    public void getTotalValue(final Consumer<Double> callback) {
+        itemDB.getAllItems().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    double totalValue = 0.0;
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Map<String, Object> data = document.getData();
+                        if (data.containsKey("estimatedValue")) {
+                            Object estimatedValueObj = data.get("estimatedValue");
+                            if (estimatedValueObj instanceof Number) {
+                                totalValue += ((Number) estimatedValueObj).doubleValue();
+                            }
+                        }
+                    }
+                    callback.accept(totalValue);
+                } else {
+                    // TODO: Handle the error when fetching data
+                    callback.accept(0.0);
+                }
+            }
+        });
+    }
     public void addItem(Item item,OnCompleteListener<Void> onCompleteListener){
         itemDB.addItem(item,onCompleteListener);
     }
 
-    public void deleteItem(Item item) {itemDB.deleteItem(item);}
+    public void deleteItem(Item item, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
+        itemDB.deleteItem(item)
+                .addOnSuccessListener(onSuccessListener)
+                .addOnFailureListener(onFailureListener);
+    }
 
-    public void editItem(String itemID, Item item,OnCompleteListener<QuerySnapshot> onCompleteListener){
-        itemDB.editItem(itemID, item,onCompleteListener);
+    public void editItem(String itemID, Item item, OnCompleteListener<Void> onCompleteListener) {
+        itemDB.editItem(itemID, item)
+                .addOnCompleteListener(onCompleteListener);
     }
 }
