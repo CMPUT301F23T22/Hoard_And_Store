@@ -6,6 +6,7 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
@@ -31,9 +33,13 @@ import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationBarView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class SortActivity extends AppCompatActivity {
     private ArrayList<String> dataList;
@@ -66,7 +72,7 @@ public class SortActivity extends AppCompatActivity {
         appliedMakes = new ArrayList<>();
         makes = new ArrayList<>();
         dataList = new ArrayList<>();
-        FilterCriteria filterCriteria = FilterCriteria.getInstance();
+        filterCriteria = FilterCriteria.getInstance();
 
         // Find views
         recyclerView = findViewById(R.id.sorting);
@@ -109,9 +115,39 @@ public class SortActivity extends AppCompatActivity {
         applyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                EditText startDateEditText = findViewById(R.id.start_date_edit_text);
+                EditText endDateEditText = findViewById(R.id.end_date_edit_text);
+                String startDateString = startDateEditText.getText().toString();
+                String endDateString = endDateEditText.getText().toString();
+                SimpleDateFormat dateFormatter = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
+                if (!startDateString.isEmpty()) {
+                    try {
+                        Date startDate = dateFormatter.parse(startDateString);
+                        filterCriteria.setStartDate(startDate);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (!endDateString.isEmpty()) {
+                    try {
+                        Date endDate = dateFormatter.parse(endDateString);
+                        filterCriteria.setEndDate(endDate);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                Log.d("filterCriteria", "Start date: " + filterCriteria.getStartDate() + "End date: " + filterCriteria.getEndDate());
+
+
                 String enteredMake = search.getText().toString();
+                Intent returnIntent = new Intent(getApplicationContext(), ListScreen.class);
+                returnIntent.putExtra("filterCriteria", filterCriteria);
+                setResult(RESULT_OK, returnIntent);
+                finish();
                 if (!enteredMake.isEmpty()) {
                     appliedMakes.add(enteredMake);
+                    filterCriteria.setMakes(appliedMakes);
+
                 }
                 //filterCriteria.setMakes(appliedMakes);
 
@@ -172,6 +208,25 @@ public class SortActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 MaterialDatePicker<Pair<Long, Long>> materialDatePicker = createMaterialDatePicker();
+
+                materialDatePicker.addOnPositiveButtonClickListener(selection -> {
+                    Long startDateInMillis = selection.first;
+                    Long endDateInMillis = selection.second;
+
+                    SimpleDateFormat dateFormatter = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
+                    dateFormatter.setTimeZone(TimeZone.getTimeZone("GMT"));
+                    String startDate = dateFormatter.format(new Date(startDateInMillis));
+                    String endDate = dateFormatter.format(new Date(endDateInMillis));
+                    Log.d("Date Range Picker", "Raw start date millis: " + startDateInMillis + ", Raw end date millis: " + endDateInMillis);
+                    Log.d("Date Range Picker", "Start date: " + startDate + ", End date: " + endDate);
+
+                    EditText startDateEditText = findViewById(R.id.start_date_edit_text);
+                    EditText endDateEditText = findViewById(R.id.end_date_edit_text);
+
+                    startDateEditText.setText(startDate);
+                    endDateEditText.setText(endDate);
+                });
+
                 materialDatePicker.show(getSupportFragmentManager(), "DATE_PICKER_TAG");
 
             }

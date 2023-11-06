@@ -9,6 +9,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -110,6 +111,15 @@ public class ItemDB {
                 // Use the "whereIn" method to create an "OR" condition
                 query = query.whereIn("make", makes);
             }
+            if (filterCriteria.getStartDate() != null) {
+                Timestamp startTimestamp = new Timestamp(filterCriteria.getStartDate());
+                query = query.whereGreaterThanOrEqualTo("dateOfAcquisition", startTimestamp);
+            }
+            if (filterCriteria.getEndDate() != null) {
+                Timestamp endTimestamp = new Timestamp(filterCriteria.getEndDate());
+                query = query.whereLessThanOrEqualTo("dateOfAcquisition", endTimestamp);
+            }
+
         }
         return query;
     }

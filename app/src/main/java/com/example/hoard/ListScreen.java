@@ -107,8 +107,9 @@ public class ListScreen extends AppCompatActivity {
 //                    sortIntent.putExtra("filterCriteria", filterCriteria);
 //                    filterActivityResultLauncher.launch(sortIntent);
 
-                        Intent sortIntent = new Intent(getApplicationContext(), SortActivity.class);
-                        startActivity(sortIntent);
+                    Intent sortIntent = new Intent(getApplicationContext(), SortActivity.class);
+                    sortIntent.putExtra("filterCriteria", filterCriteria);
+                    filterActivityResultLauncher.launch(sortIntent);
 
 
 
@@ -212,31 +213,27 @@ public class ListScreen extends AppCompatActivity {
         }
     };
 
-//    ActivityResultLauncher<Intent> filterActivityResultLauncher = registerForActivityResult(
-//            new ActivityResultContracts.StartActivityForResult(),
-//            new ActivityResultCallback<ActivityResult>() {
-//                @Override
-//                public void onActivityResult(ActivityResult result) {
-//                    if (result.getResultCode() == Activity.RESULT_OK) {
-//                        Intent data = result.getData();
-//                        if (data != null) {
-//                            FilterCriteria updatedFilterCriteria  = (FilterCriteria) data.getSerializableExtra("filterCriteria");
-//                            if (updatedFilterCriteria != null) {
-//                                // Update the filterCriteria with the updated filter criteria
-//                                filterCriteria = updatedFilterCriteria;
-//                                // You can then use the updated filterCriteria as needed
-//                                // For example, refresh your data with the new filter criteria
-//                                dbController.loadItems(new DataLoadCallback() {
-//                                    @Override
-//                                    public void onDataLoaded(List<Item> items) {
-//                                        itemAdapter = new ItemAdapter(items);
-//                                        recyclerView.setAdapter(itemAdapter);
-//                                    }
-//                                }, filterCriteria);
-//
-//                            }
-//                        }
-//                    }
-//                }
-//            });
+    ActivityResultLauncher<Intent> filterActivityResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Intent data = result.getData();
+                        if (data != null) {
+                            FilterCriteria updatedFilterCriteria = (FilterCriteria) data.getSerializableExtra("filterCriteria");
+                            if (updatedFilterCriteria != null) {
+                                filterCriteria.apply(updatedFilterCriteria);
+                                dbController.loadItems(new DataLoadCallback() {
+                                    @Override
+                                    public void onDataLoaded(List<Item> items) {
+                                        itemAdapter.setItems(items);
+                                        recyclerView.scrollToPosition(0);
+                                    }
+                                }, filterCriteria);
+                            }
+                        }
+                    }
+                }
+            });
 }

@@ -64,9 +64,16 @@
                 android:text="Filter By:" />
 
             <EditText
+                android:id="@+id/start_date_edit_text"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:hint="Date Range"></EditText>
+                android:hint="From Start date MM/DD/YYYY"></EditText>
+
+            <EditText
+                android:id="@+id/end_date_edit_text"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:hint="To end date MM/DD/YYYY"></EditText>
 
             <Button
                 android:id="@+id/showDateRangePicker"
@@ -190,11 +197,3 @@
         app:srcCompat="@drawable/baseline_add_24"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-
-
-
-
-
-
-
