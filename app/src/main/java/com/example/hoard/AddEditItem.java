@@ -282,6 +282,8 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
                 chip.setCheckedIconVisible(true);
                 chip.setCheckable(true);
                 chip.setTag(returnedTag);
+                // make it so that new created tag is selected
+                chip.setChecked(true);
                 // Add the chip to the ChipGroup
                 chipGroupTags.addView(chip);
             }
