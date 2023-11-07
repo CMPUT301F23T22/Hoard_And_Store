@@ -114,12 +114,19 @@ public class ItemDB {
             if (filterCriteria.getStartDate() != null) {
                 Timestamp startTimestamp = new Timestamp(filterCriteria.getStartDate());
                 query = query.whereGreaterThanOrEqualTo("dateOfAcquisition", startTimestamp);
+                Log.d("Firestore", "startTimestamp: " + startTimestamp.toString());
             }
             if (filterCriteria.getEndDate() != null) {
                 Timestamp endTimestamp = new Timestamp(filterCriteria.getEndDate());
                 query = query.whereLessThanOrEqualTo("dateOfAcquisition", endTimestamp);
+                Log.d("Firestore", "endTimestamp: " + endTimestamp.toString());
             }
 
+            if (filterCriteria.getDescriptionKeyWords() != null && !filterCriteria.getDescriptionKeyWords().isEmpty()) {
+                List<String> descriptionKeyWords = filterCriteria.getDescriptionKeyWords();
+                query = query.whereArrayContainsAny("briefDescriptionList", descriptionKeyWords);
+                Log.d("Firestore", "descriptionKeyWords: " + descriptionKeyWords.toString());
+            }
         }
         return query;
     }

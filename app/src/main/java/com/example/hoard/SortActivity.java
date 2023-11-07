@@ -36,30 +36,23 @@ import com.google.android.material.navigation.NavigationBarView;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
 public class SortActivity extends AppCompatActivity {
-    private ArrayList<String> dataList;
-    private RecyclerView recyclerView;
-    private SortAdapter sortAdapter;
-    private LinearLayoutManager layoutManager;
     private BottomNavigationView bottomNav;
     private BottomAppBar bottomAppBar;
-    private Menu bottomMenu;
-    private MenuItem sort;
     private EditText makeTextField;
     private AutoCompleteTextView search;
-    private ItemDBController dbController;
     private ItemAdapter itemAdapter;
     private ArrayAdapter<String> itemMakes;
     private List<String> makes;
     private FloatingActionButton fab;
-    private Button applyButton;
     private Button addMoreFilters;
-    private Button resetFilters;
     private List<String> appliedMakes;
     private FilterCriteria filterCriteria;
 
@@ -71,15 +64,15 @@ public class SortActivity extends AppCompatActivity {
         // Initialize data
         appliedMakes = new ArrayList<>();
         makes = new ArrayList<>();
-        dataList = new ArrayList<>();
+        ArrayList<String> dataList = new ArrayList<>();
         filterCriteria = FilterCriteria.getInstance();
 
         // Find views
-        recyclerView = findViewById(R.id.sorting);
+        RecyclerView recyclerView = findViewById(R.id.sorting);
         bottomNav = findViewById(R.id.bottomNavigationView);
         bottomAppBar = findViewById(R.id.bottomAppBar);
-        bottomMenu = bottomNav.getMenu();
-        sort = bottomMenu.findItem(R.id.nav_sort);
+        Menu bottomMenu = bottomNav.getMenu();
+        MenuItem sort = bottomMenu.findItem(R.id.nav_sort);
         sort.setChecked(true);
 
         // Initialize adapters and layout manager
@@ -88,15 +81,15 @@ public class SortActivity extends AppCompatActivity {
         search.setThreshold(1);
         String[] sortOptions = {"Date", "Make", "Estimated Value", "Description", "Edmonton", "Tags" };
         dataList = new ArrayList<>(Arrays.asList(sortOptions));
-        sortAdapter = new SortAdapter(dataList);
-        layoutManager = new LinearLayoutManager(this);
+        SortAdapter sortAdapter = new SortAdapter(dataList);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(sortAdapter);
-        dbController = ItemDBController.getInstance();
+        ItemDBController dbController = ItemDBController.getInstance();
         fab = findViewById(R.id.addItemButton);
-        applyButton = findViewById(R.id.apply_filter_sort_button);
+        Button applyButton = findViewById(R.id.apply_filter_sort_button);
         addMoreFilters = findViewById(R.id.add_more_make_filter);
-        resetFilters = findViewById(R.id.reset_make_filter);
+        Button resetFilters = findViewById(R.id.reset_make_filter);
         //addMoreFilters.setVisibility(View.INVISIBLE);
 
         setFiltersCount(addMoreFilters, filterCriteria.getMakes());
@@ -127,17 +120,35 @@ public class SortActivity extends AppCompatActivity {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                } else {
+                    filterCriteria.setStartDate(null);
                 }
                 if (!endDateString.isEmpty()) {
                     try {
                         Date endDate = dateFormatter.parse(endDateString);
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTime(endDate);
+                        calendar.set(Calendar.HOUR_OF_DAY, 23);
+                        calendar.set(Calendar.MINUTE, 59);
+                        calendar.set(Calendar.SECOND, 59);
+                        calendar.set(Calendar.MILLISECOND, 999);
+                        endDate = calendar.getTime();
                         filterCriteria.setEndDate(endDate);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                } else {
+                    filterCriteria.setEndDate(null);
                 }
-                Log.d("filterCriteria", "Start date: " + filterCriteria.getStartDate() + "End date: " + filterCriteria.getEndDate());
 
+                EditText BriefDescriptionKeywordEditText = findViewById(R.id.BriefDescriptionKeyword);
+                String BriefDescriptionKeywordString = BriefDescriptionKeywordEditText.getText().toString();
+                if (!BriefDescriptionKeywordString.isEmpty()) {
+                    List<String> briefDescriptionKeywords = Arrays.asList(BriefDescriptionKeywordString.split("\\s+"));
+                    filterCriteria.setDescriptionKeyWords(briefDescriptionKeywords);
+                } else {
+                    filterCriteria.setDescriptionKeyWords(null);
+                }
 
                 String enteredMake = search.getText().toString();
                 Intent returnIntent = new Intent(getApplicationContext(), ListScreen.class);
@@ -164,8 +175,6 @@ public class SortActivity extends AppCompatActivity {
                 Rect r = new Rect();
                 rootView.getWindowVisibleDisplayFrame(r);
                 int screenHeight = rootView.getHeight();
-                int keypadHeight = screenHeight - r.bottom;
-                int threshold = screenHeight / 6;
 
                 if (screenHeight < 1400) {
                     bottomNav.setVisibility(View.GONE);
@@ -217,8 +226,6 @@ public class SortActivity extends AppCompatActivity {
                     dateFormatter.setTimeZone(TimeZone.getTimeZone("GMT"));
                     String startDate = dateFormatter.format(new Date(startDateInMillis));
                     String endDate = dateFormatter.format(new Date(endDateInMillis));
-                    Log.d("Date Range Picker", "Raw start date millis: " + startDateInMillis + ", Raw end date millis: " + endDateInMillis);
-                    Log.d("Date Range Picker", "Start date: " + startDate + ", End date: " + endDate);
 
                     EditText startDateEditText = findViewById(R.id.start_date_edit_text);
                     EditText endDateEditText = findViewById(R.id.end_date_edit_text);

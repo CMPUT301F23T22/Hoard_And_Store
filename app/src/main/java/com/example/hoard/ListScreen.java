@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -155,7 +156,7 @@ public class ListScreen extends AppCompatActivity {
                                 Double.parseDouble(estimatedValue.getText().toString()),
                                 comment.getText().toString()
                         );
-
+                        Log.d("Item", newItem.getBriefDescriptionList().toString());
                         dbController.addItem(newItem);
                         itemAdapter.addItem(newItem);
                         itemAdapter.notifyItemChanged(itemAdapter.getsize() - 1);

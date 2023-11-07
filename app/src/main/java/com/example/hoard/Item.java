@@ -1,9 +1,12 @@
 package com.example.hoard;
 
+import android.util.Log;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -16,6 +19,7 @@ public class Item implements Serializable {
     private double estimatedValue;
     private String comment;
     private ArrayList<Tag> tags;
+    private List<String> briefDescriptionList;
 
     public Item(Date dateOfAcquisition, String briefDescription, String make, String model, String serialNumber, double estimatedValue, String comment) {
 
@@ -48,8 +52,13 @@ public class Item implements Serializable {
         this.serialNumber = serialNumber;
         this.estimatedValue = estimatedValue;
         this.comment = comment;
+        this.briefDescriptionList = splitBriefDescription(this.briefDescription);
     }
 
+    private List<String> splitBriefDescription(String briefDescription) {
+        String[] briefDescriptionArray = briefDescription.split(" ");
+        return Arrays.asList(briefDescriptionArray);
+    }
     public static boolean isValidDate(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
         String formattedDate = sdf.format(date);
@@ -98,6 +107,7 @@ public class Item implements Serializable {
 
     public void setBriefDescription(String briefDescription) {
         this.briefDescription = briefDescription;
+        this.briefDescriptionList = splitBriefDescription(this.briefDescription);
     }
 
     public String getMake() {
@@ -140,6 +150,9 @@ public class Item implements Serializable {
         this.comment = comment;
     }
 
+    public List<String> getBriefDescriptionList() {
+        return briefDescriptionList;
+    }
     public void addTag(Tag tag) {
         tags.add(tag);
     }
