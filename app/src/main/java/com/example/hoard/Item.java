@@ -53,8 +53,6 @@ public class Item implements Serializable {
         this.estimatedValue = estimatedValue;
         this.comment = comment;
         this.briefDescriptionList = splitBriefDescription(this.briefDescription);
-
-        Log.d("BriefDescriptionArray", briefDescriptionList.toString());
     }
 
     private List<String> splitBriefDescription(String briefDescription) {
