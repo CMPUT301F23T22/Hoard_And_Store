@@ -36,6 +36,7 @@ import com.google.android.material.navigation.NavigationBarView;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -119,14 +120,25 @@ public class SortActivity extends AppCompatActivity {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                } else {
+                    filterCriteria.setStartDate(null);
                 }
                 if (!endDateString.isEmpty()) {
                     try {
                         Date endDate = dateFormatter.parse(endDateString);
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTime(endDate);
+                        calendar.set(Calendar.HOUR_OF_DAY, 23);
+                        calendar.set(Calendar.MINUTE, 59);
+                        calendar.set(Calendar.SECOND, 59);
+                        calendar.set(Calendar.MILLISECOND, 999);
+                        endDate = calendar.getTime();
                         filterCriteria.setEndDate(endDate);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                } else {
+                    filterCriteria.setEndDate(null);
                 }
 
                 EditText BriefDescriptionKeywordEditText = findViewById(R.id.BriefDescriptionKeyword);
@@ -134,6 +146,8 @@ public class SortActivity extends AppCompatActivity {
                 if (!BriefDescriptionKeywordString.isEmpty()) {
                     List<String> briefDescriptionKeywords = Arrays.asList(BriefDescriptionKeywordString.split("\\s+"));
                     filterCriteria.setDescriptionKeyWords(briefDescriptionKeywords);
+                } else {
+                    filterCriteria.setDescriptionKeyWords(null);
                 }
 
                 String enteredMake = search.getText().toString();
