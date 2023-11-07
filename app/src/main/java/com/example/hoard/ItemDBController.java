@@ -60,7 +60,7 @@ public class ItemDBController {
                         String itemID = (String) data.get("itemID");
                         ArrayList<Tag> tags = new ArrayList<Tag>();
                         // convert tags from hash map to tag objects
-                        if (document.contains("tags")) {
+                        if (document.contains("tags")) { //TODO check for null array in tag list
                             List<Map<String, Object>> tagsList = (List<Map<String, Object>>) document.getData().get("tags");
                             for (Map<String, Object> tagMap : tagsList) {
                                 String tagName = (String) tagMap.get("tagName");
