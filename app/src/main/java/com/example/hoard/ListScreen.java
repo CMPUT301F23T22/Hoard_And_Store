@@ -91,7 +91,7 @@ public class ListScreen extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         dbController = ItemDBController.getInstance();
-        dbController.loadItems(new DataLoadCallback() {
+        dbController.loadItems(new DataLoadCallbackItem() {
             @Override
             public void onDataLoaded(List<Item> items) {
                 itemAdapter = new ItemAdapter(items);
@@ -183,8 +183,8 @@ public class ListScreen extends AppCompatActivity {
                     } else if (event == Snackbar.Callback.DISMISS_EVENT_ACTION) {
                         // TODO: Handle action
                     }
-
                 }
+
 
                 @Override
                 public void onShown(Snackbar snackbar) {
@@ -206,7 +206,7 @@ public class ListScreen extends AppCompatActivity {
                 recyclerView.setAdapter(itemAdapter);
                 updateTotalValue();
             }
-        });
+        }, filterCriteria);
     }
     private void updateTotalValue() {
         dbController.getTotalValue(new Consumer<Double>() {

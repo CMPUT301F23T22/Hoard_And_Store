@@ -1,7 +1,6 @@
 package com.example.hoard;
 
 import androidx.annotation.NonNull;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -10,7 +9,6 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -25,9 +23,6 @@ public class ItemDBController {
         itemDB = new ItemDB(new ItemDBConnector());
     }
 
-    // chatgpt: to make a singleton we only ever want one instance here
-    // prompts: Need to only have one instance of a class how can i do this in java
-    // Replied with pesudo code on how to do this
     public static ItemDBController getInstance() {
         if (instance == null) {
             synchronized (ItemDBController.class) {
@@ -39,7 +34,7 @@ public class ItemDBController {
         return instance;
     }
 
-    public void loadItems(final DataLoadCallback callback, final FilterCriteria filterCriteria) {
+    public void loadItems(final DataLoadCallbackItem callback, final FilterCriteria filterCriteria) {
         if (filterCriteria != null) {
             itemDB.filter(filterCriteria)
                     .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -48,7 +43,9 @@ public class ItemDBController {
                             if (task.isSuccessful()) {
                                 List<Item> filteredItems = new ArrayList<>();
                                 for (QueryDocumentSnapshot document : task.getResult()) {
+                                    // Extract data from the document
                                     Map<String, Object> data = document.getData();
+                                    // Extract fields from the data
                                     double estimatedValue = (double) data.get("estimatedValue");
                                     Timestamp timestamp = (Timestamp) data.get("dateOfAcquisition");
                                     Date dateOfAcquisition = timestamp.toDate();
@@ -58,27 +55,26 @@ public class ItemDBController {
                                     String make = (String) data.get("make");
                                     String briefDescription = (String) data.get("briefDescription");
                                     String itemID = (String) data.get("itemID");
-                                    ArrayList<Tag> tags = new ArrayList<Tag>();
-                                    // convert tags from hash map to tag objects
-                                    if (document.contains("tags")) { //TODO check for null array in tag list
-                                        List<Map<String, Object>> tagsList = (List<Map<String, Object>>) document.getData().get("tags");
-                                        for (Map<String, Object> tagMap : tagsList) {
-                                            String tagName = (String) tagMap.get("tagName");
-                                            String tagColor = (String) tagMap.get("tagColor");
-                                            String tagID = (String) tagMap.get("tagID");
-                                            Tag tag = new Tag(tagName,tagColor,tagID);
-                                            tags.add(tag);
+                                    List<Tag> tags = new ArrayList<>();
+                                    if (document.contains("tags")) {
+                                        List<Map<String, Object>> tagsList = (List<Map<String, Object>>) data.get("tags");
+                                        if (tagsList != null) {
+                                            for (Map<String, Object> tagMap : tagsList) {
+                                                String tagName = (String) tagMap.get("tagName");
+                                                String tagColor = (String) tagMap.get("tagColor");
+                                                String tagID = (String) tagMap.get("tagID");
+                                                Tag tag = new Tag(tagName, tagColor, tagID);
+                                                tags.add(tag);
+                                            }
                                         }
                                     }
 
-                                    Item item = new Item(dateOfAcquisition, briefDescription, make, model, serialNumber, estimatedValue, comment,itemID,tags);
+                                    Item item = new Item(dateOfAcquisition, briefDescription, make, model, serialNumber, estimatedValue, comment, itemID, (ArrayList<Tag>) tags);
                                     filteredItems.add(item);
-
                                 }
                                 callback.onDataLoaded(filteredItems);
                             } else {
                                 // Handle the error when fetching data
-                                // You can show an error message or take appropriate action
                             }
                         }
                     });
@@ -89,8 +85,9 @@ public class ItemDBController {
                     if (task.isSuccessful()) {
                         List<Item> items = new ArrayList<>();
                         for (QueryDocumentSnapshot document : task.getResult()) {
-                            //                        String iteml = document.getId();
+                            // Extract data from the document
                             Map<String, Object> data = document.getData();
+                            // Extract fields from the data
                             double estimatedValue = (double) data.get("estimatedValue");
                             Timestamp timestamp = (Timestamp) data.get("dateOfAcquisition");
                             Date dateOfAcquisition = timestamp.toDate();
@@ -100,30 +97,32 @@ public class ItemDBController {
                             String make = (String) data.get("make");
                             String briefDescription = (String) data.get("briefDescription");
                             String itemID = (String) data.get("itemID");
-                            ArrayList<Tag> tags = new ArrayList<Tag>();
-                            // convert tags from hash map to tag objects
-                            if (document.contains("tags")) { //TODO check for null array in tag list
-                                List<Map<String, Object>> tagsList = (List<Map<String, Object>>) document.getData().get("tags");
-                                for (Map<String, Object> tagMap : tagsList) {
-                                    String tagName = (String) tagMap.get("tagName");
-                                    String tagColor = (String) tagMap.get("tagColor");
-                                    String tagID = (String) tagMap.get("tagID");
-                                    Tag tag = new Tag(tagName,tagColor,tagID);
-                                    tags.add(tag);
+                            List<Tag> tags = new ArrayList<>();
+                            if (document.contains("tags")) {
+                                List<Map<String, Object>> tagsList = (List<Map<String, Object>>) data.get("tags");
+                                if (tagsList != null) {
+                                    for (Map<String, Object> tagMap : tagsList) {
+                                        String tagName = (String) tagMap.get("tagName");
+                                        String tagColor = (String) tagMap.get("tagColor");
+                                        String tagID = (String) tagMap.get("tagID");
+                                        Tag tag = new Tag(tagName, tagColor, tagID);
+                                        tags.add(tag);
+                                    }
                                 }
                             }
-                            Item item = new Item(dateOfAcquisition, briefDescription, make, model, serialNumber, estimatedValue, comment,itemID,tags);
+
+                            Item item = new Item(dateOfAcquisition, briefDescription, make, model, serialNumber, estimatedValue, comment, itemID, (ArrayList<Tag>) tags);
                             items.add(item);
                         }
                         callback.onDataLoaded(items);
                     } else {
                         // Handle the error when fetching data
-                        // You can show an error message or take appropriate action
                     }
                 }
-
-        });
+            });
+        }
     }
+
     public void getTotalValue(final Consumer<Double> callback) {
         itemDB.getAllItems().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
@@ -141,14 +140,15 @@ public class ItemDBController {
                     }
                     callback.accept(totalValue);
                 } else {
-                    // TODO: Handle the error when fetching data
+                    // Handle the error when fetching data
                     callback.accept(0.0);
                 }
             }
         });
     }
-    public void addItem(Item item,OnCompleteListener<Void> onCompleteListener){
-        itemDB.addItem(item,onCompleteListener);
+
+    public void addItem(Item item, OnCompleteListener<Void> onCompleteListener) {
+        itemDB.addItem(item, onCompleteListener);
     }
 
     public void deleteItem(Item item, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
@@ -156,7 +156,6 @@ public class ItemDBController {
                 .addOnSuccessListener(onSuccessListener)
                 .addOnFailureListener(onFailureListener);
     }
-
 
     public void editItem(String itemID, Item item, OnCompleteListener<Void> onCompleteListener) {
         itemDB.editItem(itemID, item)
