@@ -40,6 +40,7 @@ public class SortActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private SortAdapter sortAdapter;
     private LinearLayoutManager layoutManager;
+    private Button showDatePicker;
     private BottomNavigationView bottomNav;
     private BottomAppBar bottomAppBar;
     private Menu bottomMenu;
@@ -157,7 +158,9 @@ public class SortActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
                 if (id == R.id.nav_sort) {
-                    // Handle sorting
+                    Intent sortIntent = new Intent(getApplicationContext(), SortActivity.class);
+                    startActivity(sortIntent);
+
                 } else if (id == R.id.nav_home) {
                     // Navigate to the home screen
                     finish();
@@ -171,7 +174,10 @@ public class SortActivity extends AppCompatActivity {
         showDatePicker.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Create the MaterialDatePicker to select a date range
                 MaterialDatePicker<Pair<Long, Long>> materialDatePicker = createMaterialDatePicker();
+
+                // Show the date picker
                 materialDatePicker.show(getSupportFragmentManager(), "DATE_PICKER_TAG");
 
             }
@@ -232,6 +238,7 @@ public class SortActivity extends AppCompatActivity {
     private MaterialDatePicker<Pair<Long, Long>> createMaterialDatePicker() {
         MaterialDatePicker.Builder<Pair<Long, Long>> builder = MaterialDatePicker.Builder.dateRangePicker();
         builder.setTitleText("Select Date Range");
+
         return builder.build();
     }
 
@@ -245,6 +252,5 @@ public class SortActivity extends AppCompatActivity {
         }
     }
 }
-
 
 

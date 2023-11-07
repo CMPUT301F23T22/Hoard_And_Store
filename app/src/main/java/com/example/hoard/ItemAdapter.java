@@ -50,7 +50,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
             public void onClick(View view) {
                 // Your code for handling the item click
                 context = holder.itemView.getContext();
-                Intent intent = new Intent(context, ItemEditDeleteActivity.class);
+                Intent intent = new Intent(context, DetailsActivity.class);
                 intent.putExtra("SELECTED_ITEM", item);
                 context.startActivity(intent);
             }
