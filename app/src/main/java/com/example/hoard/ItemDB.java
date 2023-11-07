@@ -120,6 +120,12 @@ public class ItemDB {
                 query = query.whereLessThanOrEqualTo("dateOfAcquisition", endTimestamp);
             }
 
+            if (filterCriteria.getDescriptionKeyWords() != null && !filterCriteria.getDescriptionKeyWords().isEmpty()) {
+                List<String> descriptionKeyWords = filterCriteria.getDescriptionKeyWords();
+                for (String keyWord : descriptionKeyWords) {
+                    query = query.whereArrayContains("briefDescription", keyWord);
+                }
+            }
         }
         return query;
     }
