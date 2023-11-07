@@ -12,9 +12,12 @@ import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
+
+import java.util.List;
 
 public class ItemDB {
     private FirebaseFirestore db;
@@ -103,5 +106,23 @@ public class ItemDB {
     public Task<QuerySnapshot> getAllItems() {
         return itemsCollection.get();
     }
+    public Task<QuerySnapshot> filter(FilterCriteria filterCriteria) {
+        Query query = constructDynamicQuery(filterCriteria);
+        return query.get();
+    }
 
+    public Query constructDynamicQuery(FilterCriteria filterCriteria) {
+        Query query = itemsCollection; // Start with the base query
+
+        if (filterCriteria != null) {
+            if (filterCriteria.getMakes() != null && !filterCriteria.getMakes().isEmpty()) {
+                // Create a list of makes to filter on
+                List<String> makes = filterCriteria.getMakes();
+
+                // Use the "whereIn" method to create an "OR" condition
+                query = query.whereIn("make", makes);
+            }
+        }
+        return query;
+    }
 }

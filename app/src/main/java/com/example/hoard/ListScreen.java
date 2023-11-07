@@ -1,19 +1,29 @@
 package com.example.hoard;
 
 import android.app.Activity;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Menu;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -27,12 +37,15 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
 
-public class ListScreen extends AppCompatActivity{
+public class ListScreen extends AppCompatActivity {
 
+    private ItemDB itemDB;
     private BottomNavigationView bottomNav;
     private BottomAppBar bottomAppBar;
     private FloatingActionButton addItemButton;
@@ -46,16 +59,24 @@ public class ListScreen extends AppCompatActivity{
     private Menu bottomMenu;
     private MenuItem sort;
     private MenuItem home;
+
     private Item itemToDelete = null;
+    private FilterCriteria filterCriteria;
+
+    private final int sortingRequestCode = 1;
 
     private ActivityResultLauncher<Intent> addActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleAddResult);
 
 
-
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_screen);
+
+        filterCriteria = FilterCriteria.getInstance();
+
+        itemDB = new ItemDB(new ItemDBConnector());
 
         addItemButton = findViewById(R.id.addItemButton);
         tvTotalValue = findViewById(R.id.tvTotalValueAmount);
@@ -76,7 +97,7 @@ public class ListScreen extends AppCompatActivity{
                 itemAdapter = new ItemAdapter(items);
                 recyclerView.setAdapter(itemAdapter);
             }
-        });
+        }, filterCriteria);
 
         ItemTouchHelper helper = new ItemTouchHelper(simpleCallback);
         helper.attachToRecyclerView(recyclerView);
@@ -164,6 +185,7 @@ public class ListScreen extends AppCompatActivity{
                     }
                 }
 
+
                 @Override
                 public void onShown(Snackbar snackbar) {
 
@@ -184,7 +206,7 @@ public class ListScreen extends AppCompatActivity{
                 recyclerView.setAdapter(itemAdapter);
                 updateTotalValue();
             }
-        });
+        }, filterCriteria);
     }
     private void updateTotalValue() {
         dbController.getTotalValue(new Consumer<Double>() {
