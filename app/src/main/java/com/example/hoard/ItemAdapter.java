@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> implements Filterable {
@@ -25,6 +26,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
 
     public ItemAdapter(List<Item> itemList) {
         this.itemList = itemList;
+        this.filteredItems = new ArrayList<>(itemList);
     }
 
     @NonNull
@@ -36,7 +38,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Item item = itemList.get(position);
+        Item item = filteredItems.get(position);
         holder.briefDescription.setText(item.getBriefDescription());
         // Format the date using SimpleDateFormat
         SimpleDateFormat desiredFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -59,7 +61,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
 
     @Override
     public int getItemCount() {
-        return itemList.size();
+        return filteredItems.size();
     }
 
     @Override
@@ -89,6 +91,19 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
                 notifyDataSetChanged(); // Notify the adapter that the data has changed
             }
         };
+    }
+
+    public void filterByDateRange(Date startDate, Date endDate) {
+        List<Item> tempFilteredList = new ArrayList<>();
+        for (Item item : itemList) {
+            Date itemDate = item.getDateOfAcquisition();
+            if (!itemDate.before(startDate) && !itemDate.after(endDate)) {
+                tempFilteredList.add(item);
+            }
+        }
+
+        filteredItems = tempFilteredList;
+        notifyDataSetChanged();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -126,5 +141,11 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
             return itemList.get(position);
         }
         return null; // Return null or handle the out-of-bounds case as needed
+    }
+
+    public void setItems(List<Item> newItems) {
+        itemList = newItems;
+        filteredItems = new ArrayList<>(itemList);
+        notifyDataSetChanged();
     }
 }

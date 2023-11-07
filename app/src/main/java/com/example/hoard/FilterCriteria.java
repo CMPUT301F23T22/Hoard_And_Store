@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class FilterCriteria {
+public class FilterCriteria implements Serializable  {
     private List<String> makes;
     private List<String> descriptionKeyWords;
     private List<Tag> tags;
@@ -76,6 +76,19 @@ public class FilterCriteria {
     public void clearMakes() {
         makes.clear();
     }
+
+    public void apply(FilterCriteria updatedCriteria) {
+        if (updatedCriteria.getDescriptionKeyWords() != null) {
+            this.setDescriptionKeyWords(updatedCriteria.getDescriptionKeyWords()); 
+        }
+        if (updatedCriteria.getStartDate() != null) {
+            this.setStartDate(updatedCriteria.getStartDate());
+        }
+        if (updatedCriteria.getEndDate() != null) {
+            this.setEndDate(updatedCriteria.getEndDate());
+        }
+    }
+
 }
 
 
