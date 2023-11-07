@@ -81,9 +81,8 @@ public class SortActivity extends AppCompatActivity {
         itemMakes = new ArrayAdapter<>(this, android.R.layout.select_dialog_item);
         search = findViewById(R.id.filter_make_search);
         search.setThreshold(1);
-        String[] sortOptions = {"Date", "Make", "Estimated Value", "Description", "Edmonton", "Tags" };
-        dataList = new ArrayList<>(Arrays.asList(sortOptions));
-        sortAdapter = new SortAdapter(dataList);
+
+        sortAdapter = new SortAdapter();
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(sortAdapter);
@@ -115,7 +114,8 @@ public class SortActivity extends AppCompatActivity {
                     appliedMakes.add(enteredMake);
                 }
                 //filterCriteria.setMakes(appliedMakes);
-
+//                sortAdapter.getSortOptionsEnabled();
+                filterCriteria.setSortOptions(sortAdapter.getSortOptionsEnabled());
                 Intent listIntent = new Intent(getApplicationContext(), ListScreen.class);
                 startActivity(listIntent);
             }

@@ -18,6 +18,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 
 import java.util.List;
+import java.util.Map;
 
 public class ItemDB {
     private FirebaseFirestore db;
@@ -102,10 +103,11 @@ public class ItemDB {
         return deleteItemByField(itemsCollection, "itemID", item.getItemID());
     }
 
-    // Example method to retrieve all items from Firestore
+
     public Task<QuerySnapshot> getAllItems() {
         return itemsCollection.get();
     }
+
     public Task<QuerySnapshot> filter(FilterCriteria filterCriteria) {
         Query query = constructDynamicQuery(filterCriteria);
         return query.get();
@@ -121,6 +123,20 @@ public class ItemDB {
 
                 // Use the "whereIn" method to create an "OR" condition
                 query = query.whereIn("make", makes);
+            }
+            Map<String, String> sortOptions = filterCriteria.getSortOptions();
+            if (sortOptions != null) {
+                for (Map.Entry<String, String> entry : sortOptions.entrySet()) {
+                    String sortField = entry.getKey();
+                    String sortOrder = entry.getValue();
+
+                    // Determine the sorting order
+                    Query.Direction direction = sortOrder.equalsIgnoreCase("ascending") ?
+                            Query.Direction.ASCENDING : Query.Direction.DESCENDING;
+
+                    // Apply sorting based on the provided field and direction
+                    query = query.orderBy(sortField, direction);
+                }
             }
         }
         return query;

@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class FilterCriteria implements Serializable  {
     private List<String> makes;
@@ -13,6 +14,8 @@ public class FilterCriteria implements Serializable  {
     private List<Tag> tags;
     private Date startDate;
     private Date endDate;
+    private Map<String, String> sortOptions;
+
 
     private static FilterCriteria instance;
 
@@ -75,6 +78,14 @@ public class FilterCriteria implements Serializable  {
 
     public void clearMakes() {
         makes.clear();
+    }
+
+    public Map<String, String> getSortOptions (){
+        return sortOptions;
+    }
+
+    public void setSortOptions(Map<String, String> sortOptions) {
+        this.sortOptions = sortOptions;
     }
 
     public void apply(FilterCriteria updatedCriteria) {
