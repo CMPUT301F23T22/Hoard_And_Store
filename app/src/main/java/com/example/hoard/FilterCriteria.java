@@ -100,6 +100,28 @@ public class FilterCriteria implements Serializable  {
         }
     }
 
+    // our database stores the fields in camelCase however we display them to end user differently
+    public static String toCamelCase(String input, String delimiter) {
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
+
+        String[] words = input.split(delimiter);
+        StringBuilder result = new StringBuilder();
+
+        for (int i = 0; i < words.length; i++) {
+            String word = words[i];
+            if (i == 0) {
+                result.append(word.toLowerCase()); // Convert the first word to lowercase
+            } else {
+                result.append(word.substring(0, 1).toUpperCase()); // Capitalize the first letter
+                result.append(word.substring(1).toLowerCase()); // Convert the rest to lowercase
+            }
+        }
+
+        return result.toString();
+    }
+
 }
 
 
