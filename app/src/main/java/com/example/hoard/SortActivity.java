@@ -36,6 +36,7 @@ import com.google.android.material.navigation.NavigationBarView;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -136,8 +137,13 @@ public class SortActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
-                Log.d("filterCriteria", "Start date: " + filterCriteria.getStartDate() + "End date: " + filterCriteria.getEndDate());
 
+                EditText BriefDescriptionKeywordEditText = findViewById(R.id.BriefDescriptionKeyword);
+                String BriefDescriptionKeywordString = BriefDescriptionKeywordEditText.getText().toString();
+                if (!BriefDescriptionKeywordString.isEmpty()) {
+                    List<String> briefDescriptionKeywords = Arrays.asList(BriefDescriptionKeywordString.split("\\s+"));
+                    filterCriteria.setDescriptionKeyWords(briefDescriptionKeywords);
+                }
 
                 String enteredMake = search.getText().toString();
                 Intent returnIntent = new Intent(getApplicationContext(), ListScreen.class);
@@ -217,8 +223,6 @@ public class SortActivity extends AppCompatActivity {
                     dateFormatter.setTimeZone(TimeZone.getTimeZone("GMT"));
                     String startDate = dateFormatter.format(new Date(startDateInMillis));
                     String endDate = dateFormatter.format(new Date(endDateInMillis));
-                    Log.d("Date Range Picker", "Raw start date millis: " + startDateInMillis + ", Raw end date millis: " + endDateInMillis);
-                    Log.d("Date Range Picker", "Start date: " + startDate + ", End date: " + endDate);
 
                     EditText startDateEditText = findViewById(R.id.start_date_edit_text);
                     EditText endDateEditText = findViewById(R.id.end_date_edit_text);
