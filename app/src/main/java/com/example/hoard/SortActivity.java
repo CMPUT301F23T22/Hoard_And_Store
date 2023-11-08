@@ -202,7 +202,9 @@ public class SortActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
                 if (id == R.id.nav_sort) {
-                    // Handle sorting
+                    Intent sortIntent = new Intent(getApplicationContext(), SortActivity.class);
+                    startActivity(sortIntent);
+
                 } else if (id == R.id.nav_home) {
                     // Navigate to the home screen
                     finish();

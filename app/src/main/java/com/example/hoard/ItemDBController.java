@@ -5,6 +5,8 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.Query;
@@ -15,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class ItemDBController {
     private static ItemDBController instance;
@@ -37,7 +40,7 @@ public class ItemDBController {
         return instance;
     }
 
-    public void loadItems(final DataLoadCallback callback, final FilterCriteria filterCriteria) {
+    public void loadItems(final DataLoadCallbackItem callback, final FilterCriteria filterCriteria) {
         if (filterCriteria != null) {
             itemDB.filter(filterCriteria)
                     .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -79,7 +82,7 @@ public class ItemDBController {
                     if (task.isSuccessful()) {
                         List<Item> items = new ArrayList<>();
                         for (QueryDocumentSnapshot document : task.getResult()) {
-                            //                        String iteml = document.getId();
+                            //                        String item = document.getId();
                             Map<String, Object> data = document.getData();
                             double estimatedValue = (double) data.get("estimatedValue");
                             Timestamp timestamp = (Timestamp) data.get("dateOfAcquisition");
@@ -88,9 +91,21 @@ public class ItemDBController {
                             String serialNumber = (String) data.get("serialNumber");
                             String model = (String) data.get("model");
                             String make = (String) data.get("make");
-                            String briefDescription = (String) data.get("briefDescription");
+                            String briefDescription = (String) data.get("briefDescription");String itemID = (String) data.get("itemID");
+                        ArrayList<Tag> tags = new ArrayList<Tag>();
+                        // convert tags from hash map to tag objects
+                        if (document.contains("tags")) { //TODO check for null array in tag list
+                            List<Map<String, Object>> tagsList = (List<Map<String, Object>>) document.getData().get("tags");
+                            for (Map<String, Object> tagMap : tagsList) {
+                                String tagName = (String) tagMap.get("tagName");
+                                String tagColor = (String) tagMap.get("tagColor");
+                                String tagID = (String) tagMap.get("tagID");
+                                Tag tag = new Tag(tagName,tagColor,tagID);
+                                tags.add(tag);
+                            }
+                        }
 
-                            Item item = new Item(dateOfAcquisition, briefDescription, make, model, serialNumber, estimatedValue, comment);
+                            Item item = new Item(dateOfAcquisition, briefDescription, make, model, serialNumber, estimatedValue, comment,itemID,tags);
                             items.add(item);
                         }
                         callback.onDataLoaded(items);
@@ -106,12 +121,41 @@ public class ItemDBController {
     }
 
 
-
-    public void addItem(Item item){
-        itemDB.addItem(item);
+public void getTotalValue(final Consumer<Double> callback) {
+        itemDB.getAllItems().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    double totalValue = 0.0;
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Map<String, Object> data = document.getData();
+                        if (data.containsKey("estimatedValue")) {
+                            Object estimatedValueObj = data.get("estimatedValue");
+                            if (estimatedValueObj instanceof Number) {
+                                totalValue += ((Number) estimatedValueObj).doubleValue();
+                            }
+                        }
+                    }
+                    callback.accept(totalValue);
+                } else {
+                    // TODO: Handle the error when fetching data
+                    callback.accept(0.0);
+                }
+            }
+        });
+    }
+    public void addItem(Item item,OnCompleteListener<Void> onCompleteListener){
+        itemDB.addItem(item,onCompleteListener);
     }
 
-    public void deleteItem(Item item) {itemDB.deleteItem(item);}
+    public void deleteItem(Item item, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
+        itemDB.deleteItem(item)
+                .addOnSuccessListener(onSuccessListener)
+                .addOnFailureListener(onFailureListener);
+    }
 
-
+    public void editItem(String itemID, Item item, OnCompleteListener<Void> onCompleteListener) {
+        itemDB.editItem(itemID, item)
+                .addOnCompleteListener(onCompleteListener);
+    }
 }

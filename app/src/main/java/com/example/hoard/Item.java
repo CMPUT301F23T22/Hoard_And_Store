@@ -7,21 +7,19 @@ import java.util.Arrays;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 public class Item implements Serializable {
     private Date dateOfAcquisition;
-    private String briefDescription;
-    private String make;
-    private String model;
-    private String serialNumber;
+    private String briefDescription ,make, model, serialNumber , comment;
     private double estimatedValue;
-    private String comment;
+    private String itemID;
     private ArrayList<Tag> tags;
     private List<String> briefDescriptionList;
 
-    public Item(Date dateOfAcquisition, String briefDescription, String make, String model, String serialNumber, double estimatedValue, String comment) {
+    public Item(Date dateOfAcquisition, String briefDescription, String make, String model, String serialNumber, double estimatedValue, String comment, ArrayList<Tag> tagsList) {
 
         if (!isValidDate(dateOfAcquisition)) {
             throw new IllegalArgumentException("Invalid date format.");
@@ -53,6 +51,20 @@ public class Item implements Serializable {
         this.estimatedValue = estimatedValue;
         this.comment = comment;
         this.briefDescriptionList = splitBriefDescription(this.briefDescription);
+        this.itemID = UUID.randomUUID().toString();
+        this.tags = tagsList;
+    }
+
+    public Item(Date dateOfAcquisition, String briefDescription, String make, String model, String serialNumber, double estimatedValue, String comment, String itemID,ArrayList<Tag> tagsList) {
+        this.dateOfAcquisition = dateOfAcquisition;
+        this.briefDescription = briefDescription;
+        this.make = make;
+        this.model = model;
+        this.serialNumber = serialNumber;
+        this.estimatedValue = estimatedValue;
+        this.comment = comment;
+        this.itemID = itemID;
+        this.tags = tagsList;
     }
 
     private List<String> splitBriefDescription(String briefDescription) {
@@ -107,7 +119,6 @@ public class Item implements Serializable {
 
     public void setBriefDescription(String briefDescription) {
         this.briefDescription = briefDescription;
-        this.briefDescriptionList = splitBriefDescription(this.briefDescription);
     }
 
     public String getMake() {
@@ -150,9 +161,6 @@ public class Item implements Serializable {
         this.comment = comment;
     }
 
-    public List<String> getBriefDescriptionList() {
-        return briefDescriptionList;
-    }
     public void addTag(Tag tag) {
         tags.add(tag);
     }

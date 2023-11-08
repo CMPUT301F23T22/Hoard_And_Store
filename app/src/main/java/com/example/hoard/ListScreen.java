@@ -1,31 +1,36 @@
 package com.example.hoard;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -35,14 +40,17 @@ import com.google.android.material.snackbar.Snackbar;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.function.Consumer;
 
-public class ListScreen extends AppCompatActivity {
+public class ListScreen extends AppCompatActivity{
 
     private ItemDB itemDB;
     private BottomNavigationView bottomNav;
     private BottomAppBar bottomAppBar;
     private FloatingActionButton addItemButton;
     private Sort sortFragment = new Sort();
+    private TextView tvTotalValue;
     private Fragment currentFragment;
     FrameLayout listScreenFrame;
     private RecyclerView recyclerView;
@@ -51,10 +59,13 @@ public class ListScreen extends AppCompatActivity {
     private Menu bottomMenu;
     private MenuItem sort;
     private MenuItem home;
+
     private Item itemToDelete = null;
     private FilterCriteria filterCriteria;
 
     private final int sortingRequestCode = 1;
+
+    private ActivityResultLauncher<Intent> addActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleAddResult);
 
 
     
@@ -68,6 +79,7 @@ public class ListScreen extends AppCompatActivity {
         itemDB = new ItemDB(new ItemDBConnector());
 
         addItemButton = findViewById(R.id.addItemButton);
+        tvTotalValue = findViewById(R.id.tvTotalValueAmount);
 
         bottomNav = findViewById(R.id.bottomNavigationView);
 
@@ -80,7 +92,7 @@ public class ListScreen extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         dbController = ItemDBController.getInstance();
-        dbController.loadItems(new DataLoadCallback() {
+        dbController.loadItems(new DataLoadCallbackItem() {
             @Override
             public void onDataLoaded(List<Item> items) {
                 itemAdapter = new ItemAdapter(items);
@@ -99,72 +111,24 @@ public class ListScreen extends AppCompatActivity {
                 if (id == R.id.nav_home) {
 
                 } else if (id == R.id.nav_sort) {
-//                    // Replace the fragment container with the SortFragment
-//                    home.setEnabled(false);
-//                    home.setChecked(false);
-//                    sort.setEnabled(true);
-//
-//                    Intent sortIntent = new Intent(getApplicationContext(), SortActivity.class);
-//                    sortIntent.putExtra("filterCriteria", filterCriteria);
-//                    filterActivityResultLauncher.launch(sortIntent);
-
                     Intent sortIntent = new Intent(getApplicationContext(), SortActivity.class);
                     sortIntent.putExtra("filterCriteria", filterCriteria);
                     filterActivityResultLauncher.launch(sortIntent);
-
 
 
                 }
                 return true;
             }
         });
-
-
+        updateTotalValue();
 
         addItemButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showAddItemDialog();
+                Intent intent = new Intent(ListScreen.this, AddEditItem.class);
+                addActivityResultLauncher.launch(intent);
             }
         });
-    }
-
-
-
-    private void showAddItemDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = this.getLayoutInflater();
-        View view = inflater.inflate(R.layout.dialog_add_item, null);
-
-        EditText briefDescription = view.findViewById(R.id.briefDescription);
-        EditText make = view.findViewById(R.id.make);
-        EditText model = view.findViewById(R.id.model);
-        EditText serialNumber = view.findViewById(R.id.serialNumber);
-        EditText estimatedValue = view.findViewById(R.id.estimatedValue);
-        EditText comment = view.findViewById(R.id.comment);
-
-        builder.setView(view)
-                .setPositiveButton("Save", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Item newItem = new Item(
-                                new Date(),
-                                briefDescription.getText().toString(),
-                                make.getText().toString(),
-                                model.getText().toString(),
-                                serialNumber.getText().toString(),
-                                Double.parseDouble(estimatedValue.getText().toString()),
-                                comment.getText().toString()
-                        );
-                        Log.d("Item", newItem.getBriefDescriptionList().toString());
-                        dbController.addItem(newItem);
-                        itemAdapter.addItem(newItem);
-                        itemAdapter.notifyItemChanged(itemAdapter.getsize() - 1);
-                        dialog.dismiss();
-                    }
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
     }
 
     ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
@@ -175,30 +139,53 @@ public class ListScreen extends AppCompatActivity {
 
         @Override
         public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+            // Save the item before it's deleted
+            final int deletedItemPosition = viewHolder.getAdapterPosition();
+            final Item deletedItem = itemAdapter.getItem(deletedItemPosition);
+
+            // Remove the item from the list
+            itemAdapter.removeItem(deletedItemPosition);
+            itemAdapter.notifyItemChanged(deletedItemPosition);
+
             Snackbar snackbar = Snackbar
-                .make(findViewById(R.id.coordinate_layout), R.string.text_label, Snackbar.LENGTH_LONG)
-                .setText("Deleting " + itemAdapter.getItem(viewHolder.getAdapterPosition()).getMake())
-                .setAction("Undo", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        //itemToDelete = itemAdapter.getItem(viewHolder.getAdapterPosition());
-                        itemAdapter.notifyItemChanged(itemAdapter.getsize() - 1);
-                    }
-                });
+                    .make(findViewById(R.id.coordinate_layout), R.string.text_label, Snackbar.LENGTH_LONG)
+                    .setText("Deleting " + deletedItem.getMake())
+                    .setAction("Undo", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            itemAdapter.addItem(deletedItem);
+                            itemAdapter.notifyItemInserted(deletedItemPosition);
+                        }
+                    });
             snackbar.addCallback(new Snackbar.Callback() {
 
                 @Override
                 public void onDismissed(Snackbar snackbar, int event) {
                     if (event == Snackbar.Callback.DISMISS_EVENT_TIMEOUT || event == Snackbar.Callback.DISMISS_EVENT_SWIPE) {
-                        // Snackbar closed on its own
-                        itemToDelete = itemAdapter.getItem(viewHolder.getAdapterPosition());
+                        Item itemToDelete = deletedItem;
                         if (itemToDelete != null) {
-                            itemAdapter.removeItem(viewHolder.getAdapterPosition());
-                            itemAdapter.notifyItemChanged(itemAdapter.getsize() - 1);
-                            dbController.deleteItem(itemToDelete);
-                        } else {
-                            // Handle the case where the position is out of bounds or the item is not found
+                            dbController.deleteItem(itemToDelete, new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            updateTotalValue();
+                                        }
+                                    });
+                                }
+                            }, new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Snackbar.make(findViewById(R.id.coordinate_layout), "Failed to delete item. Please try again.", Snackbar.LENGTH_LONG).show();
+                                    itemAdapter.addItem(deletedItem);
+                                    itemAdapter.notifyItemInserted(deletedItemPosition);
+                                    updateTotalValue();
+                                }
+                            });
                         }
+                    } else if (event == Snackbar.Callback.DISMISS_EVENT_ACTION) {
+                        // TODO: Handle action
                     }
 
                 }
@@ -237,4 +224,36 @@ public class ListScreen extends AppCompatActivity {
                     }
                 }
             });
+
+    protected void onResume() {
+        super.onResume();
+        dbController.loadItems(new DataLoadCallbackItem() {
+            @Override
+            public void onDataLoaded(List<Item> items) {
+                itemAdapter = new ItemAdapter(items);
+                recyclerView.setAdapter(itemAdapter);
+                updateTotalValue();
+            }
+        });
+    }
+    private void updateTotalValue() {
+        dbController.getTotalValue(new Consumer<Double>() {
+            @Override
+            public void accept(Double totalValue) {
+                // Here, update your TextView with the total value
+                TextView totalValueTextView = findViewById(R.id.tvTotalValueAmount); // Assuming you have a TextView with this ID
+                totalValueTextView.setText(String.format(Locale.getDefault(), "%.2f", totalValue));
+            }
+        });
+    }
+    private void handleAddResult(ActivityResult result) {
+        if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+            Item returnedItem = (Item) result.getData().getSerializableExtra("newItem");
+            if (returnedItem != null) {
+                    itemAdapter.addItem(returnedItem);
+                    itemAdapter.notifyItemChanged(itemAdapter.getsize() - 1);
+                }
+            updateTotalValue();
+            }
+        }
 }
