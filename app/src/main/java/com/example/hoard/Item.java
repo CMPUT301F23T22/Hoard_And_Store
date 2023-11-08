@@ -1,6 +1,9 @@
 package com.example.hoard;
 
 import android.util.Log;
+
+import com.google.firebase.firestore.PropertyName;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +21,7 @@ public class Item implements Serializable {
     private double estimatedValue;
     private String itemID;
     private ArrayList<Tag> tags;
+    @PropertyName("briefDescriptionList")
     private List<String> briefDescriptionList;
 
     private boolean isSelected;
@@ -67,6 +71,7 @@ public class Item implements Serializable {
         this.comment = comment;
         this.itemID = itemID;
         this.tags = tagsList;
+        this.briefDescriptionList = splitBriefDescription(this.briefDescription);
 
         this.isSelected = false;
         tags = new ArrayList<>();
@@ -186,6 +191,10 @@ public class Item implements Serializable {
         if (tags != null) {
             tags.remove(tag);
         }
+    }
+
+    public List<String> getBriefDescriptionList() {
+        return briefDescriptionList;
     }
 
     public ArrayList<Tag> getTags() {

@@ -26,6 +26,7 @@ public class ItemDBController {
     private ItemDBController() {
         itemDB = new ItemDB(new ItemDBConnector());
     }
+
     // chatgpt: to make a singleton we only ever want one instance here
     // prompts: Need to only have one instance of a class how can i do this in java
     // Replied with pesudo code on how to do this
@@ -174,6 +175,7 @@ public class ItemDBController {
 
     public void editItem(Item item) {
         itemDB.editItem(item);
+    }
 
     public void deleteItem(Item item, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
         itemDB.deleteItem(item)

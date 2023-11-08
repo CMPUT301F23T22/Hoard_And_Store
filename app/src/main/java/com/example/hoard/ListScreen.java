@@ -203,9 +203,9 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
                 if (id == R.id.nav_home) {
 
                 } else if (id == R.id.nav_sort) {
-                    Intent sortIntent = new Intent(getApplicationContext(), SortActivity.class);
-                    sortIntent.putExtra("filterCriteria", filterCriteria);
-                    filterActivityResultLauncher.launch(sortIntent);
+//                    Intent sortIntent = new Intent(getApplicationContext(), SortActivity.class);
+//                    sortIntent.putExtra("filterCriteria", filterCriteria);
+//                    filterActivityResultLauncher.launch(sortIntent);
 
 
                     Intent sortIntent = new Intent(getApplicationContext(), SortActivity.class);
@@ -299,30 +299,6 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
 
         }
     };
-
-    ActivityResultLauncher<Intent> filterActivityResultLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            new ActivityResultCallback<ActivityResult>() {
-                @Override
-                public void onActivityResult(ActivityResult result) {
-                    if (result.getResultCode() == Activity.RESULT_OK) {
-                        Intent data = result.getData();
-                        if (data != null) {
-                            FilterCriteria updatedFilterCriteria = (FilterCriteria) data.getSerializableExtra("filterCriteria");
-                            if (updatedFilterCriteria != null) {
-                                filterCriteria.apply(updatedFilterCriteria);
-                                dbController.loadItems(new DataLoadCallbackItem() {
-                                    @Override
-                                    public void onDataLoaded(List<Item> items) {
-                                        itemAdapter.setItems(items);
-                                        recyclerView.scrollToPosition(0);
-                                    }
-                                }, filterCriteria);
-                            }
-                        }
-                    }
-                }
-            });
 
     protected void onResume() {
         super.onResume();
