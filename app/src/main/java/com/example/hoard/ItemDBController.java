@@ -1,5 +1,7 @@
 package com.example.hoard;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -61,7 +63,12 @@ public class ItemDBController {
                                 callback.onDataLoaded(filteredItems);
                             } else {
                                 // Handle the error when fetching data
-                                // You can show an error message or take appropriate action
+                                Exception e = task.getException();
+                                if (e != null) {
+                                    Log.e("Firestore", "Error fetching data: " + e.getMessage());
+                                } else {
+                                    Log.e("Firestore", "Unknown error fetching data.");
+                                }
                             }
                         }
                     });

@@ -17,6 +17,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class ItemDB {
@@ -99,28 +100,32 @@ public class ItemDB {
         Query query = constructDynamicQuery(filterCriteria);
         return query.get();
     }
-
+    //Query(target=Query(items where makein[123] and briefDescriptionListarray_contains_any[asd] order by __name__);limitType=LIMIT_TO_FIRST)
     public Query constructDynamicQuery(FilterCriteria filterCriteria) {
         Query query = itemsCollection; // Start with the base query
-
+//        List<String> makes = Arrays.asList("123");
+//        List<String> des = Arrays.asList("asd");
+//        query = query.whereIn("make", makes);
+//        query = query.whereArrayContainsAny("briefDescriptionList", des);
         if (filterCriteria != null) {
             if (filterCriteria.getMakes() != null && !filterCriteria.getMakes().isEmpty()) {
                 // Create a list of makes to filter on
                 List<String> makes = filterCriteria.getMakes();
-
                 // Use the "whereIn" method to create an "OR" condition
                 query = query.whereIn("make", makes);
             }
-            if (filterCriteria.getStartDate() != null) {
+
+            if (filterCriteria.getStartDate() != null && filterCriteria.getEndDate() != null) {
                 Timestamp startTimestamp = new Timestamp(filterCriteria.getStartDate());
-                query = query.whereGreaterThanOrEqualTo("dateOfAcquisition", startTimestamp);
-                Log.d("Firestore", "startTimestamp: " + startTimestamp.toString());
-            }
-            if (filterCriteria.getEndDate() != null) {
                 Timestamp endTimestamp = new Timestamp(filterCriteria.getEndDate());
-                query = query.whereLessThanOrEqualTo("dateOfAcquisition", endTimestamp);
+
+                query = query.whereGreaterThanOrEqualTo("dateOfAcquisition", startTimestamp)
+                        .whereLessThanOrEqualTo("dateOfAcquisition", endTimestamp);
+
+                Log.d("Firestore", "startTimestamp: " + startTimestamp.toString());
                 Log.d("Firestore", "endTimestamp: " + endTimestamp.toString());
             }
+
 
             if (filterCriteria.getDescriptionKeyWords() != null && !filterCriteria.getDescriptionKeyWords().isEmpty()) {
                 List<String> descriptionKeyWords = filterCriteria.getDescriptionKeyWords();
