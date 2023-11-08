@@ -212,7 +212,7 @@ public class ListScreen extends AppCompatActivity{
                             FilterCriteria updatedFilterCriteria = (FilterCriteria) data.getSerializableExtra("filterCriteria");
                             if (updatedFilterCriteria != null) {
                                 filterCriteria.apply(updatedFilterCriteria);
-                                dbController.loadItems(new DataLoadCallback() {
+                                dbController.loadItems(new DataLoadCallbackItem() {
                                     @Override
                                     public void onDataLoaded(List<Item> items) {
                                         itemAdapter.setItems(items);
@@ -234,7 +234,7 @@ public class ListScreen extends AppCompatActivity{
                 recyclerView.setAdapter(itemAdapter);
                 updateTotalValue();
             }
-        });
+        }, filterCriteria);
     }
     private void updateTotalValue() {
         dbController.getTotalValue(new Consumer<Double>() {

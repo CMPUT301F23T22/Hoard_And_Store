@@ -120,6 +120,9 @@ public class Item implements Serializable {
     public void setBriefDescription(String briefDescription) {
         this.briefDescription = briefDescription;
     }
+    public String getItemID() {
+        return itemID;
+    }
 
     public String getMake() {
         return make;
@@ -163,6 +166,10 @@ public class Item implements Serializable {
 
     public void addTag(Tag tag) {
         tags.add(tag);
+    }
+
+    public void setTags(ArrayList<Tag> tags) {
+        this.tags = tags;
     }
 
     public void removeTag(Tag tag) {

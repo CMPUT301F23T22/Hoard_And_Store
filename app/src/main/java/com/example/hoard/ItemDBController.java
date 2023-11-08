@@ -49,7 +49,9 @@ public class ItemDBController {
                             if (task.isSuccessful()) {
                                 List<Item> filteredItems = new ArrayList<>();
                                 for (QueryDocumentSnapshot document : task.getResult()) {
+                                    // Extract data from the document
                                     Map<String, Object> data = document.getData();
+                                    // Extract fields from the data
                                     double estimatedValue = (double) data.get("estimatedValue");
                                     Timestamp timestamp = (Timestamp) data.get("dateOfAcquisition");
                                     Date dateOfAcquisition = timestamp.toDate();
@@ -58,10 +60,23 @@ public class ItemDBController {
                                     String model = (String) data.get("model");
                                     String make = (String) data.get("make");
                                     String briefDescription = (String) data.get("briefDescription");
+                                    String itemID = (String) data.get("itemID");
+                                    List<Tag> tags = new ArrayList<>();
+                                    if (document.contains("tags")) {
+                                        List<Map<String, Object>> tagsList = (List<Map<String, Object>>) data.get("tags");
+                                        if (tagsList != null) {
+                                            for (Map<String, Object> tagMap : tagsList) {
+                                                String tagName = (String) tagMap.get("tagName");
+                                                String tagColor = (String) tagMap.get("tagColor");
+                                                String tagID = (String) tagMap.get("tagID");
+                                                Tag tag = new Tag(tagName, tagColor, tagID);
+                                                tags.add(tag);
+                                            }
+                                        }
+                                    }
 
-                                    Item item = new Item(dateOfAcquisition, briefDescription, make, model, serialNumber, estimatedValue, comment);
+                                    Item item = new Item(dateOfAcquisition, briefDescription, make, model, serialNumber, estimatedValue, comment, itemID, (ArrayList<Tag>) tags);
                                     filteredItems.add(item);
-
                                 }
                                 callback.onDataLoaded(filteredItems);
                             } else {
@@ -82,8 +97,9 @@ public class ItemDBController {
                     if (task.isSuccessful()) {
                         List<Item> items = new ArrayList<>();
                         for (QueryDocumentSnapshot document : task.getResult()) {
-                            //                        String item = document.getId();
+                            // Extract data from the document
                             Map<String, Object> data = document.getData();
+                            // Extract fields from the data
                             double estimatedValue = (double) data.get("estimatedValue");
                             Timestamp timestamp = (Timestamp) data.get("dateOfAcquisition");
                             Date dateOfAcquisition = timestamp.toDate();
@@ -91,37 +107,37 @@ public class ItemDBController {
                             String serialNumber = (String) data.get("serialNumber");
                             String model = (String) data.get("model");
                             String make = (String) data.get("make");
-                            String briefDescription = (String) data.get("briefDescription");String itemID = (String) data.get("itemID");
-                        ArrayList<Tag> tags = new ArrayList<Tag>();
-                        // convert tags from hash map to tag objects
-                        if (document.contains("tags")) { //TODO check for null array in tag list
-                            List<Map<String, Object>> tagsList = (List<Map<String, Object>>) document.getData().get("tags");
-                            for (Map<String, Object> tagMap : tagsList) {
-                                String tagName = (String) tagMap.get("tagName");
-                                String tagColor = (String) tagMap.get("tagColor");
-                                String tagID = (String) tagMap.get("tagID");
-                                Tag tag = new Tag(tagName,tagColor,tagID);
-                                tags.add(tag);
+                            String briefDescription = (String) data.get("briefDescription");
+                            String itemID = (String) data.get("itemID");
+                            List<Tag> tags = new ArrayList<>();
+                            if (document.contains("tags")) {
+                                List<Map<String, Object>> tagsList = (List<Map<String, Object>>) data.get("tags");
+                                if (tagsList != null) {
+                                    for (Map<String, Object> tagMap : tagsList) {
+                                        String tagName = (String) tagMap.get("tagName");
+                                        String tagColor = (String) tagMap.get("tagColor");
+                                        String tagID = (String) tagMap.get("tagID");
+                                        Tag tag = new Tag(tagName, tagColor, tagID);
+                                        tags.add(tag);
+                                    }
+                                }
                             }
-                        }
 
-                            Item item = new Item(dateOfAcquisition, briefDescription, make, model, serialNumber, estimatedValue, comment,itemID,tags);
+                            Item item = new Item(dateOfAcquisition, briefDescription, make, model, serialNumber, estimatedValue, comment, itemID, (ArrayList<Tag>) tags);
                             items.add(item);
                         }
                         callback.onDataLoaded(items);
                     } else {
                         // Handle the error when fetching data
-                        // You can show an error message or take appropriate action
                     }
                 }
-
             });
-
         }
     }
 
 
-public void getTotalValue(final Consumer<Double> callback) {
+
+    public void getTotalValue(final Consumer<Double> callback) {
         itemDB.getAllItems().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {

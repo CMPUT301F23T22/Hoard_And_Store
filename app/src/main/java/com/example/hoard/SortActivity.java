@@ -95,7 +95,7 @@ public class SortActivity extends AppCompatActivity {
         setFiltersCount(addMoreFilters, filterCriteria.getMakes());
 
         // Load items and populate the AutoCompleteTextView
-        dbController.loadItems(new DataLoadCallback() {
+        dbController.loadItems(new DataLoadCallbackItem() {
             @Override
             public void onDataLoaded(List<Item> items) {
                 itemAdapter = new ItemAdapter(items);
