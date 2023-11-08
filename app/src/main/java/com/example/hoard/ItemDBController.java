@@ -98,9 +98,9 @@ public class ItemDBController {
                             Timestamp timestamp = (Timestamp) data.get("dateOfAcquisition");
                             Date dateOfAcquisition = timestamp.toDate();
                             String comment = (String) data.get("comment");
-                            String serialNumber = (String) data.get("serialNumber");
-                            String model = (String) data.get("model");
+                            String serialNumber = (String) data.get("model");
                             String make = (String) data.get("make");
+                            String model = (String) data.get("model");
                             String briefDescription = (String) data.get("briefDescription");
                             String itemID = (String) data.get("itemID");
                             List<Tag> tags = new ArrayList<>();
@@ -150,15 +150,25 @@ public class ItemDBController {
                     callback.accept(0.0);
                 }
             }
+        });
+    }
 
     public void addItem(Item item, OnCompleteListener<Void> onCompleteListener) {
         itemDB.addItem(item, onCompleteListener);
     }
 
-    public void deleteItem(Item item) {itemDB.deleteItem(item);}
-    public Task<Void> bulkDeleteItems(List<Item> items) { return itemDB.bulkDeleteItems(items);}
-    public void editItem(Item item){
+    public void deleteItem(Item item) {
+        itemDB.deleteItem(item);
+    }
+
+    public Task<Void> bulkDeleteItems(List<Item> items) {
+        return itemDB.bulkDeleteItems(items);
+    }
+
+    public void editItem(Item item) {
         itemDB.editItem(item);
+    }
+
     public void deleteItem(Item item, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
         itemDB.deleteItem(item)
                 .addOnSuccessListener(onSuccessListener)

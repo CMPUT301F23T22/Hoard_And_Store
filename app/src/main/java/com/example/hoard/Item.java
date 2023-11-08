@@ -6,6 +6,7 @@ import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.UUID;
 
 public class Item implements Serializable {
     private Date dateOfAcquisition;

@@ -100,7 +100,7 @@ public class SortActivity extends AppCompatActivity {
         dbController.loadItems(new DataLoadCallbackItem() {
             @Override
             public void onDataLoaded(List<Item> items) {
-                itemAdapter = new ItemAdapter(items);
+                itemAdapter = new ItemAdapter(items, recyclerView);
                 loadAdapter(itemAdapter);
                 search.setAdapter(itemMakes);
             }

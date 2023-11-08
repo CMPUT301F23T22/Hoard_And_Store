@@ -19,6 +19,8 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
@@ -28,7 +30,6 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
@@ -53,7 +54,7 @@ import java.util.Locale;
 import java.util.function.Consumer;
 
 
-public class ListScreen extends AppCompatActivity implements ItemAdapter.SelectionModeCallback{
+public class ListScreen extends AppCompatActivity implements ItemAdapter.SelectionModeCallback {
 
     private ItemDB itemDB;
     private Toolbar topBar;
@@ -76,7 +77,7 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
     private Menu selectionModeMenu;
     private MenuItem bulkDelete;
     private MenuItem search;
-    private  MenuItem closeBulkDelete;
+    private MenuItem closeBulkDelete;
     private MenuItem bulkTag;
     private ItemAdapter.SelectionModeCallback selectionModeCallback;
     private FilterCriteria filterCriteria;
@@ -128,7 +129,7 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
                 recyclerView.setAdapter(itemAdapter);
                 itemAdapter.setSelectionModeCallback(ListScreen.this);
             }
-        });
+        }, filterCriteria);
 
         topBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
@@ -183,7 +184,7 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
 
                 return true;
             }
-        }, filterCriteria);
+        });
 
         ItemTouchHelper helper = new ItemTouchHelper(simpleCallback);
         helper.attachToRecyclerView(recyclerView);
@@ -293,12 +294,14 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
         dbController.loadItems(new DataLoadCallbackItem() {
             @Override
             public void onDataLoaded(List<Item> items) {
-                itemAdapter = new ItemAdapter(items);
+                itemAdapter = new ItemAdapter(items, recyclerView);
                 recyclerView.setAdapter(itemAdapter);
+                itemAdapter.setSelectionModeCallback(ListScreen.this);
                 updateTotalValue();
             }
         }, filterCriteria);
     }
+
     private void updateTotalValue() {
         dbController.getTotalValue(new Consumer<Double>() {
             @Override
@@ -309,18 +312,14 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
             }
         });
     }
+
     private void handleAddResult(ActivityResult result) {
         if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
             Item returnedItem = (Item) result.getData().getSerializableExtra("newItem");
             if (returnedItem != null) {
-                if (wasUpdated) {
-                    dbController.editItem(returnedItem);
-                } else {
-                    dbController.addItem(returnedItem);
-                    itemAdapter.addItem(returnedItem);
-                    itemAdapter.notifyItemChanged(itemAdapter.getsize() - 1);
-                }
-            updateTotalValue();
+                itemAdapter.addItem(returnedItem);
+                itemAdapter.notifyDataSetChanged(); // Refresh the RecyclerView
+                updateTotalValue();
             }
         }
     }
@@ -328,7 +327,6 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
     @Override
     public void onSelectionModeChanged(boolean selectionMode) {
         if (selectionMode) {
-
             search.setEnabled(false);
             search.setVisible(false);
 
@@ -340,16 +338,14 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
 
             bulkTag.setEnabled(true);
             bulkTag.setVisible(true);
+
             bottomAppBar = findViewById(R.id.bottomAppBar);
             bottomAppBar.setVisibility(View.GONE);
+
             addItemButton = findViewById(R.id.addItemButton);
             addItemButton.setVisibility(View.GONE);
 
             updateSelectionModeTitle();
-
-
-
-
         } else {
             search.setEnabled(true);
             search.setVisible(true);
@@ -365,19 +361,21 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
 
             bottomAppBar = findViewById(R.id.bottomAppBar);
             bottomAppBar.setVisibility(View.VISIBLE);
+
             addItemButton = findViewById(R.id.addItemButton);
             addItemButton.setVisibility(View.VISIBLE);
-}
 
             topBar.setTitle("Items");
         }
     }
+
     public void closeBulkSelect() {
         if (itemAdapter != null) {
             itemAdapter.setSelectionMode(false);
             onSelectionModeChanged(false);
         }
     }
+
     public void updateSelectionModeTitle() {
         if (itemAdapter != null) {
             topBar.setTitle("Selected (" + itemAdapter.getItemsSelectedCount() + ")");

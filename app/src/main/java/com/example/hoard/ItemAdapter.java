@@ -7,6 +7,8 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -80,7 +82,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
         Item currentItem = filteredItems.get(position);
         holder.bind(selectedItems.get(position, false));
 
-
+        holder.briefDescription.setText(currentItem.getBriefDescription());
         // Format the date using SimpleDateFormat
         SimpleDateFormat desiredFormat = new SimpleDateFormat("yyyy-MM-dd");
         String formattedDate = desiredFormat.format(currentItem.getDateOfAcquisition());
@@ -234,12 +236,14 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
 
     public void addItem(Item item) {
         itemList.add(item);
+        filteredItems.add(item);
         notifyDataSetChanged();
     }
 
     public void removeItem(int position) {
         if (position >= 0 && position < itemList.size()) {
             itemList.remove(position);
+            filteredItems.remove(position);
             notifyItemRemoved(position);
         }
     }
@@ -264,7 +268,6 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
         filteredItems = new ArrayList<>(itemList);
         notifyDataSetChanged();
     }
-}
 
     public double getSum(){
         double sum = 0.0;
