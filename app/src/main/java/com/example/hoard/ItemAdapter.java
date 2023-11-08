@@ -2,12 +2,16 @@ package com.example.hoard;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.SimpleDateFormat;
@@ -17,14 +21,24 @@ import java.util.List;
 public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
 
     private List<Item> itemList;
+    private RecyclerView recyclerView;
+//    private List<Item> selectedItems;
     private Context context;
 
     private boolean isSelectionMode = false;
 
+    private SparseBooleanArray selectedItems = new SparseBooleanArray();
+
     public void setSelectionMode(boolean selectionMode) {
         this.isSelectionMode = selectionMode;
+        if (!isSelectionMode) {
+            selectedItems.clear();
+            resetBackgroundColors();// Clear the selected items when selection mode is turned off
+        }
         notifyDataSetChanged();
     }
+
+
     public boolean getSelectionMode() {
         return isSelectionMode;
     }
@@ -33,25 +47,20 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
         return itemList;
     }
 
-    public void clearSelections() {
-        for (Item item : itemList) {
-            item.setSelected(false);
-        }
-        notifyDataSetChanged();
+
+
+    public ItemAdapter(List<Item> itemList, RecyclerView recyclerView) {
+        this.itemList = itemList;
+        this.recyclerView = recyclerView;
     }
-    public List<Item> getSelectedItems() {
-        List<Item> selectedItems = new ArrayList<>();
-        for (Item item : itemList) {
-            if (item.isSelected()) {
-                selectedItems.add(item);
+
+    private void resetBackgroundColors() {
+        for (int i = 0; i < itemList.size(); i++) {
+            View itemView = recyclerView.getLayoutManager().findViewByPosition(i);
+            if (itemView != null) {
+                itemView.setBackgroundColor(Color.WHITE);
             }
         }
-        return selectedItems;
-    }
-
-
-    public ItemAdapter(List<Item> itemList) {
-        this.itemList = itemList;
     }
 
     @NonNull
@@ -64,21 +73,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Item currentItem = itemList.get(position);
-        holder.bind(currentItem.isSelected());
-
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int adapterPosition = holder.getAdapterPosition();
-                if (adapterPosition != RecyclerView.NO_POSITION) {
-                    if (isSelectionMode) {
-                        Item itemAtPosition = itemList.get(adapterPosition);
-                        itemAtPosition.setSelected(!itemAtPosition.isSelected());
-                        notifyItemChanged(adapterPosition);
-                    }
-                }
-            }
-        });
+        holder.bind(selectedItems.get(position, false));
 
 
 
@@ -102,20 +97,75 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
                 }
             }
         });
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int adapterPosition = holder.getAdapterPosition();
+                if (adapterPosition != RecyclerView.NO_POSITION) {
+                    if (isSelectionMode) {
+                        toggleItemSelection(adapterPosition);
+                        notifyItemChanged(adapterPosition);
+                    }
+                }
+            }
+        });
+
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                int adapterPosition = holder.getAdapterPosition();
+                if (adapterPosition != RecyclerView.NO_POSITION) {
+                    if (!isSelectionMode) {
+                        isSelectionMode = true;
+                        if (selectionModeCallback != null) {
+                            selectionModeCallback.onSelectionModeChanged(true);
+                        }
+                    }
+                    toggleItemSelection(adapterPosition);
+                    notifyItemChanged(adapterPosition);
+                }
+                return true;
+        }
+    });
     }
+
+    private void toggleItemSelection(int position) {
+        if (selectedItems.get(position, false)) {
+            selectedItems.delete(position);
+        } else {
+            selectedItems.put(position, true);
+        }
+        selectionModeCallback.onSelectionModeChanged(true);
+    }
+
+    public List<Item> getSelectedItems() {
+        List<Item> selectedItemsList = new ArrayList<>();
+        for (int i = 0; i < selectedItems.size(); i++) {
+            selectedItemsList.add(itemList.get(selectedItems.keyAt(i)));
+        }
+        return selectedItemsList;
+    }
+    public void clearSelectedItems() {
+        selectedItems.clear();
+        notifyDataSetChanged();
+    }
+
+    public interface SelectionModeCallback {
+        void onSelectionModeChanged(boolean selectionMode);
+    }
+
+    private SelectionModeCallback selectionModeCallback;
+
+    // Set the selection mode callback
+    public void setSelectionModeCallback(SelectionModeCallback callback) {
+
+        this.selectionModeCallback = callback;
+    }
+
 
     @Override
     public int getItemCount() {
         return itemList.size();
-    }
-    public int getSelectedItemCount() {
-        int count = 0;
-        for (Item item : itemList) {
-            if (item.isSelected()) {
-                count++;
-            }
-        }
-        return count;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -132,16 +182,13 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
             detailsArrow = itemView.findViewById(R.id.detailsArrow);
         }
         void bind(boolean isSelected) {
-            if (isSelected) {
-                itemView.setBackgroundColor(Color.LTGRAY);
-            } else {
-                itemView.setBackgroundColor(Color.WHITE);
-            }
+            itemView.setBackgroundColor(isSelected ? Color.LTGRAY : Color.WHITE);
         }
     }
 
     public void addItem(Item item) {
         itemList.add(item);
+        notifyDataSetChanged();
     }
 
     public void removeItem(int position) {
@@ -155,10 +202,30 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
         return itemList.size();
     }
 
+    public int getItemsSelectedCount() {
+        return selectedItems.size();
+    }
+
     public Item getItem(int position) {
         if (position >= 0 && position < itemList.size()) {
             return itemList.get(position);
         }
         return null; // Return null or handle the out-of-bounds case as needed
+    }
+
+    public double getSum(){
+        double sum = 0.0;
+        for(Item item: itemList){
+            sum = sum + item.getEstimatedValue();
+        }
+        return  sum;
+    }
+
+    // Notify data set changes, and recalculate sum
+    public void notifyAndRecalculate(int position) {
+        notifyItemChanged(position);
+        // Calculate the sum after the change
+        double sum = getSum();
+        // You can use this sum for any purpose, like displaying it in your UI.
     }
 }
