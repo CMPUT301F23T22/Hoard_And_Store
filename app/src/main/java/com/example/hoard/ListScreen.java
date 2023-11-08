@@ -88,7 +88,7 @@ public class ListScreen extends AppCompatActivity{
             }
             return false;
         });
-        // Set an OnClickListener for the "Delete All" button
+        // Set an OnClickListener for the "Deletegit All" button
         deleteAllButton.setOnClickListener(v -> {
             if (itemAdapter.getSelectedItemCount() == 0) {
                 Toast.makeText(ListScreen.this, "No items selected.", Toast.LENGTH_SHORT).show();
