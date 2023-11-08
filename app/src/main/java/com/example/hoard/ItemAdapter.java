@@ -16,13 +16,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
+public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> implements Filterable {
+    // implements filterable is not for our way of filtering or sorting this is used for the autocomplete view
+    // used in activity_sort.xml
 
     private List<Item> itemList;
     private RecyclerView recyclerView;
 //    private List<Item> selectedItems;
+    private List<Item> filteredItems;
     private Context context;
 
     private boolean isSelectionMode = false;
@@ -51,6 +55,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
 
     public ItemAdapter(List<Item> itemList, RecyclerView recyclerView) {
         this.itemList = itemList;
+        this.filteredItems = new ArrayList<>(itemList);
         this.recyclerView = recyclerView;
     }
 
@@ -72,9 +77,8 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Item currentItem = itemList.get(position);
+        Item currentItem = filteredItems.get(position);
         holder.bind(selectedItems.get(position, false));
-
 
 
         // Format the date using SimpleDateFormat
@@ -91,7 +95,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
                 if (adapterPosition != RecyclerView.NO_POSITION) {
                     Item itemAtPosition = itemList.get(adapterPosition);
                     context = view.getContext();
-                    Intent intent = new Intent(context, ItemEditDeleteActivity.class);
+                    Intent intent = new Intent(context, DetailsActivity.class);
                     intent.putExtra("SELECTED_ITEM", itemAtPosition);
                     context.startActivity(intent);
                 }
@@ -165,7 +169,49 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
 
     @Override
     public int getItemCount() {
-        return itemList.size();
+        return filteredItems.size();
+    }
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                FilterResults results = new FilterResults();
+                if (constraint == null || constraint.length() == 0) {
+                    // No filter implemented, return the original unfiltered data
+                    results.values = itemList;
+                    results.count = itemList.size();
+                } else {
+                    // Implement filtering logic here and set the filtered data
+                    List<Item> filteredList = new ArrayList<>();
+                    // Perform your filtering based on the 'constraint' CharSequence
+                    // Add matching items to filteredList
+                    results.values = filteredList;
+                    results.count = filteredList.size();
+                }
+                return results;
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                filteredItems = (List<Item>) results.values;
+                notifyDataSetChanged(); // Notify the adapter that the data has changed
+            }
+        };
+    }
+
+    public void filterByDateRange(Date startDate, Date endDate) {
+        List<Item> tempFilteredList = new ArrayList<>();
+        for (Item item : itemList) {
+            Date itemDate = item.getDateOfAcquisition();
+            if (!itemDate.before(startDate) && !itemDate.after(endDate)) {
+                tempFilteredList.add(item);
+            }
+        }
+
+        filteredItems = tempFilteredList;
+        notifyDataSetChanged();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -212,6 +258,13 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
         }
         return null; // Return null or handle the out-of-bounds case as needed
     }
+
+    public void setItems(List<Item> newItems) {
+        itemList = newItems;
+        filteredItems = new ArrayList<>(itemList);
+        notifyDataSetChanged();
+    }
+}
 
     public double getSum(){
         double sum = 0.0;
