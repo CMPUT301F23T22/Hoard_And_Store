@@ -77,6 +77,7 @@ public class ItemDBController {
 
                                     Item item = new Item(dateOfAcquisition, briefDescription, make, model, serialNumber, estimatedValue, comment, itemID, (ArrayList<Tag>) tags);
                                     filteredItems.add(item);
+
                                 }
                                 callback.onDataLoaded(filteredItems);
                             } else {
@@ -135,8 +136,6 @@ public class ItemDBController {
         }
     }
 
-
-
     public void getTotalValue(final Consumer<Double> callback) {
         itemDB.getAllItems().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
@@ -160,9 +159,21 @@ public class ItemDBController {
             }
         });
     }
-    public void addItem(Item item,OnCompleteListener<Void> onCompleteListener){
-        itemDB.addItem(item,onCompleteListener);
+
+    public void addItem(Item item, OnCompleteListener<Void> onCompleteListener) {
+        itemDB.addItem(item, onCompleteListener);
     }
+
+    public void deleteItem(Item item) {
+        itemDB.deleteItem(item);
+    }
+
+    public Task<Void> bulkDeleteItems(List<Item> items) {
+        return itemDB.bulkDeleteItems(items);
+    }
+
+    public void editItem(Item item) {
+        itemDB.editItem(item);
 
     public void deleteItem(Item item, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
         itemDB.deleteItem(item)

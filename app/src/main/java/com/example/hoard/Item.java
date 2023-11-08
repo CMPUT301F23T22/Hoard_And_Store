@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.UUID;
 
 public class Item implements Serializable {
     private Date dateOfAcquisition;
@@ -19,6 +20,7 @@ public class Item implements Serializable {
     private ArrayList<Tag> tags;
     private List<String> briefDescriptionList;
 
+    private boolean isSelected;
     public Item(Date dateOfAcquisition, String briefDescription, String make, String model, String serialNumber, double estimatedValue, String comment, ArrayList<Tag> tagsList) {
 
         if (!isValidDate(dateOfAcquisition)) {
@@ -65,6 +67,10 @@ public class Item implements Serializable {
         this.comment = comment;
         this.itemID = itemID;
         this.tags = tagsList;
+
+        this.isSelected = false;
+        tags = new ArrayList<>();
+
     }
 
     private List<String> splitBriefDescription(String briefDescription) {
@@ -120,6 +126,7 @@ public class Item implements Serializable {
     public void setBriefDescription(String briefDescription) {
         this.briefDescription = briefDescription;
     }
+
     public String getItemID() {
         return itemID;
     }
@@ -165,18 +172,23 @@ public class Item implements Serializable {
     }
 
     public void addTag(Tag tag) {
-        tags.add(tag);
+        if (tags != null) {
+            tags.add(tag);
+        }else{
+            //#TODO error message
+        }
     }
 
     public void setTags(ArrayList<Tag> tags) {
         this.tags = tags;
     }
-
     public void removeTag(Tag tag) {
-        tags.remove(tag);
+        if (tags != null) {
+            tags.remove(tag);
+        }
     }
 
     public ArrayList<Tag> getTags() {
-        return tags;
+        return this.tags;
     }
 }

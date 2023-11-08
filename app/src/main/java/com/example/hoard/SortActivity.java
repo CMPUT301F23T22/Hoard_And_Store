@@ -44,15 +44,25 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 public class SortActivity extends AppCompatActivity {
+    private ArrayList<String> dataList;
+    private RecyclerView recyclerView;
+    private SortAdapter sortAdapter;
+    private LinearLayoutManager layoutManager;
+    private Button showDatePicker;
     private BottomNavigationView bottomNav;
     private BottomAppBar bottomAppBar;
+    private Menu bottomMenu;
+    private MenuItem sort;
     private EditText makeTextField;
     private AutoCompleteTextView search;
+    private ItemDBController dbController;
     private ItemAdapter itemAdapter;
     private ArrayAdapter<String> itemMakes;
     private List<String> makes;
     private FloatingActionButton fab;
+    private Button applyButton;
     private Button addMoreFilters;
+    private Button resetFilters;
     private List<String> appliedMakes;
     private FilterCriteria filterCriteria;
 
@@ -65,14 +75,14 @@ public class SortActivity extends AppCompatActivity {
         appliedMakes = new ArrayList<>();
         makes = new ArrayList<>();
         ArrayList<String> dataList = new ArrayList<>();
-        filterCriteria = FilterCriteria.getInstance();
+        FilterCriteria filterCriteria = FilterCriteria.getInstance();
 
         // Find views
-        RecyclerView recyclerView = findViewById(R.id.sorting);
+        recyclerView = findViewById(R.id.sorting);
         bottomNav = findViewById(R.id.bottomNavigationView);
         bottomAppBar = findViewById(R.id.bottomAppBar);
-        Menu bottomMenu = bottomNav.getMenu();
-        MenuItem sort = bottomMenu.findItem(R.id.nav_sort);
+        bottomMenu = bottomNav.getMenu();
+        sort = bottomMenu.findItem(R.id.nav_sort);
         sort.setChecked(true);
 
         // Initialize adapters and layout manager
@@ -81,15 +91,15 @@ public class SortActivity extends AppCompatActivity {
         search.setThreshold(1);
         String[] sortOptions = {"Date", "Make", "Estimated Value", "Description", "Edmonton", "Tags" };
         dataList = new ArrayList<>(Arrays.asList(sortOptions));
-        SortAdapter sortAdapter = new SortAdapter(dataList);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        sortAdapter = new SortAdapter(dataList);
+        layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(sortAdapter);
-        ItemDBController dbController = ItemDBController.getInstance();
+        dbController = ItemDBController.getInstance();
         fab = findViewById(R.id.addItemButton);
-        Button applyButton = findViewById(R.id.apply_filter_sort_button);
+        applyButton = findViewById(R.id.apply_filter_sort_button);
         addMoreFilters = findViewById(R.id.add_more_make_filter);
-        Button resetFilters = findViewById(R.id.reset_make_filter);
+        resetFilters = findViewById(R.id.reset_make_filter);
         //addMoreFilters.setVisibility(View.INVISIBLE);
 
         setFiltersCount(addMoreFilters, filterCriteria.getMakes());
@@ -98,7 +108,7 @@ public class SortActivity extends AppCompatActivity {
         dbController.loadItems(new DataLoadCallbackItem() {
             @Override
             public void onDataLoaded(List<Item> items) {
-                itemAdapter = new ItemAdapter(items);
+                itemAdapter = new ItemAdapter(items, recyclerView);
                 loadAdapter(itemAdapter);
                 search.setAdapter(itemMakes);
             }
