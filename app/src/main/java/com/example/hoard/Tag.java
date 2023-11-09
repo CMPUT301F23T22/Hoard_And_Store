@@ -48,6 +48,6 @@ public class Tag implements Serializable {
             return false;
         }
         Tag tag = (Tag) o;
-        return tagName.equals(tag.tagName);
+        return tagID.equals(tag.tagID);
     }
 }
