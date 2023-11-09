@@ -2,21 +2,19 @@ package com.example.hoard;
 
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -104,14 +102,51 @@ public class ItemDB {
     }
 
 
-    public Task<QuerySnapshot> getAllItems() {
-        return itemsCollection.get();
+    public Task<List<DocumentSnapshot>> getAllItems() {
+        return itemsCollection.get().continueWith(task -> {
+            if (task.isSuccessful()) {
+                QuerySnapshot querySnapshot = task.getResult();
+                return querySnapshot.getDocuments();
+            } else {
+                throw task.getException();
+            }
+        });
     }
 
-    public Task<QuerySnapshot> filter(FilterCriteria filterCriteria) {
+    public Task<List<DocumentSnapshot>> filter(FilterCriteria filterCriteria) {
         Query query = constructDynamicQuery(filterCriteria);
-        return query.get();
+
+        return query.get().continueWith(task -> {
+            if (task.isSuccessful()) {
+                QuerySnapshot querySnapshot = task.getResult();
+                List<DocumentSnapshot> sortedResults = sortResults(querySnapshot, filterCriteria);
+                return sortedResults;
+            } else {
+                throw task.getException();
+            }
+        });
     }
+
+
+
+//    public Task<QuerySnapshot> filter(FilterCriteria filterCriteria) {
+//        // Construct the query with filters
+//        Query query = constructDynamicQuery(filterCriteria);
+//
+//        // Execute the query and return the Task<QuerySnapshot>
+//        return query.get().continueWith(task -> {
+//            if (task.isSuccessful()) {
+//                QuerySnapshot querySnapshot = task.getResult();
+//                List<DocumentSnapshot> sortedResults = sortResults(querySnapshot, filterCriteria);
+//
+//                return querySnapshot; // Return the original QuerySnapshot
+//            } else {
+//                // Handle query execution errors
+//                throw task.getException();
+//            }
+//        });
+//    }
+
 
     public Query constructDynamicQuery(FilterCriteria filterCriteria) {
         Query query = itemsCollection; // Start with the base query
@@ -124,21 +159,36 @@ public class ItemDB {
                 // Use the "whereIn" method to create an "OR" condition
                 query = query.whereIn("make", makes);
             }
-            Map<String, String> sortOptions = filterCriteria.getSortOptions();
-            if (sortOptions != null) {
-                for (Map.Entry<String, String> entry : sortOptions.entrySet()) {
-                    String sortField = entry.getKey();
-                    String sortOrder = entry.getValue();
+        }
 
-                    // Determine the sorting order
-                    Query.Direction direction = sortOrder.equalsIgnoreCase("ascending") ?
-                            Query.Direction.ASCENDING : Query.Direction.DESCENDING;
+        return query; // Filter applied, now sort on the client-side
+    }
 
-                    // Apply sorting based on the provided field and direction
-                    query = query.orderBy(sortField, direction);
+    public List<DocumentSnapshot> sortResults(QuerySnapshot querySnapshot, FilterCriteria filterCriteria) {
+        List<DocumentSnapshot> filteredAndSortedResults = querySnapshot.getDocuments();
+
+        Map<String, String> sortOptions = filterCriteria.getSortOptions();
+        if (sortOptions != null) {
+            for (Map.Entry<String, String> entry : sortOptions.entrySet()) {
+                String sortField = entry.getKey();
+                String sortOrder = entry.getValue();
+
+                // Sort the results based on the provided field and direction
+                filteredAndSortedResults.sort((doc1, doc2) -> {
+                    Object value1 = doc1.get(sortField);
+                    Object value2 = doc2.get(sortField);
+
+                    // Use the CustomComparator for comparison
+                    return new SortComparator().compare(value1, value2);
+                });
+
+                if (sortOrder.equalsIgnoreCase("descending")) {
+                    Collections.reverse(filteredAndSortedResults);
                 }
             }
         }
-        return query;
+
+        return filteredAndSortedResults;
     }
+
 }
