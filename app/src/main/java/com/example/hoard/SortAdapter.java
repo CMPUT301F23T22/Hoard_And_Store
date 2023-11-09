@@ -25,7 +25,7 @@ public class SortAdapter extends RecyclerView.Adapter<SortAdapter.SortViewHolder
     private FilterCriteria filterCriteria;
 
     public SortAdapter() {
-        this.sortOptions = Arrays.asList("Date", "Description", "Make", "Estimated Value");
+        this.sortOptions = Arrays.asList("Date", "Description", "Make", "Estimated Value","Tags");
         // this is to just inialize all the values
         this.sortOptionsState = new HashMap<>();
 
@@ -38,6 +38,7 @@ public class SortAdapter extends RecyclerView.Adapter<SortAdapter.SortViewHolder
         userToDatabaseMapping.put("Description", "comment");
         userToDatabaseMapping.put("Make", "make");
         userToDatabaseMapping.put("Estimated Value", "estimatedValue");
+        userToDatabaseMapping.put("Tags", "tags");
 
         // Create the reverse mapping for converting from database to user-friendly names
         for (Map.Entry<String, String> entry : userToDatabaseMapping.entrySet()) {

@@ -120,15 +120,14 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
         holder.detailsArrow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!isSelectionMode) {
-                    int adapterPosition = holder.getAdapterPosition();
-                    if (adapterPosition != RecyclerView.NO_POSITION) {
-                        Item itemAtPosition = itemList.get(adapterPosition);
-                        context = view.getContext();
-                        Intent intent = new Intent(context, DetailsActivity.class);
-                        intent.putExtra("SELECTED_ITEM", itemAtPosition);
-                        context.startActivity(intent);
-                    }
+                int adapterPosition = holder.getAdapterPosition();
+                if (adapterPosition != RecyclerView.NO_POSITION) {
+                    Item itemAtPosition = itemList.get(adapterPosition);
+                    context = view.getContext();
+                    Intent intent = new Intent(context, DetailsActivity.class);
+                    intent.putExtra("SELECTED_ITEM", itemAtPosition);
+                    context.startActivity(intent);
+                }
             }
         });
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -159,8 +158,8 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
                     notifyItemChanged(adapterPosition);
                 }
                 return true;
-        }
-    });
+            }
+        });
     }
 
     private void toggleItemSelection(int position) {

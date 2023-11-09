@@ -68,7 +68,6 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
     private BottomNavigationView bottomNav;
     private BottomAppBar bottomAppBar;
     private FloatingActionButton addItemButton;
-    private Sort sortFragment = new Sort();
     private TextView tvTotalValue;
     private Fragment currentFragment;
     FrameLayout listScreenFrame;
@@ -102,7 +101,7 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
 
         setContentView(R.layout.activity_list_screen);
         totalValueTextView = findViewById(R.id.tvTotalValueAmount);
-
+        tagSelectionLayout = findViewById(R.id.tagSelectionLayout);
         filterCriteria = FilterCriteria.getInstance();
 
         itemDB = new ItemDB(new ItemDBConnector());
@@ -125,9 +124,6 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
 
         home.setChecked(true);
 
-        MenuItem deleteItem = bottomMenu.findItem(R.id.nav_delete);
-        Drawable deleteIcon = deleteItem.getIcon();
-        Drawable wrappedIcon = DrawableCompat.wrap(deleteIcon);
 
         chipGroupTags = findViewById(R.id.tagChipGroup);
         recyclerView = findViewById(R.id.recyclerView);
@@ -298,15 +294,11 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
                     Intent sortIntent = new Intent(getApplicationContext(), SortActivity.class);
                     startActivity(sortIntent);
                     return true;
-                } else if (id == R.id.nav_delete) {
-
-                    return true;
                 }
 
                 return true;
             }
         });
-        updateTotalValue();
 
         addItemButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -389,6 +381,7 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
 
     protected void onResume() {
         super.onResume();
+        home.setChecked(true);
         dbController.loadItems(new DataLoadCallbackItem() {
             @Override
             public void onDataLoaded(List<Item> items) {
@@ -397,13 +390,8 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
                 itemAdapter.setSelectionModeCallback(ListScreen.this);
                 itemAdapter.setSumCallback(ListScreen.this);
             }
-        }, filterCriteria);
-
-                recyclerView.setAdapter(itemAdapter);
-
-                updateTotalValue();
-            }
         }, FilterCriteria.getInstance());
+
     }
     @Override
     public void onSavedInstanceState(Bundle outState) {
