@@ -34,7 +34,7 @@ public class SortAdapter extends RecyclerView.Adapter<SortAdapter.SortViewHolder
 
         // Initialize the state of all options to "ascending"
         // Initialize the mappings
-        userToDatabaseMapping.put("Date", "date");
+        userToDatabaseMapping.put("Date", "dateOfAcquisition");
         userToDatabaseMapping.put("Description", "comment");
         userToDatabaseMapping.put("Make", "make");
         userToDatabaseMapping.put("Estimated Value", "estimatedValue");

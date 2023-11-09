@@ -1,5 +1,7 @@
 package com.example.hoard;
 
+
+import com.google.firebase.Timestamp;
 import java.util.Comparator;
 import java.util.Date;
 
@@ -13,8 +15,8 @@ public class SortComparator implements Comparator<Object> {
         } else if (value1 instanceof Double && value2 instanceof Double) {
             return Double.compare((Double) value1, (Double) value2);
         // compare dates
-        } else if (value1 instanceof Date && value2 instanceof Date) {
-            return ((Date) value1).compareTo((Date) value2);
+        } else if (value1 instanceof Timestamp && value2 instanceof Timestamp) {
+            return ((Timestamp) value1).compareTo((Timestamp) value2);
         // compare Tags
         } else if (value1 instanceof Tag && value2 instanceof Tag) {
             return ((Tag) value1).getTagName().compareTo(((Tag) value2).getTagName());
