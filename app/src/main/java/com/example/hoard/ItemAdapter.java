@@ -2,6 +2,7 @@ package com.example.hoard;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -93,14 +94,16 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
         holder.detailsArrow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int adapterPosition = holder.getAdapterPosition();
-                if (adapterPosition != RecyclerView.NO_POSITION) {
-                    Item itemAtPosition = itemList.get(adapterPosition);
-                    context = view.getContext();
-                    Intent intent = new Intent(context, DetailsActivity.class);
-                    intent.putExtra("SELECTED_ITEM", itemAtPosition);
-                    context.startActivity(intent);
-                }
+                if (!isSelectionMode) {
+                    int adapterPosition = holder.getAdapterPosition();
+                    if (adapterPosition != RecyclerView.NO_POSITION) {
+                        Item itemAtPosition = itemList.get(adapterPosition);
+                        context = view.getContext();
+                        Intent intent = new Intent(context, DetailsActivity.class);
+                        intent.putExtra("SELECTED_ITEM", itemAtPosition);
+                        context.startActivity(intent);
+                    }
+            }
             }
         });
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -156,7 +159,19 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
         notifyDataSetChanged();
     }
 
+    public void selectItem(String itemID) {
+        for (int i = 0; i < itemList.size(); i++) {
+            if (itemList.get(i).getItemID().equals(itemID)) {
+                selectedItems.put(i, true);
+                notifyItemChanged(i);
+                break;
+            }
+        }
+    }
+
     public interface SelectionModeCallback {
+        void onSavedInstanceState(Bundle outState);
+
         void onSelectionModeChanged(boolean selectionMode);
     }
 

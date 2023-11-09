@@ -6,33 +6,26 @@ import com.google.android.gms.tasks.Task;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -43,12 +36,13 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.snackbar.Snackbar;
 
-import java.util.Arrays;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
@@ -72,6 +66,7 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
     private Menu bottomMenu;
     private MenuItem sort;
     private MenuItem home;
+    private ActivityResultLauncher<Intent> addTagResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleAddTagResult);
 
     private Item itemToDelete = null;
     private Menu selectionModeMenu;
@@ -81,11 +76,12 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
     private MenuItem bulkTag;
     private ItemAdapter.SelectionModeCallback selectionModeCallback;
     private FilterCriteria filterCriteria;
-
+    private TagDBController tagDBController;
     private final int sortingRequestCode = 1;
 
     private ActivityResultLauncher<Intent> addActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleAddResult);
-
+    ChipGroup chipGroupTags;
+    FrameLayout tagSelectionLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,13 +108,14 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
         sort = bottomMenu.findItem(R.id.nav_sort);
         home = bottomMenu.findItem(R.id.nav_home);
 
+
         home.setChecked(true);
 
         MenuItem deleteItem = bottomMenu.findItem(R.id.nav_delete);
         Drawable deleteIcon = deleteItem.getIcon();
         Drawable wrappedIcon = DrawableCompat.wrap(deleteIcon);
 
-
+        chipGroupTags = findViewById(R.id.tagChipGroup);
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         dbController = ItemDBController.getInstance();
@@ -177,7 +174,90 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
 
                     }
                 } else if (id == R.id.bulk_tag) {
-                    // Implement bulk tag functionality
+                    if (itemAdapter.getItemsSelectedCount() == 0) {
+                        Toast.makeText(ListScreen.this, "No items selected.", Toast.LENGTH_SHORT).show();
+                    } else {
+
+                        tagSelectionLayout = findViewById(R.id.tagSelectionLayout);
+                        ChipGroup chipGroupTags = findViewById(R.id.tagChipGroup); // Assuming you have a ChipGroup with this ID
+                        tagDBController = TagDBController.getInstance();
+
+                        tagDBController.loadTags(new DataLoadCallBackTag() {
+                            @Override
+                            public void onDataLoaded(List<Tag> tags) {
+                                // Clear the previous tags
+                                chipGroupTags.removeAllViews();
+                                // Iterate through the items, creating a chip for each one
+                                for (Tag tag : tags) {
+                                    Chip chip = new Chip(ListScreen.this);
+                                    chip.setText(tag.getTagName());
+                                    chip.setChipBackgroundColor(ColorStateList.valueOf(Color.parseColor(tag.getTagColor())));
+                                    chip.setCheckedIconVisible(true);
+                                    chip.setCheckable(true);
+                                    chip.setTag(tag);
+                                    // Add the chip to the ChipGroup
+                                    chipGroupTags.addView(chip);
+                                }
+                            }
+                        });
+
+                        // Make the tag selection layout visible
+                        tagSelectionLayout.setVisibility(View.VISIBLE);
+
+                        // Implement bulk tag functionality
+                        Button applyTagsButton = findViewById(R.id.applyTagsButton);
+                        Button addTagBtn = findViewById(R.id.AddTagButton);
+                        addTagBtn.setOnClickListener(view -> {
+                            Intent tagIntent = new Intent(ListScreen.this, TagAddEdit.class);
+                            addTagResultLauncher.launch(tagIntent);
+
+                        });
+                        applyTagsButton.setOnClickListener(view -> {
+                            if (itemAdapter.getSelectionMode()) {
+                                new AlertDialog.Builder(ListScreen.this, R.style.PurpleAlertDialog)
+                                        .setTitle("Confirm Delete")
+                                        .setMessage("Are you sure you want to add tags to these items?")
+                                        .setPositiveButton("Yes", (dialog, which) -> {
+                                            // Get selected tags
+                                            List<Tag> selectedTags = new ArrayList<>();
+                                            for (int i = 0; i < chipGroupTags.getChildCount(); i++) {
+                                                Chip chip = (Chip) chipGroupTags.getChildAt(i);
+                                                if (chip.isChecked()) {
+                                                    Tag tag = (Tag) chip.getTag();
+                                                    selectedTags.add(tag);
+                                                }
+                                            }
+
+                                            // Now you have the selected tags, iterate over selected items and update them
+                                            List<Item> selectedItems = itemAdapter.getSelectedItems();
+                                            for (Item selectedItem : selectedItems) {
+                                                for (Tag selectedTag : selectedTags) {
+                                                    selectedItem.addTag(selectedTag);
+                                                }
+                                                // Update each item in the database
+                                                dbController.editItem(selectedItem.getItemID(), selectedItem, task -> {
+                                                    if (!task.isSuccessful()) {
+                                                        Exception e = task.getException();
+                                                        Log.e("BulkTag", "Failed to update item tags", e);
+                                                        Toast.makeText(ListScreen.this, "Failed to update item tags" + (e != null ? ": " + e.getMessage() : ""), Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
+                                            }
+                                            itemAdapter.notifyDataSetChanged();
+
+                                            // Inform the user
+                                            Toast.makeText(ListScreen.this, "Tags applied to selected items.", Toast.LENGTH_SHORT).show();
+
+                                            // Update UI and hide the tag selection layout
+                                            itemAdapter.notifyDataSetChanged();
+                                            tagSelectionLayout.setVisibility(View.GONE);
+                                            closeBulkSelect(); // Close the bulk selection mode
+                                        }).setNegativeButton("No", (dialog, which) -> {
+                                            dialog.dismiss();
+                                        }).setIcon(android.R.drawable.ic_dialog_alert).show();
+                            }
+                        });
+                    }
                 } else if (id == R.id.close_bulk_select) {
                     closeBulkSelect();
                 }
@@ -294,13 +374,48 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
         dbController.loadItems(new DataLoadCallbackItem() {
             @Override
             public void onDataLoaded(List<Item> items) {
-                itemAdapter = new ItemAdapter(items, recyclerView);
+
                 recyclerView.setAdapter(itemAdapter);
-                itemAdapter.setSelectionModeCallback(ListScreen.this);
+
                 updateTotalValue();
             }
-        }, filterCriteria);
+        }, FilterCriteria.getInstance());
     }
+    @Override
+    public void onSavedInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("selectionMode", itemAdapter.getSelectionMode());
+        ArrayList<String> itemIDs = new ArrayList<>();
+        for (Item item : itemAdapter.getItemList()) {
+            itemIDs.add(item.getItemID());
+        }
+        outState.putStringArrayList("itemIDs", itemIDs);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        boolean selectionMode = savedInstanceState.getBoolean("selectionMode");
+        ArrayList<String> itemIDs = savedInstanceState.getStringArrayList("itemIDs");
+        if (itemIDs != null) {
+            dbController.loadItems(new DataLoadCallbackItem() {
+                @Override
+                public void onDataLoaded(List<Item> items) {
+                    itemAdapter = new ItemAdapter(items, recyclerView);
+                    recyclerView.setAdapter(itemAdapter);
+                    itemAdapter.setSelectionModeCallback(ListScreen.this);
+                    itemAdapter.setSelectionMode(selectionMode);
+                    updateTotalValue();
+                    for (String itemID : itemIDs) {
+                        itemAdapter.selectItem(itemID);
+                    }
+                    itemAdapter.notifyDataSetChanged();
+
+                }
+            }, FilterCriteria.getInstance());
+        }
+    }
+
 
     private void updateTotalValue() {
         dbController.getTotalValue(new Consumer<Double>() {
@@ -353,6 +468,8 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
             bulkDelete.setEnabled(false);
             bulkDelete.setVisible(false);
 
+            tagSelectionLayout.setVisibility(View.GONE);
+
             closeBulkDelete.setEnabled(false);
             closeBulkDelete.setVisible(false);
 
@@ -379,6 +496,26 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
     public void updateSelectionModeTitle() {
         if (itemAdapter != null) {
             topBar.setTitle("Selected (" + itemAdapter.getItemsSelectedCount() + ")");
+        }
+    }
+
+    private void handleAddTagResult(ActivityResult result) {
+
+        if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+            Tag returnedTag = (Tag) result.getData().getSerializableExtra("newTag");
+            if (returnedTag != null) {
+                Chip chip = new Chip(ListScreen.this);
+                chip.setText(returnedTag.getTagName());
+                chip.setChipBackgroundColor(ColorStateList.valueOf(Color.parseColor(returnedTag.getTagColor())));
+                chip.setCheckedIconVisible(true);
+                chip.setCheckable(true);
+                chip.setTag(returnedTag);
+                // make it so that new created tag is selected
+                chip.setChecked(true);
+                // Add the chip to the ChipGroup
+                chipGroupTags.addView(chip);
+            }
+
         }
     }
 }

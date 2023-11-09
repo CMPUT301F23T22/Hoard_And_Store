@@ -22,5 +22,6 @@
     <string name="tag_name_placeholder">Tag Name</string>
     <string name="submit_button_text">SUBMIT</string>
     <string name="create_new_tag_placeholder">Create New Tag</string>
+    <string name="apply_tags_placeholder">Apply Tags</string>
 
 </resources>
