@@ -74,6 +74,19 @@
             android:clipToPadding="false" />
     </androidx.core.widget.NestedScrollView>
 
+    <Button
+        android:id="@+id/deleteAllButton"
+        style="?attr/materialButtonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end|start"
+        android:layout_margin="20dp"
+        android:backgroundTint="@color/purple"
+        android:padding="15dp"
+        android:text="Delete Selected Items"
+        android:visibility="gone"
+        android:textColor="@color/white"
+        android:textSize="20sp" />
 
     <com.google.android.material.bottomappbar.BottomAppBar
         android:id="@+id/bottomAppBar"
@@ -103,5 +116,8 @@
         app:fabCustomSize="0dp"
         app:layout_anchorGravity="top|center"
         app:srcCompat="@drawable/baseline_add_24"/>
+
+
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,8 +1,7 @@
 package com.example.hoard;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -12,6 +11,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -26,6 +26,9 @@ public class ItemDBController {
         itemDB = new ItemDB(new ItemDBConnector());
     }
 
+    // chatgpt: to make a singleton we only ever want one instance here
+    // prompts: Need to only have one instance of a class how can i do this in java
+    // Replied with pesudo code on how to do this
     public static ItemDBController getInstance() {
         if (instance == null) {
             synchronized (ItemDBController.class) {
@@ -36,8 +39,6 @@ public class ItemDBController {
         }
         return instance;
     }
-
-
 
     public void loadItems(final DataLoadCallbackItem callback, final FilterCriteria filterCriteria) {
         if (filterCriteria != null) {
@@ -199,35 +200,44 @@ public class ItemDBController {
     }
 
 
-    public void getTotalValue(final Consumer<Double> callback){
-
+    public void getTotalValue(final Consumer<Double> callback) {
+        itemDB.getAllItems().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    double totalValue = 0.0;
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Map<String, Object> data = document.getData();
+                        if (data.containsKey("estimatedValue")) {
+                            Object estimatedValueObj = data.get("estimatedValue");
+                            if (estimatedValueObj instanceof Number) {
+                                totalValue += ((Number) estimatedValueObj).doubleValue();
+                            }
+                        }
+                    }
+                    callback.accept(totalValue);
+                } else {
+                    // TODO: Handle the error when fetching data
+                    callback.accept(0.0);
+                }
+            }
+        });
     }
-//    public void getTotalValue(final Consumer<Double> callback) {
-//        itemDB.getAllItems().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//            @Override
-//            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                if (task.isSuccessful()) {
-//                    double totalValue = 0.0;
-//                    for (QueryDocumentSnapshot document : task.getResult()) {
-//                        Map<String, Object> data = document.getData();
-//                        if (data.containsKey("estimatedValue")) {
-//                            Object estimatedValueObj = data.get("estimatedValue");
-//                            if (estimatedValueObj instanceof Number) {
-//                                totalValue += ((Number) estimatedValueObj).doubleValue();
-//                            }
-//                        }
-//                    }
-//                    callback.accept(totalValue);
-//                } else {
-//                    // Handle the error when fetching data
-//                    callback.accept(0.0);
-//                }
-//            }
-//        });
-//    }
 
     public void addItem(Item item, OnCompleteListener<Void> onCompleteListener) {
         itemDB.addItem(item, onCompleteListener);
+    }
+
+    public void deleteItem(Item item) {
+        itemDB.deleteItem(item);
+    }
+
+    public Task<Void> bulkDeleteItems(List<Item> items) {
+        return itemDB.bulkDeleteItems(items);
+    }
+
+    public void editItem(Item item) {
+        itemDB.editItem(item);
     }
 
     public void deleteItem(Item item, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {

@@ -67,13 +67,13 @@
                 android:id="@+id/start_date_edit_text"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:hint="From Start date MM/DD/YYYY"></EditText>
+                android:hint="From Start date MM/DD/YYYY"/>
 
             <EditText
                 android:id="@+id/end_date_edit_text"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:hint="To end date MM/DD/YYYY"></EditText>
+                android:hint="To end date MM/DD/YYYY"/>
 
             <Button
                 android:id="@+id/showDateRangePicker"
@@ -83,14 +83,11 @@
                 android:text="Pick From Calendar">
             </Button>
 
-            <TextView
-                android:id="@+id/tags"
-                android:layout_width="wrap_content"
+            <EditText
+                android:id="@+id/BriefDescriptionKeyword"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center|start"
-                android:layout_marginTop="10dp"
-                android:text="Selected Date is : "
-                android:textSize="18sp" />
+                android:hint="Brief Description"/>
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip"
