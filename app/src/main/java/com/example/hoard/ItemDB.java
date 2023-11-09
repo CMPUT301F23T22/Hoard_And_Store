@@ -39,8 +39,13 @@ public class ItemDB {
         itemsCollection = db.collection("items");
     }
 
-    // Methods to interact with Firestore for items
-    // Example method to add an item to Firestore
+    /**
+     * add a given item
+     *
+     * @param item items to be edited
+     * @param onCompleteListener listener to verify
+     * @return task
+     */
     public Task<Void> addItem(Item item, OnCompleteListener<Void> onCompleteListener) {
         // Create a new document with a generated ID in the "items" collection
         DocumentReference newItemRef = itemsCollection.document();
@@ -49,6 +54,13 @@ public class ItemDB {
         return newItemRef.set(item);
     }
 
+    /**
+     * Edit a given item
+     *
+     * @param item items to be edited
+     * @param  itemId itemId to edit
+     * @return task
+     */
     public Task<Void> editItem(String itemId, Item item) {
         // Create a new TaskCompletionSource<Void> which will allow us to return Task<Void>
         TaskCompletionSource<Void> taskCompletionSource = new TaskCompletionSource<>();
@@ -117,11 +129,23 @@ public class ItemDB {
         return taskCompletionSource.getTask();
     }
 
+    /**
+     * delete a single item
+     *
+     * @param item items to delete
+     * @return task
+     */
     public Task<Void> deleteItem(Item item) {
         // Assuming deleteItemByField returns a Task<Void>
         return deleteItemByField(itemsCollection, "serialNumber", item.getSerialNumber());
     }
 
+    /**
+     * delete multiple items
+     *
+     * @param items list of items to be deleted
+     * @return  task
+     */
     public Task<Void> bulkDeleteItems(List<Item> items) {
         List<Task<Void>> deleteTasks = new ArrayList<>();
 
@@ -138,11 +162,12 @@ public class ItemDB {
         return allTasks;
     }
 
-
-
-
-
-
+    /**
+     * Edit a given item
+     *
+     * @param item items to be edited
+     * @return task
+     */
     public Task<Void> editItem(Item item) {
         return itemsCollection.document(item.getSerialNumber())
                 .set(item) // Overwrites the document with the new data
@@ -161,7 +186,11 @@ public class ItemDB {
     }
 
 
-
+    /**
+     * returns all the items in the database
+     *
+     * @return  Task of list of document snapshots
+     */
     public Task<List<DocumentSnapshot>> getAllItems() {
         return itemsCollection.get().continueWith(task -> {
             if (task.isSuccessful()) {
@@ -173,6 +202,12 @@ public class ItemDB {
         });
     }
 
+    /**
+     * filter and sort the items if required
+     *
+     * @param filterCriteria the filtercriteria to sort/filter
+     * @return Task of list of document snapshots
+     */
     public Task<List<DocumentSnapshot>> filter(FilterCriteria filterCriteria) {
         Query query = constructDynamicQuery(filterCriteria);
 
@@ -187,7 +222,8 @@ public class ItemDB {
         });
     }
 
-    public Query constructDynamicQuery(FilterCriteria filterCriteria) {
+
+    private Query constructDynamicQuery(FilterCriteria filterCriteria) {
         Query query = itemsCollection; // Start with the base query
 
         if (filterCriteria != null) {
@@ -220,6 +256,13 @@ public class ItemDB {
         return query;
     }
 
+    /**
+     * sorts the items returned from firestore
+     *
+     * @param querySnapshot items returned from the db
+     * @param filterCriteria the filtercriteria to sort/filter
+     * @return  list of document snapshots
+     */
     public List<DocumentSnapshot> sortResults(QuerySnapshot querySnapshot, FilterCriteria filterCriteria) {
         List<DocumentSnapshot> filteredAndSortedResults = querySnapshot.getDocuments();
 

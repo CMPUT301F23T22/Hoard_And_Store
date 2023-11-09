@@ -6,10 +6,11 @@ import com.google.firebase.firestore.FirebaseFirestoreSettings;
 public class ItemDBConnector {
     private FirebaseFirestore db;
 
+
     public ItemDBConnector() {
+        // connect to the FireStore DB
         db = FirebaseFirestore.getInstance();
 
-        // Optionally configure Firestore settings
         FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
                 .setPersistenceEnabled(true) // Enable local data persistence
                 .build();

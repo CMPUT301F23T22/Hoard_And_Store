@@ -19,6 +19,11 @@ public class CustomDatePicker {
         this.listener = listener;
     }
 
+
+    /**
+     * shows the custom date picker
+     *
+     */
     public void showDatePicker() {
         MaterialDatePicker.Builder<Long> builder = MaterialDatePicker.Builder.datePicker();
         MaterialDatePicker<Long> materialDatePicker = builder.build();

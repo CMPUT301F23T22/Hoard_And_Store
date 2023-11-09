@@ -1,10 +1,12 @@
 package com.example.hoard;
 
 
+import android.media.Image;
 import android.nfc.Tag;
 
 import com.google.firebase.Timestamp;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -12,11 +14,19 @@ import java.util.Date;
 import java.util.HashMap;
 
 public class SortComparator implements Comparator<Object> {
+    /**
+     * Compares 2 objects and their valies
+     *
+     * @param  value1 first object value to compare
+     * @param  value2 second object to compare
+     * @return int -1 if value1 is smaller, 1 if value1 is bigger and 0 if value1 and value2
+     * are equal
+     */
     @Override
     public int compare(Object value1, Object value2) {
         //compare strings
         if (value1 instanceof String && value2 instanceof String) {
-            return ((String) value1).toLowerCase().compareTo(((String) value2).toLowerCase());
+            return ((String) value1).toLowerCase().compareTo(((String) value2).toLowerCase( ));
         //compare dobules
         } else if (value1 instanceof Double && value2 instanceof Double) {
             return Double.compare((Double) value1, (Double) value2);

@@ -91,99 +91,221 @@ public class Item implements Serializable {
         return matcher.matches();
     }
 
+    /**
+     * Checks if the provided description is valid (not empty).
+     *
+     * @param description The description to be validated.
+     * @return True if the description is valid, false otherwise.
+     */
     public static boolean isValidDescription(String description) {
         return !description.isEmpty();
     }
 
+    /**
+     * Checks if the provided make is valid (not empty).
+     *
+     * @param make The make to be validated.
+     * @return True if the make is valid, false otherwise.
+     */
     public static boolean isValidMake(String make) {
         return !make.isEmpty();
     }
 
+    /**
+     * Checks if the provided model is valid (not empty).
+     *
+     * @param model The model to be validated.
+     * @return True if the model is valid, false otherwise.
+     */
     public static boolean isValidModel(String model) {
         return !model.isEmpty();
     }
 
+    /**
+     * Checks if the provided serial number is valid (not empty).
+     *
+     * @param serialNumber The serial number to be validated.
+     * @return True if the serial number is valid, false otherwise.
+     */
     public static boolean isValidSerialNumber(String serialNumber) {
         return !serialNumber.isEmpty();
     }
 
+    /**
+     * Checks if the provided value is valid (non-negative).
+     *
+     * @param value The value to be validated.
+     * @return True if the value is valid, false otherwise.
+     */
     public static boolean isValidValue(double value) {
         return value >= 0;
     }
 
+    /**
+     * Checks if the provided comment is valid (not empty).
+     *
+     * @param comment The comment to be validated.
+     * @return True if the comment is valid, false otherwise.
+     */
     public static boolean isValidComment(String comment) {
         return !comment.isEmpty();
     }
 
     // Getters and Setters for the Item's properties
+
+    /**
+     * Gets the date of acquisition for the item.
+     *
+     * @return The date of acquisition.
+     */
     public Date getDateOfAcquisition() {
         return dateOfAcquisition;
     }
 
+    /**
+     * Sets the date of acquisition for the item.
+     *
+     * @param dateOfAcquisition The date of acquisition to be set.
+     */
     public void setDateOfAcquisition(Date dateOfAcquisition) {
         this.dateOfAcquisition = dateOfAcquisition;
     }
 
+    /**
+     * Gets the brief description of the item.
+     *
+     * @return The brief description.
+     */
     public String getBriefDescription() {
         return briefDescription;
     }
 
+    /**
+     * Sets the brief description of the item.
+     *
+     * @param briefDescription The brief description to be set.
+     */
     public void setBriefDescription(String briefDescription) {
         this.briefDescription = briefDescription;
     }
 
+    /**
+     * Gets the unique ID of the item.
+     *
+     * @return The item's ID.
+     */
     public String getItemID() {
         return itemID;
     }
 
+    /**
+     * Gets the make of the item.
+     *
+     * @return The make of the item.
+     */
     public String getMake() {
         return make;
     }
 
+    /**
+     * Sets the make of the item.
+     *
+     * @param make The make to be set.
+     */
     public void setMake(String make) {
         this.make = make;
     }
 
+    /**
+     * Gets the model of the item.
+     *
+     * @return The model of the item.
+     */
     public String getModel() {
         return model;
     }
 
+    /**
+     * Sets the model of the item.
+     *
+     * @param model The model to be set.
+     */
     public void setModel(String model) {
         this.model = model;
     }
 
+    /**
+     * Gets the serial number of the item.
+     *
+     * @return The serial number of the item.
+     */
     public String getSerialNumber() {
         return serialNumber;
     }
 
+    /**
+     * Sets the serial number of the item.
+     *
+     * @param serialNumber The serial number to be set.
+     */
     public void setSerialNumber(String serialNumber) {
         this.serialNumber = serialNumber;
     }
 
+    /**
+     * Gets the estimated value of the item.
+     *
+     * @return The estimated value of the item.
+     */
     public double getEstimatedValue() {
         return estimatedValue;
     }
 
+    /**
+     * Sets the estimated value of the item.
+     *
+     * @param estimatedValue The estimated value to be set.
+     */
     public void setEstimatedValue(double estimatedValue) {
         this.estimatedValue = estimatedValue;
     }
 
+    /**
+     * Gets the comment associated with the item.
+     *
+     * @return The comment associated with the item.
+     */
     public String getComment() {
         return comment;
     }
 
+    /**
+     * Sets the comment associated with the item.
+     *
+     * @param comment The comment to be set.
+     */
     public void setComment(String comment) {
         this.comment = comment;
     }
 
+    /**
+     * Adds a tag to the item.
+     *
+     * @param tag The tag to be added.
+     */
     public void addTag(Tag tag) {
         if (tags != null) {
             tags.add(tag);
-        }else{
-            //#TODO error message
+        } else {
+            // TODO: Handle the case where tags list is null (e.g., log an error message).
         }
     }
 
+    /**
+     * set the items tag
+     *
+     * @param  tags ArrayList<Tag>
+     */
     public void setTags(ArrayList<Tag> tags) {
         this.tags = tags;
     }
