@@ -73,6 +73,14 @@ public class FilterCriteria implements Serializable  {
         this.endDate = endDate;
     }
 
+    public void clearStartDate() {
+        startDate = null;
+    }
+
+    public void clearEndDate() {
+        endDate = null;
+    }
+
     public void clearMakes() {
         makes.clear();
     }
@@ -82,9 +90,11 @@ public class FilterCriteria implements Serializable  {
             this.setDescriptionKeyWords(updatedCriteria.getDescriptionKeyWords()); 
         }
         if (updatedCriteria.getStartDate() != null) {
+            this.clearStartDate();
             this.setStartDate(updatedCriteria.getStartDate());
         }
         if (updatedCriteria.getEndDate() != null) {
+            this.clearEndDate();
             this.setEndDate(updatedCriteria.getEndDate());
         }
     }

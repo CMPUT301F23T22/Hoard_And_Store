@@ -1,6 +1,9 @@
 package com.example.hoard;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -9,6 +12,7 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -23,6 +27,9 @@ public class ItemDBController {
         itemDB = new ItemDB(new ItemDBConnector());
     }
 
+    // chatgpt: to make a singleton we only ever want one instance here
+    // prompts: Need to only have one instance of a class how can i do this in java
+    // Replied with pesudo code on how to do this
     public static ItemDBController getInstance() {
         if (instance == null) {
             synchronized (ItemDBController.class) {
@@ -71,10 +78,17 @@ public class ItemDBController {
 
                                     Item item = new Item(dateOfAcquisition, briefDescription, make, model, serialNumber, estimatedValue, comment, itemID, (ArrayList<Tag>) tags);
                                     filteredItems.add(item);
+
                                 }
                                 callback.onDataLoaded(filteredItems);
                             } else {
                                 // Handle the error when fetching data
+                                Exception e = task.getException();
+                                if (e != null) {
+                                    Log.e("Firestore", "Error fetching data: " + e.getMessage());
+                                } else {
+                                    Log.e("Firestore", "Unknown error fetching data.");
+                                }
                             }
                         }
                     });
@@ -140,7 +154,7 @@ public class ItemDBController {
                     }
                     callback.accept(totalValue);
                 } else {
-                    // Handle the error when fetching data
+                    // TODO: Handle the error when fetching data
                     callback.accept(0.0);
                 }
             }
@@ -149,6 +163,18 @@ public class ItemDBController {
 
     public void addItem(Item item, OnCompleteListener<Void> onCompleteListener) {
         itemDB.addItem(item, onCompleteListener);
+    }
+
+    public void deleteItem(Item item) {
+        itemDB.deleteItem(item);
+    }
+
+    public Task<Void> bulkDeleteItems(List<Item> items) {
+        return itemDB.bulkDeleteItems(items);
+    }
+
+    public void editItem(Item item) {
+        itemDB.editItem(item);
     }
 
     public void deleteItem(Item item, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {

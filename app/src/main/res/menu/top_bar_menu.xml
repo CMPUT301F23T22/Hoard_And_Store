@@ -7,6 +7,28 @@
         android:title="search"
         android:contentDescription=""
         app:showAsAction="ifRoom" />
-
-
+    <item
+        android:id="@+id/bulk_delete"
+        android:icon="@drawable/delete_24px"
+        android:title="search"
+        android:contentDescription=""
+        android:visible="false"
+        android:enabled="false"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/bulk_tag"
+        android:icon="@drawable/tag_24px"
+        android:title="search"
+        android:contentDescription=""
+        android:visible="false"
+        android:enabled="false"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/close_bulk_select"
+        android:icon="@drawable/close_24px"
+        android:title="search"
+        android:contentDescription=""
+        android:visible="false"
+        android:enabled="false"
+        app:showAsAction="ifRoom"/>
 </menu>
