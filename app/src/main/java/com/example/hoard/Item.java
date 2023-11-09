@@ -1,9 +1,16 @@
 package com.example.hoard;
 
+import android.util.Log;
+
+import com.google.firebase.firestore.PropertyName;
+
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.UUID;
@@ -14,6 +21,9 @@ public class Item implements Serializable {
     private double estimatedValue;
     private String itemID;
     private ArrayList<Tag> tags;
+    @PropertyName("briefDescriptionList")
+    private List<String> briefDescriptionList;
+
     private boolean isSelected;
     public Item(Date dateOfAcquisition, String briefDescription, String make, String model, String serialNumber, double estimatedValue, String comment, ArrayList<Tag> tagsList) {
 
@@ -46,6 +56,7 @@ public class Item implements Serializable {
         this.serialNumber = serialNumber;
         this.estimatedValue = estimatedValue;
         this.comment = comment;
+        this.briefDescriptionList = splitBriefDescription(this.briefDescription);
         this.itemID = UUID.randomUUID().toString();
         this.tags = tagsList;
     }
@@ -60,12 +71,17 @@ public class Item implements Serializable {
         this.comment = comment;
         this.itemID = itemID;
         this.tags = tagsList;
+        this.briefDescriptionList = splitBriefDescription(this.briefDescription);
 
         this.isSelected = false;
-        tags = new ArrayList<>();
+        this.tags = tags;
 
     }
 
+    private List<String> splitBriefDescription(String briefDescription) {
+        String[] briefDescriptionArray = briefDescription.split(" ");
+        return Arrays.asList(briefDescriptionArray);
+    }
     public static boolean isValidDate(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
         String formattedDate = sdf.format(date);
@@ -177,11 +193,11 @@ public class Item implements Serializable {
         }
     }
 
+    public List<String> getBriefDescriptionList() {
+        return briefDescriptionList;
+    }
+
     public ArrayList<Tag> getTags() {
         return this.tags;
     }
-
-    public boolean isSelected() {return isSelected;}
-
-    public void setSelected(boolean selected) {isSelected = selected;}
 }

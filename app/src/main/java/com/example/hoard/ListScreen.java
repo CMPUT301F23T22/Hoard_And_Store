@@ -5,27 +5,40 @@ import com.google.android.gms.tasks.Task;
 
 
 import android.app.Activity;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -47,8 +60,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
 
-
-public class ListScreen extends AppCompatActivity implements ItemAdapter.SelectionModeCallback {
+public class ListScreen extends AppCompatActivity implements ItemAdapter.SelectionModeCallback, ItemAdapter.SumCallBack {
 
     private ItemDB itemDB;
     private Toolbar topBar;
@@ -78,6 +90,8 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
     private FilterCriteria filterCriteria;
     private TagDBController tagDBController;
     private final int sortingRequestCode = 1;
+    private TextView totalValueTextView;
+
 
     private ActivityResultLauncher<Intent> addActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleAddResult);
     ChipGroup chipGroupTags;
@@ -87,6 +101,7 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_list_screen);
+        totalValueTextView = findViewById(R.id.tvTotalValueAmount);
 
         filterCriteria = FilterCriteria.getInstance();
 
@@ -108,7 +123,6 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
         sort = bottomMenu.findItem(R.id.nav_sort);
         home = bottomMenu.findItem(R.id.nav_home);
 
-
         home.setChecked(true);
 
         MenuItem deleteItem = bottomMenu.findItem(R.id.nav_delete);
@@ -122,9 +136,13 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
         dbController.loadItems(new DataLoadCallbackItem() {
             @Override
             public void onDataLoaded(List<Item> items) {
+
                 itemAdapter = new ItemAdapter(items, recyclerView);
+                itemAdapter.setSumCallback(ListScreen.this);
                 recyclerView.setAdapter(itemAdapter);
                 itemAdapter.setSelectionModeCallback(ListScreen.this);
+                itemAdapter.setSum();
+
             }
         }, filterCriteria);
 
@@ -374,6 +392,12 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
         dbController.loadItems(new DataLoadCallbackItem() {
             @Override
             public void onDataLoaded(List<Item> items) {
+                itemAdapter = new ItemAdapter(items, recyclerView);
+                recyclerView.setAdapter(itemAdapter);
+                itemAdapter.setSelectionModeCallback(ListScreen.this);
+                itemAdapter.setSumCallback(ListScreen.this);
+            }
+        }, filterCriteria);
 
                 recyclerView.setAdapter(itemAdapter);
 
@@ -415,7 +439,6 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
             }, FilterCriteria.getInstance());
         }
     }
-
 
     private void updateTotalValue() {
         dbController.getTotalValue(new Consumer<Double>() {
@@ -517,5 +540,13 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
             }
 
         }
+    }
+
+
+    @Override
+    public void onSumChanged(double sum) {
+        // Update the total value TextView
+        totalValueTextView.setText(String.format(Locale.getDefault(), "%.2f", sum));
+
     }
 }

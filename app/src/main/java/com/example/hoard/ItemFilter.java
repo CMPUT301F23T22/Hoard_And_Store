@@ -8,7 +8,7 @@ public class ItemFilter {
     private Date startDate;
     private Date endDate;
     private List<String> make;
-    private List<String> desciptionKeyWords;
+    private List<String> descriptionKeyWords;
     private List<Tag> tags;
     public ItemFilter() {
         //We automatically assume the range in infinite set these to large and early date values
@@ -57,11 +57,11 @@ public class ItemFilter {
     }
 
     public List<String> getDesciptionKeyWords() {
-        return desciptionKeyWords;
+        return descriptionKeyWords;
     }
 
-    public void setDesciptionKeyWords(List<String> desciptionKeyWords) {
-        this.desciptionKeyWords = desciptionKeyWords;
+    public void descriptionKeyWords(List<String> descriptionKeyWords) {
+        this.descriptionKeyWords = descriptionKeyWords;
     }
 
     public List<Tag> getTags() {
