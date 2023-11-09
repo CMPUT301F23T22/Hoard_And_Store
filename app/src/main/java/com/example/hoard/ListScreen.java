@@ -215,8 +215,8 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
                         applyTagsButton.setOnClickListener(view -> {
                             if (itemAdapter.getSelectionMode()) {
                                 new AlertDialog.Builder(ListScreen.this, R.style.PurpleAlertDialog)
-                                        .setTitle("Confirm Delete")
-                                        .setMessage("Are you sure you want to add tags to these items?")
+                                        .setTitle("Confirm Tags")
+                                        .setMessage("Are you sure you want to add the selected tags to these items?")
                                         .setPositiveButton("Yes", (dialog, which) -> {
                                             // Get selected tags
                                             List<Tag> selectedTags = new ArrayList<>();
