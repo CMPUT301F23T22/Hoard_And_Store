@@ -246,8 +246,9 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
                                             List<Item> selectedItems = itemAdapter.getSelectedItems();
                                             for (Item selectedItem : selectedItems) {
                                                 for (Tag selectedTag : selectedTags) {
-                                                    selectedItem.addTag(selectedTag);
-                                                }
+                                                    if (!selectedItem.getTags().contains(selectedTag))
+                                                        selectedItem.addTag(selectedTag);
+                                                    }
                                                 // Update each item in the database
                                                 dbController.editItem(selectedItem.getItemID(), selectedItem, task -> {
                                                     if (!task.isSuccessful()) {
@@ -385,8 +386,8 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
         dbController.loadItems(new DataLoadCallbackItem() {
             @Override
             public void onDataLoaded(List<Item> items) {
-                itemAdapter = new ItemAdapter(items, recyclerView);
-                recyclerView.setAdapter(itemAdapter);
+//                itemAdapter = new ItemAdapter(items, recyclerView);
+//                recyclerView.setAdapter(itemAdapter);
                 itemAdapter.setSelectionModeCallback(ListScreen.this);
                 itemAdapter.setSumCallback(ListScreen.this);
             }
@@ -415,7 +416,6 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
                 public void onDataLoaded(List<Item> items) {
                     itemAdapter = new ItemAdapter(items, recyclerView);
                     recyclerView.setAdapter(itemAdapter);
-                    itemAdapter.setSelectionModeCallback(ListScreen.this);
                     itemAdapter.setSelectionMode(selectionMode);
                     updateTotalValue();
                     for (String itemID : itemIDs) {

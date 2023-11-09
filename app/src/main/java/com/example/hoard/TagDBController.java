@@ -58,7 +58,7 @@ public class TagDBController {
         });
     }
     public void addTag(Tag tag, OnCompleteListener<Void> onCompleteListener){
-        tagDB.addTag(tag,onCompleteListener);
+
     }
 
 }

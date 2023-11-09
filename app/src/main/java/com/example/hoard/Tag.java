@@ -40,4 +40,14 @@ public class Tag implements Serializable {
     public void setTagColor(String tagColor) {
         this.tagColor = tagColor;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this ) return true;
+        if (!(o instanceof Tag)) {
+            return false;
+        }
+        Tag tag = (Tag) o;
+        return tagName.equals(tag.tagName);
+    }
 }
