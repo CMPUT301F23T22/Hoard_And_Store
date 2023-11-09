@@ -56,7 +56,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
 
-public class ListScreen extends AppCompatActivity {
+public class ListScreen extends AppCompatActivity implements ItemAdapter.SelectionModeCallback, ItemAdapter.SumCallBack {
 
     private ItemDB itemDB;
     private Toolbar topBar;
@@ -85,6 +85,8 @@ public class ListScreen extends AppCompatActivity {
     private FilterCriteria filterCriteria;
 
     private final int sortingRequestCode = 1;
+    private TextView totalValueTextView;
+
 
     private ActivityResultLauncher<Intent> addActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleAddResult);
 
@@ -93,6 +95,7 @@ public class ListScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_list_screen);
+        totalValueTextView = findViewById(R.id.tvTotalValueAmount);
 
         filterCriteria = FilterCriteria.getInstance();
 
@@ -127,9 +130,13 @@ public class ListScreen extends AppCompatActivity {
         dbController.loadItems(new DataLoadCallbackItem() {
             @Override
             public void onDataLoaded(List<Item> items) {
+
                 itemAdapter = new ItemAdapter(items, recyclerView);
+                itemAdapter.setSumCallback(ListScreen.this);
                 recyclerView.setAdapter(itemAdapter);
                 itemAdapter.setSelectionModeCallback(ListScreen.this);
+                itemAdapter.setSum();
+
             }
         }, filterCriteria);
 
@@ -299,7 +306,7 @@ public class ListScreen extends AppCompatActivity {
                 itemAdapter = new ItemAdapter(items, recyclerView);
                 recyclerView.setAdapter(itemAdapter);
                 itemAdapter.setSelectionModeCallback(ListScreen.this);
-                updateTotalValue();
+                itemAdapter.setSumCallback(ListScreen.this);
             }
         }, filterCriteria);
     }
@@ -323,6 +330,7 @@ public class ListScreen extends AppCompatActivity {
                 updateTotalValue();
             }
         }
+    }
 
     @Override
     public void onSelectionModeChanged(boolean selectionMode) {
@@ -380,5 +388,13 @@ public class ListScreen extends AppCompatActivity {
         if (itemAdapter != null) {
             topBar.setTitle("Selected (" + itemAdapter.getItemsSelectedCount() + ")");
         }
+    }
+
+
+    @Override
+    public void onSumChanged(double sum) {
+        // Update the total value TextView
+        totalValueTextView.setText(String.format(Locale.getDefault(), "%.2f", sum));
+
     }
 }

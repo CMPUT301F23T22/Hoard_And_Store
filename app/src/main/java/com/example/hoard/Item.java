@@ -74,7 +74,7 @@ public class Item implements Serializable {
         this.briefDescriptionList = splitBriefDescription(this.briefDescription);
 
         this.isSelected = false;
-        tags = new ArrayList<>();
+        this.tags = tags;
 
     }
 

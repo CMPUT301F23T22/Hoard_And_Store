@@ -201,27 +201,28 @@ public class ItemDBController {
 
 
     public void getTotalValue(final Consumer<Double> callback) {
-        itemDB.getAllItems().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    double totalValue = 0.0;
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        Map<String, Object> data = document.getData();
-                        if (data.containsKey("estimatedValue")) {
-                            Object estimatedValueObj = data.get("estimatedValue");
-                            if (estimatedValueObj instanceof Number) {
-                                totalValue += ((Number) estimatedValueObj).doubleValue();
-                            }
-                        }
-                    }
-                    callback.accept(totalValue);
-                } else {
-                    // TODO: Handle the error when fetching data
-                    callback.accept(0.0);
-                }
-            }
-        });
+        // We may need to rethink how we are getting estimated value this is very messy and touches alot of code everywhere
+//        itemDB.getAllItems().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//            @Override
+//            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                if (task.isSuccessful()) {
+//                    double totalValue = 0.0;
+//                    for (QueryDocumentSnapshot document : task.getResult()) {
+//                        Map<String, Object> data = document.getData();
+//                        if (data.containsKey("estimatedValue")) {
+//                            Object estimatedValueObj = data.get("estimatedValue");
+//                            if (estimatedValueObj instanceof Number) {
+//                                totalValue += ((Number) estimatedValueObj).doubleValue();
+//                            }
+//                        }
+//                    }
+//                    callback.accept(totalValue);
+//                } else {
+//                    // TODO: Handle the error when fetching data
+//                    callback.accept(0.0);
+//                }
+//            }
+//        });
     }
 
     public void addItem(Item item, OnCompleteListener<Void> onCompleteListener) {

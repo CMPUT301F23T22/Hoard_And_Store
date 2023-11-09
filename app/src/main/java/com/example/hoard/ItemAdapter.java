@@ -30,10 +30,16 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
 //    private List<Item> selectedItems;
     private List<Item> filteredItems;
     private Context context;
-
+    private double currentSum = 0;
+    private SumCallBack sumCallBack;
     private boolean isSelectionMode = false;
+    private ItemAdapterListener itemAdapterListener;
 
     private SparseBooleanArray selectedItems = new SparseBooleanArray();
+
+    public void setItemAdapterListener(ItemAdapterListener listener) {
+        this.itemAdapterListener = listener;
+    }
 
     public void setSelectionMode(boolean selectionMode) {
         this.isSelectionMode = selectionMode;
@@ -42,6 +48,17 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
             resetBackgroundColors();// Clear the selected items when selection mode is turned off
         }
         notifyDataSetChanged();
+    }
+    public void updateEstimatedValue() {
+        for(Item item: itemList){
+            currentSum = currentSum + item.getEstimatedValue();
+        }
+
+        if (itemAdapterListener != null) {
+            itemAdapterListener.onEstimatedValueChanged(currentSum);
+        }
+        notifyAndRecalculate();
+
     }
 
 
@@ -54,11 +71,19 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
     }
 
 
-
     public ItemAdapter(List<Item> itemList, RecyclerView recyclerView) {
         this.itemList = itemList;
         this.filteredItems = new ArrayList<>(itemList);
         this.recyclerView = recyclerView;
+    }
+
+
+    public void setSum() {
+        currentSum = 0;
+        for(Item item: itemList){
+            currentSum = currentSum + item.getEstimatedValue();
+        }
+        sumCallBack.onSumChanged(currentSum);
     }
 
     private void resetBackgroundColors() {
@@ -156,6 +181,10 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
         notifyDataSetChanged();
     }
 
+    public interface SumCallBack {
+        void onSumChanged(double sum);
+    }
+
     public interface SelectionModeCallback {
         void onSelectionModeChanged(boolean selectionMode);
     }
@@ -166,6 +195,11 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
     public void setSelectionModeCallback(SelectionModeCallback callback) {
 
         this.selectionModeCallback = callback;
+    }
+
+
+    public void setSumCallback(SumCallBack callback) {
+        this.sumCallBack = callback;
     }
 
 
@@ -237,6 +271,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
     public void addItem(Item item) {
         itemList.add(item);
         filteredItems.add(item);
+        setSum();
         notifyDataSetChanged();
     }
 
@@ -246,6 +281,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
             filteredItems.remove(position);
             notifyItemRemoved(position);
         }
+        setSum();
     }
 
     public int getsize(){
@@ -266,7 +302,9 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
     public void setItems(List<Item> newItems) {
         itemList = newItems;
         filteredItems = new ArrayList<>(itemList);
+        updateEstimatedValue();
         notifyDataSetChanged();
+
     }
 
     public double getSum(){
@@ -278,10 +316,14 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
     }
 
     // Notify data set changes, and recalculate sum
-    public void notifyAndRecalculate(int position) {
-        notifyItemChanged(position);
+    public void notifyAndRecalculate() {
+        notifyDataSetChanged();
         // Calculate the sum after the change
-        double sum = getSum();
+        double sum = currentSum;
         // You can use this sum for any purpose, like displaying it in your UI.
+    }
+
+    public interface ItemAdapterListener {
+        void onEstimatedValueChanged(double sum);
     }
 }
