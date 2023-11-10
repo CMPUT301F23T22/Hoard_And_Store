@@ -29,6 +29,10 @@ public class DetailsActivity extends AppCompatActivity {
     ChipGroup chipGroup;
     private final ActivityResultLauncher<Intent> editActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleEditResult);
 
+    /**
+     * This method is called when the activity is created
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,6 +99,12 @@ public class DetailsActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Handles the result from the edit activity. If the result is OK, the selected item is updated
+     * with the new details returned from the edit activity.
+     *
+     * @param result The result data from the activity.
+     */
     private void handleEditResult(ActivityResult result) {
         if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
             Item returnedItem = (Item) result.getData().getSerializableExtra("updatedItem");
@@ -105,6 +115,11 @@ public class DetailsActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Displays the selected item's details in the activity's views. It formats the date
+     * and updates all text views with the item's information. It also creates chips for each tag
+     * associated with the item and adds them to the chip group.
+     */
     private void displaySelectedItem() {
         // Format the date
         Date date = selectedItem.getDateOfAcquisition();

@@ -22,6 +22,9 @@ import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener;
 
 import java.util.List;
 
+/**
+ * Activity for adding or editing a tag.
+ */
 public class TagAddEdit extends AppCompatActivity {
 
     private EditText editTextTagName;
@@ -77,6 +80,9 @@ public class TagAddEdit extends AppCompatActivity {
         createButton.setOnClickListener(v -> createAndSendTag());
     }
 
+    /**
+     * Shows the color picker dialog.
+     */
     private void showColorPickerDialog() {
         new ColorPickerDialog.Builder(this)
                 .setPositiveButton(getString(R.string.submit_button_text),
@@ -89,6 +95,11 @@ public class TagAddEdit extends AppCompatActivity {
                 .show();
     }
 
+    /**
+     * Sets the color of the layout to the selected color.
+     *
+     * @param envelope The color envelope containing the selected color.
+     */
     private void setLayoutColor(ColorEnvelope envelope) {
         tagColor = "#" + envelope.getHexCode();
         editTextTagColor.setText(tagColor);
@@ -96,6 +107,9 @@ public class TagAddEdit extends AppCompatActivity {
 
     }
 
+    /**
+     * Creates a new tag and sends it back to the calling activity.
+     */
     private void createAndSendTag() {
         tagName = editTextTagName.getText().toString().trim();
         // Assume tagColor holds the selected color hex code. It needs to be initialized in your activity.

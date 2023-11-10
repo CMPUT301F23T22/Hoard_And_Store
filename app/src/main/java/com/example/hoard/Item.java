@@ -23,6 +23,17 @@ public class Item implements Serializable {
 
     private boolean isSelected;
 
+    /**
+     * Constructor for the Item class.
+     *
+     * @param dateOfAcquisition The date of acquisition for the item.
+     * @param briefDescription  The brief description of the item.
+     * @param make              The make of the item.
+     * @param model             The model of the item.
+     * @param serialNumber      The serial number of the item.
+     * @param estimatedValue    The estimated value of the item.
+     * @param comment           The comment associated with the item.
+     */
     public Item(Date dateOfAcquisition, String briefDescription, String make, String model, String serialNumber, double estimatedValue, String comment, ArrayList<Tag> tagsList) {
 
         if (!isValidDate(dateOfAcquisition)) {
@@ -76,11 +87,23 @@ public class Item implements Serializable {
 
     }
 
+    /**
+     * Splits the brief description into a list of words.
+     *
+     * @param briefDescription The brief description to be split.
+     * @return A list of words.
+     */
     private List<String> splitBriefDescription(String briefDescription) {
         String[] briefDescriptionArray = briefDescription.split(" ");
         return Arrays.asList(briefDescriptionArray);
     }
 
+    /**
+     * Checks if the provided date is valid (MM/dd/yyyy).
+     *
+     * @param date The date to be validated.
+     * @return True if the date is valid, false otherwise.
+     */
     public static boolean isValidDate(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
         String formattedDate = sdf.format(date);
