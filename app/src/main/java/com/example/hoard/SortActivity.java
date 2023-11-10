@@ -35,7 +35,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
-
+/**
+ * An activity class dedicated to sorting functionalities within the application.
+ *
+ */
 public class SortActivity extends AppCompatActivity {
     private ArrayList<String> dataList;
     private RecyclerView recyclerView;

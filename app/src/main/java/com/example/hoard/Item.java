@@ -12,6 +12,23 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Represents an item with various properties, used in the application for tracking and managing items.
+ * This class is serializable, allowing it to be easily passed between activities or saved to persistent storage.
+ *
+ * Properties:
+ * - dateOfAcquisition (Date): The date when the item was acquired.
+ * - briefDescription (String): A brief description of the item.
+ * - make (String): The make of the item.
+ * - model (String): The model of the item.
+ * - serialNumber (String): The serial number of the item.
+ * - comment (String): Any additional comments about the item.
+ * - estimatedValue (double): The estimated monetary value of the item.
+ * - itemID (String): A unique identifier for the item.
+ * - tags (ArrayList<Tag>): A list of tags associated with the item.
+ * - briefDescriptionList (List<String>): An additional list of brief descriptions, marked for special property name handling in serialization.
+ * - isSelected (boolean): A flag indicating if the item is currently selected in the UI.
+ */
 public class Item implements Serializable {
     private Date dateOfAcquisition;
     private String briefDescription, make, model, serialNumber, comment;
