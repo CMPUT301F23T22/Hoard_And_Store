@@ -1,5 +1,6 @@
 package com.example.hoard;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ public class SortAdapter extends RecyclerView.Adapter<SortAdapter.SortViewHolder
     private final Map<String, String> userToDatabaseMapping = new HashMap<>();
     private final Map<String, String> databaseToUserMapping = new HashMap<>();
     private FilterCriteria filterCriteria;
+    private int selectedPos = RecyclerView.NO_POSITION;
 
     public SortAdapter() {
         this.sortOptions = Arrays.asList("Date", "Description", "Make", "Estimated Value", "Tags");
@@ -31,10 +33,9 @@ public class SortAdapter extends RecyclerView.Adapter<SortAdapter.SortViewHolder
         //this keeps track of what the user wants for sorting
         this.sortOptionsEnabled = new HashMap<>();
 
-        // Initialize the state of all options to "ascending"
         // Initialize the mappings
         userToDatabaseMapping.put("Date", "dateOfAcquisition");
-        userToDatabaseMapping.put("Description", "comment");
+        userToDatabaseMapping.put("Description", "briefDescription");
         userToDatabaseMapping.put("Make", "make");
         userToDatabaseMapping.put("Estimated Value", "estimatedValue");
         userToDatabaseMapping.put("Tags", "tags");
@@ -45,6 +46,16 @@ public class SortAdapter extends RecyclerView.Adapter<SortAdapter.SortViewHolder
         }
 
     }
+    public int getPositionForItem(String str) {
+        if (sortOptions != null) {
+            for (int i = 0; i < sortOptions.size(); i++) {
+                if (str.equals(sortOptions.get(i))) {
+                    return i;
+                }
+            }
+        }
+        return RecyclerView.NO_POSITION; // Item not found
+    }
 
     public static class SortViewHolder extends RecyclerView.ViewHolder {
         public TextView sortTextView;
@@ -54,7 +65,7 @@ public class SortAdapter extends RecyclerView.Adapter<SortAdapter.SortViewHolder
         public SortViewHolder(View itemView) {
             super(itemView);
             sortTextView = itemView.findViewById(R.id.sortTextView);
-            sortCheckBox = itemView.findViewById(R.id.sort_check_box);
+            //sortCheckBox = itemView.findViewById(R.id.sort_check_box);
             sortType = itemView.findViewById(R.id.sort_type);
         }
     }
@@ -69,19 +80,59 @@ public class SortAdapter extends RecyclerView.Adapter<SortAdapter.SortViewHolder
     public void onBindViewHolder(SortViewHolder holder, int position) {
         String option = sortOptions.get(position);
         holder.sortTextView.setText(option);
+        holder.itemView.setSelected(selectedPos == position);
 
         filterCriteria = FilterCriteria.getInstance();
         if (filterCriteria.getSortOptions() != null) {
             sortOptionsEnabled = filterCriteria.getSortOptions();
 
             // Check if the current option is in the sortOptionsEnabled
+
             if (sortOptionsEnabled.containsKey(userToDatabaseMapping.get(option))) {
-                holder.sortCheckBox.setChecked(true);
+                //holder.sortCheckBox.setChecked(true);
+                holder.itemView.setSelected(true);
+                selectedPos = holder.getAdapterPosition();
                 String sortTypeText = sortOptionsEnabled.get(userToDatabaseMapping.get(option));
                 holder.sortType.setText(sortTypeText);
             }
 
         }
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int previousSelectedPos = selectedPos;
+                int clickedPos = holder.getAdapterPosition();
+
+                if (previousSelectedPos == clickedPos) {
+                    // Clicking the already selected item, deselect it
+                    selectedPos = RecyclerView.NO_POSITION;
+                } else {
+                    // Clicking a different item, update selectedPos
+                    String currentState = holder.sortType.getText().toString();
+                    String databaseName = userToDatabaseMapping.get(option);
+                    if (databaseName != null) {
+                        sortOptionsEnabled.put(databaseName, currentState);
+                    }
+                    selectedPos = clickedPos;
+                }
+
+                // Notify item changes
+                notifyItemChanged(previousSelectedPos);
+                notifyItemChanged(selectedPos);
+
+                // Check if the previous selected item was selected
+                if (previousSelectedPos != RecyclerView.NO_POSITION) {
+                    // Update the state of the previous selected item
+                    String previousOption = sortOptions.get(previousSelectedPos);
+                    filterCriteria = FilterCriteria.getInstance();
+                    String previousDatabaseName = userToDatabaseMapping.get(previousOption);
+                    if (previousDatabaseName != null) {
+                        sortOptionsEnabled.remove(previousDatabaseName);
+                    }
+                }
+            }
+        });
+
 
         holder.sortType.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,25 +152,25 @@ public class SortAdapter extends RecyclerView.Adapter<SortAdapter.SortViewHolder
                 }
             }
         });
-        holder.sortCheckBox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (holder.sortCheckBox.isChecked()) {
-                    //get the value of the button
-                    String currentState = holder.sortType.getText().toString();
-                    String databaseName = userToDatabaseMapping.get(option);
-                    if (databaseName != null) {
-                        sortOptionsEnabled.put(databaseName, currentState);
-                    }
-                } else {
-                    // it's unchecked, so remove it from enabled
-                    String databaseName = userToDatabaseMapping.get(option);
-                    if (databaseName != null) {
-                        sortOptionsEnabled.remove(databaseName);
-                    }
-                }
-            }
-        });
+//        holder.sortCheckBox.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if (holder.sortCheckBox.isChecked()) {
+//                    //get the value of the button
+//                    String currentState = holder.sortType.getText().toString();
+//                    String databaseName = userToDatabaseMapping.get(option);
+//                    if (databaseName != null) {
+//                        sortOptionsEnabled.put(databaseName, currentState);
+//                    }
+//                } else {
+//                    // it's unchecked, so remove it from enabled
+//                    String databaseName = userToDatabaseMapping.get(option);
+//                    if (databaseName != null) {
+//                        sortOptionsEnabled.remove(databaseName);
+//                    }
+//                }
+//            }
+//        });
     }
 
     public Map<String, String> getSortOptionsEnabled() {

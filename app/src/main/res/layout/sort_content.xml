@@ -4,15 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@drawable/selector">
 
     <!-- Checkbox on the left side -->
-    <CheckBox
-        android:id="@+id/sort_check_box"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_marginEnd="8dp" />
+<!--    <CheckBox-->
+<!--        android:id="@+id/sort_check_box"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_gravity="center_vertical"-->
+<!--        android:layout_marginEnd="8dp" />-->
 
     <!-- Text view for the sort name -->
     <TextView
@@ -21,7 +22,7 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:textSize="16sp"
-        android:gravity="center"
+        android:gravity="left"
         android:text="@string/sort_method_name"
         android:textColor="@android:color/black" />
 

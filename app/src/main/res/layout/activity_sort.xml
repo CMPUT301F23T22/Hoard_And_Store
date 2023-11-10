@@ -53,7 +53,7 @@
                 android:id="@+id/sorting"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                />
+                android:background="@drawable/selector"/>
 
             <TextView
                 android:id="@+id/filterLabel"
