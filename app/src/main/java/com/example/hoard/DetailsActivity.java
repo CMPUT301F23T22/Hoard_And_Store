@@ -1,4 +1,5 @@
 package com.example.hoard;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -23,13 +24,10 @@ import java.util.Date;
 import java.util.Locale;
 
 public class DetailsActivity extends AppCompatActivity {
-
     private TextView dateOfAcquisitionTextView, makeTextView, modelTextView, serialNumberTextView, estimatedValueTextView, commentTextView, briefDescriptionTextView;
     private Item selectedItem;
-
     ChipGroup chipGroup;
-
-    private ActivityResultLauncher<Intent> editActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleEditResult);
+    private final ActivityResultLauncher<Intent> editActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleEditResult);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,11 +76,12 @@ public class DetailsActivity extends AppCompatActivity {
             finish();
         }
 
-
         closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), ListScreen.class);
                 finish();
+                startActivity(intent);
             }
         });
 
@@ -128,6 +127,8 @@ public class DetailsActivity extends AppCompatActivity {
         ArrayList<Tag> tags = selectedItem.getTags();
         // create a chips from tags
         chipGroup.removeAllViews();
+
+        // iterate over the tags and add to chip group
         for (Tag tag : tags) {
             Chip chip = new Chip(DetailsActivity.this);
             chip.setText(tag.getTagName());

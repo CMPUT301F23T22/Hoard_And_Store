@@ -33,6 +33,7 @@ android {
 }
 
 dependencies {
+    implementation("com.github.skydoves:colorpickerview:2.3.0")
     implementation(platform("com.google.firebase:firebase-bom:32.4.0"))
     implementation("com.google.firebase:firebase-firestore")
     implementation("androidx.appcompat:appcompat:1.6.1")

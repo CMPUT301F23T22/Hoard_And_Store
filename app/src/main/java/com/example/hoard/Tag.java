@@ -7,7 +7,7 @@ public class Tag implements Serializable {
     private String tagName;
     private String tagColor;
 
-    private String tagID;
+    private final String tagID;
 
     public Tag(String tagName, String tagColor) {
         this.tagName = tagName;
@@ -39,5 +39,15 @@ public class Tag implements Serializable {
 
     public void setTagColor(String tagColor) {
         this.tagColor = tagColor;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        if (!(o instanceof Tag)) {
+            return false;
+        }
+        Tag tag = (Tag) o;
+        return tagID.equals(tag.tagID);
     }
 }

@@ -13,11 +13,12 @@ import java.util.Map;
 
 public class TagDBController {
     private static TagDBController instance;
-    private TagDB tagDB;
+    private final TagDB tagDB;
 
     private TagDBController() {
         tagDB = new TagDB(new ItemDBConnector());
     }
+
     // chatgpt: to make a singleton we only ever want one instance here
     // prompts: Need to only have one instance of a class how can i do this in java
     // Replied with pesudo code on how to do this
@@ -31,6 +32,7 @@ public class TagDBController {
         }
         return instance;
     }
+
     public void loadTags(final DataLoadCallBackTag callback) {
         List<Tag> Tags = new ArrayList<>();
         tagDB.getAllTags().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -44,7 +46,7 @@ public class TagDBController {
                         String tagName = (String) data.get("tagName");
                         String tagColor = (String) data.get("tagColor");
                         String tagID = (String) data.get("tagID");
-                        Tag tag = new Tag(tagName,tagColor,tagID);
+                        Tag tag = new Tag(tagName, tagColor, tagID);
                         Tags.add(tag);
                     }
 
@@ -57,8 +59,10 @@ public class TagDBController {
 
         });
     }
-    public void addTag(Tag tag, OnCompleteListener<Void> onCompleteListener){
-        tagDB.addTag(tag,onCompleteListener);
+
+    public void addTag(Tag tag, OnCompleteListener<Void> onCompleteListener) {
+        if (tag != null)
+            tagDB.addTag(tag, onCompleteListener);
     }
 
 }

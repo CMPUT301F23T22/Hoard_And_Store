@@ -1,17 +1,19 @@
 package com.example.hoard;
 
 import android.content.Context;
+
 import androidx.fragment.app.FragmentActivity;
+
 import com.google.android.material.datepicker.MaterialDatePicker;
 
 import java.util.Calendar;
 
 public class CustomDatePicker {
-    private Context context;
-    private DatePickListener listener;
+    private final Context context;
+    private final DatePickListener listener;
 
     public interface DatePickListener {
-        void onDatePicked(int year,int month,int day);
+        void onDatePicked(int year, int month, int day);
     }
 
     public CustomDatePicker(Context context, DatePickListener listener) {
@@ -19,6 +21,10 @@ public class CustomDatePicker {
         this.listener = listener;
     }
 
+
+    /**
+     * shows the custom date picker
+     */
     public void showDatePicker() {
         MaterialDatePicker.Builder<Long> builder = MaterialDatePicker.Builder.datePicker();
         MaterialDatePicker<Long> materialDatePicker = builder.build();
@@ -29,7 +35,7 @@ public class CustomDatePicker {
             calendar.setTimeInMillis(selection);
             int year = calendar.get(Calendar.YEAR);
             int month = calendar.get(Calendar.MONTH);
-            int day = calendar.get(Calendar.DAY_OF_MONTH) +1 ;
+            int day = calendar.get(Calendar.DAY_OF_MONTH) + 1;
 
             if (listener != null) {
                 listener.onDatePicked(year, month, day);

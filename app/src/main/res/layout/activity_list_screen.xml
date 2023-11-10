@@ -74,19 +74,6 @@
             android:clipToPadding="false" />
     </androidx.core.widget.NestedScrollView>
 
-    <Button
-        android:id="@+id/deleteAllButton"
-        style="?attr/materialButtonStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end|start"
-        android:layout_margin="20dp"
-        android:backgroundTint="@color/purple"
-        android:padding="15dp"
-        android:text="Delete Selected Items"
-        android:visibility="gone"
-        android:textColor="@color/white"
-        android:textSize="20sp" />
 
     <com.google.android.material.bottomappbar.BottomAppBar
         android:id="@+id/bottomAppBar"
@@ -116,6 +103,69 @@
         app:fabCustomSize="0dp"
         app:layout_anchorGravity="top|center"
         app:srcCompat="@drawable/baseline_add_24"/>
+    <FrameLayout
+        android:id="@+id/tagSelectionLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_gravity="bottom"
+        android:elevation="6dp"
+        android:background="@color/white"
+        app:layout_behavior="@string/hide_bottom_view_on_scroll_behavior">
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/materialTextViewWithIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/tag"
+            android:drawablePadding="8dp"
+            android:text="Select Tags To Apply"
+            android:layout_gravity="center"/>
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="horizontal">
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/tagChipGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp">
+                <!-- Chips will be added here dynamically -->
+            </com.google.android.material.chip.ChipGroup>
+        </HorizontalScrollView>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/AddTagButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:gravity="center"
+            android:text="@string/create_new_tag_placeholder"
+            android:textColor="@color/white"
+            app:backgroundTint="@color/purple"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/applyTagsButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:gravity="center"
+            android:text="@string/apply_tags_placeholder"
+            android:textColor="@color/white"
+            app:backgroundTint="@color/purple"/>
+
+    </LinearLayout>
+
+    </FrameLayout>
 
 
 

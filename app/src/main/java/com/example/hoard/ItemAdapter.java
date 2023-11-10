@@ -1,19 +1,19 @@
 package com.example.hoard;
+
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
-import android.widget.PopupMenu;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.SimpleDateFormat;
@@ -26,15 +26,24 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
     // used in activity_sort.xml
 
     private List<Item> itemList;
-    private RecyclerView recyclerView;
-//    private List<Item> selectedItems;
+    private final RecyclerView recyclerView;
     private List<Item> filteredItems;
     private Context context;
-
+    private double currentSum = 0;
+    private SumCallBack sumCallBack;
     private boolean isSelectionMode = false;
+    private ItemAdapterListener itemAdapterListener;
+    private final SparseBooleanArray selectedItems = new SparseBooleanArray();
 
-    private SparseBooleanArray selectedItems = new SparseBooleanArray();
+    public void setItemAdapterListener(ItemAdapterListener listener) {
+        this.itemAdapterListener = listener;
+    }
 
+    /**
+     * to determine if we are in the multiSelect mode or not
+     *
+     * @param selectionMode boolean to set the selection mode
+     */
     public void setSelectionMode(boolean selectionMode) {
         this.isSelectionMode = selectionMode;
         if (!isSelectionMode) {
@@ -44,16 +53,35 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
         notifyDataSetChanged();
     }
 
+    public void updateEstimatedValue() {
+        for (Item item : itemList) {
+            currentSum = currentSum + item.getEstimatedValue();
+        }
 
+        if (itemAdapterListener != null) {
+            itemAdapterListener.onEstimatedValueChanged(currentSum);
+        }
+        notifyAndRecalculate();
+
+    }
+
+    /**
+     * gets the current selection mode
+     *
+     * @return boolean of selectionMode
+     */
     public boolean getSelectionMode() {
         return isSelectionMode;
     }
 
+    /**
+     * gets the items in the item adapter
+     *
+     * @return list of items
+     */
     public List<Item> getItemList() {
         return itemList;
     }
-
-
 
     public ItemAdapter(List<Item> itemList, RecyclerView recyclerView) {
         this.itemList = itemList;
@@ -61,7 +89,19 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
         this.recyclerView = recyclerView;
     }
 
+    /**
+     * get the sum of all items in adapter
+     */
+    public void setSum() {
+        currentSum = 0;
+        for (Item item : itemList) {
+            currentSum = currentSum + item.getEstimatedValue();
+        }
+        sumCallBack.onSumChanged(currentSum);
+    }
+
     private void resetBackgroundColors() {
+        // reset the background colours to the unselected colour
         for (int i = 0; i < itemList.size(); i++) {
             View itemView = recyclerView.getLayoutManager().findViewByPosition(i);
             if (itemView != null) {
@@ -119,6 +159,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
+                // we enter the mult select mode
                 int adapterPosition = holder.getAdapterPosition();
                 if (adapterPosition != RecyclerView.NO_POSITION) {
                     if (!isSelectionMode) {
@@ -131,8 +172,8 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
                     notifyItemChanged(adapterPosition);
                 }
                 return true;
-        }
-    });
+            }
+        });
     }
 
     private void toggleItemSelection(int position) {
@@ -144,6 +185,11 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
         selectionModeCallback.onSelectionModeChanged(true);
     }
 
+    /**
+     * returns the selected of items
+     *
+     * @return list of items
+     */
     public List<Item> getSelectedItems() {
         List<Item> selectedItemsList = new ArrayList<>();
         for (int i = 0; i < selectedItems.size(); i++) {
@@ -151,24 +197,77 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
         }
         return selectedItemsList;
     }
+
+    /**
+     * clear all selected items
+     */
     public void clearSelectedItems() {
         selectedItems.clear();
         notifyDataSetChanged();
     }
 
+    /**
+     * selects an item using its unique id
+     *
+     * @param itemID items id
+     */
+    public void selectItem(String itemID) {
+        for (int i = 0; i < itemList.size(); i++) {
+            if (itemList.get(i).getItemID().equals(itemID)) {
+                selectedItems.put(i, true);
+                notifyItemChanged(i);
+                break;
+            }
+        }
+    }
+
+    public interface SumCallBack {
+        /**
+         * create a callback for when the itemSum is changed
+         *
+         * @param sum double: for the sum
+         */
+        void onSumChanged(double sum);
+    }
+
     public interface SelectionModeCallback {
+        void onSavedInstanceState(Bundle outState);
+
+        /**
+         * detect slectionMode changed
+         *
+         * @param selectionMode indicating the selection mode
+         */
         void onSelectionModeChanged(boolean selectionMode);
     }
 
     private SelectionModeCallback selectionModeCallback;
 
-    // Set the selection mode callback
+    /**
+     * callback to detect selection mode changed
+     *
+     * @param callback SelectionModeCallback to determine the slectionMode
+     */
     public void setSelectionModeCallback(SelectionModeCallback callback) {
 
         this.selectionModeCallback = callback;
     }
 
+    /**
+     * callback to detect sum changed
+     *
+     * @param callback SumCallBack to determine the sum
+     */
+    public void setSumCallback(SumCallBack callback) {
+        this.sumCallBack = callback;
+    }
 
+
+    /**
+     * get the number of items in adapter
+     *
+     * @return int: itemList count
+     */
     @Override
     public int getItemCount() {
         return filteredItems.size();
@@ -187,7 +286,6 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
                 } else {
                     // Implement filtering logic here and set the filtered data
                     List<Item> filteredList = new ArrayList<>();
-                    // Perform your filtering based on the 'constraint' CharSequence
                     // Add matching items to filteredList
                     results.values = filteredList;
                     results.count = filteredList.size();
@@ -229,33 +327,56 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
             estimatedValue = itemView.findViewById(R.id.estimatedValueList);
             detailsArrow = itemView.findViewById(R.id.detailsArrow);
         }
+
         void bind(boolean isSelected) {
             itemView.setBackgroundColor(isSelected ? Color.LTGRAY : Color.WHITE);
         }
     }
 
+    /**
+     * add item to the adpater
+     *
+     * @param item item to be added
+     */
     public void addItem(Item item) {
         itemList.add(item);
         filteredItems.add(item);
+        setSum();
         notifyDataSetChanged();
     }
 
+    /**
+     * remove an item from the adapter
+     *
+     * @param position position of item to remove
+     */
     public void removeItem(int position) {
         if (position >= 0 && position < itemList.size()) {
             itemList.remove(position);
             filteredItems.remove(position);
             notifyItemRemoved(position);
         }
+        setSum();
     }
 
-    public int getsize(){
+    public int getsize() {
         return itemList.size();
     }
 
+    /**
+     * get the number of items that are selected
+     *
+     * @return int selection items count
+     */
     public int getItemsSelectedCount() {
         return selectedItems.size();
     }
 
+    /**
+     * get an item using itemAdapter position
+     *
+     * @param position int for the item adapter position
+     */
     public Item getItem(int position) {
         if (position >= 0 && position < itemList.size()) {
             return itemList.get(position);
@@ -263,25 +384,36 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
         return null; // Return null or handle the out-of-bounds case as needed
     }
 
+    /**
+     * set the items in the itemAdapter
+     *
+     * @param newItems list of new items
+     */
     public void setItems(List<Item> newItems) {
         itemList = newItems;
         filteredItems = new ArrayList<>(itemList);
+        updateEstimatedValue();
         notifyDataSetChanged();
+
     }
 
-    public double getSum(){
+    public double getSum() {
         double sum = 0.0;
-        for(Item item: itemList){
+        for (Item item : itemList) {
             sum = sum + item.getEstimatedValue();
         }
-        return  sum;
+        return sum;
     }
 
     // Notify data set changes, and recalculate sum
-    public void notifyAndRecalculate(int position) {
-        notifyItemChanged(position);
+    public void notifyAndRecalculate() {
+        notifyDataSetChanged();
         // Calculate the sum after the change
-        double sum = getSum();
+        double sum = currentSum;
         // You can use this sum for any purpose, like displaying it in your UI.
+    }
+
+    public interface ItemAdapterListener {
+        void onEstimatedValueChanged(double sum);
     }
 }
