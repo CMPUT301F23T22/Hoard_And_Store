@@ -158,7 +158,7 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
             if (chipTag != null) {
                 // Loop through list of tags to check if the chip's tag ID is present
                 for (Tag tag : tags) {
-                    if (tag == chipTag) {
+                    if (tag.getTagID().equals(chipTag.getTagID())) {
                         chip.setChecked(true);
                     }
                 }
