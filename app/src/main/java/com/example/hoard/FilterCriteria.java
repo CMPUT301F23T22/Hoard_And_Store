@@ -1,17 +1,12 @@
 package com.example.hoard;
 
-import android.media.Image;
-
-import com.example.hoard.Tag;
-
 import java.io.Serializable;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public class FilterCriteria implements Serializable  {
+public class FilterCriteria implements Serializable {
     private List<String> makes;
     private List<String> descriptionKeyWords;
     private List<Tag> tags;
@@ -28,6 +23,7 @@ public class FilterCriteria implements Serializable  {
 
     /**
      * Returns a singleton object that is shared.
+     *
      * @return instance of FilterCriteria
      */
     public static FilterCriteria getInstance() {
@@ -139,7 +135,7 @@ public class FilterCriteria implements Serializable  {
      *
      * @return A map of sort options.
      */
-    public Map<String, String> getSortOptions (){
+    public Map<String, String> getSortOptions() {
         return sortOptions;
     }
 

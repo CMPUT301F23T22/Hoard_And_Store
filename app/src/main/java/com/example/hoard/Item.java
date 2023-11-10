@@ -1,30 +1,28 @@
 package com.example.hoard;
 
-import android.util.Log;
-
 import com.google.firebase.firestore.PropertyName;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.UUID;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-import java.util.UUID;
+import java.util.regex.Pattern;
 
 public class Item implements Serializable {
     private Date dateOfAcquisition;
-    private String briefDescription ,make, model, serialNumber , comment;
+    private String briefDescription, make, model, serialNumber, comment;
     private double estimatedValue;
-    private String itemID;
+    private final String itemID;
     private ArrayList<Tag> tags;
     @PropertyName("briefDescriptionList")
-    private List<String> briefDescriptionList;
+    private final List<String> briefDescriptionList;
 
     private boolean isSelected;
+
     public Item(Date dateOfAcquisition, String briefDescription, String make, String model, String serialNumber, double estimatedValue, String comment, ArrayList<Tag> tagsList) {
 
         if (!isValidDate(dateOfAcquisition)) {
@@ -61,7 +59,7 @@ public class Item implements Serializable {
         this.tags = tagsList;
     }
 
-    public Item(Date dateOfAcquisition, String briefDescription, String make, String model, String serialNumber, double estimatedValue, String comment, String itemID,ArrayList<Tag> tagsList) {
+    public Item(Date dateOfAcquisition, String briefDescription, String make, String model, String serialNumber, double estimatedValue, String comment, String itemID, ArrayList<Tag> tagsList) {
         this.dateOfAcquisition = dateOfAcquisition;
         this.briefDescription = briefDescription;
         this.make = make;
@@ -82,6 +80,7 @@ public class Item implements Serializable {
         String[] briefDescriptionArray = briefDescription.split(" ");
         return Arrays.asList(briefDescriptionArray);
     }
+
     public static boolean isValidDate(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
         String formattedDate = sdf.format(date);
@@ -304,11 +303,12 @@ public class Item implements Serializable {
     /**
      * set the items tag
      *
-     * @param  tags ArrayList<Tag>
+     * @param tags ArrayList<Tag>
      */
     public void setTags(ArrayList<Tag> tags) {
         this.tags = tags;
     }
+
     public void removeTag(Tag tag) {
         if (tags != null) {
             tags.remove(tag);

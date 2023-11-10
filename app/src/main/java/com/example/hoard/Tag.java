@@ -7,7 +7,7 @@ public class Tag implements Serializable {
     private String tagName;
     private String tagColor;
 
-    private String tagID;
+    private final String tagID;
 
     public Tag(String tagName, String tagColor) {
         this.tagName = tagName;
@@ -43,7 +43,7 @@ public class Tag implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (o == this ) return true;
+        if (o == this) return true;
         if (!(o instanceof Tag)) {
             return false;
         }

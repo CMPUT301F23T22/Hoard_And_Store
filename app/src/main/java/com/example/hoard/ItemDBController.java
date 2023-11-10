@@ -1,16 +1,11 @@
 package com.example.hoard;
 
-import androidx.annotation.NonNull;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -20,7 +15,7 @@ import java.util.function.Consumer;
 
 public class ItemDBController {
     private static ItemDBController instance;
-    private ItemDB itemDB;
+    private final ItemDB itemDB;
 
     private ItemDBController() {
         itemDB = new ItemDB(new ItemDBConnector());
@@ -29,7 +24,6 @@ public class ItemDBController {
     /**
      * Singleton for ItemDBController to have an ensured instance
      * across classes
-     *
      */
     public static ItemDBController getInstance() {
         // chatgpt: to make a singleton we only ever want one instance here
@@ -48,7 +42,7 @@ public class ItemDBController {
     /**
      * loads all items from db with filtering and sorting applied
      *
-     * @param callback callback to detect when the query finished
+     * @param callback       callback to detect when the query finished
      * @param filterCriteria get filter and sort information
      * @return task
      */

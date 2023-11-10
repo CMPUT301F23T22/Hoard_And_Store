@@ -2,16 +2,12 @@ package com.example.hoard;
 
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
-import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.android.gms.tasks.Tasks;
-import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -22,17 +18,14 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 
-import java.util.Collections;
-import java.util.List;
-
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 public class ItemDB {
-    private FirebaseFirestore db;
-    private CollectionReference itemsCollection;
+    private final FirebaseFirestore db;
+    private final CollectionReference itemsCollection;
 
     public ItemDB(ItemDBConnector dbConnector) {
         db = dbConnector.getDatabase();
@@ -42,7 +35,7 @@ public class ItemDB {
     /**
      * add a given item
      *
-     * @param item items to be edited
+     * @param item               items to be edited
      * @param onCompleteListener listener to verify
      * @return task
      */
@@ -57,8 +50,8 @@ public class ItemDB {
     /**
      * Edit a given item
      *
-     * @param item items to be edited
-     * @param  itemId itemId to edit
+     * @param item   items to be edited
+     * @param itemId itemId to edit
      * @return task
      */
     public Task<Void> editItem(String itemId, Item item) {
@@ -144,7 +137,7 @@ public class ItemDB {
      * delete multiple items
      *
      * @param items list of items to be deleted
-     * @return  task
+     * @return task
      */
     public Task<Void> bulkDeleteItems(List<Item> items) {
         List<Task<Void>> deleteTasks = new ArrayList<>();
@@ -189,7 +182,7 @@ public class ItemDB {
     /**
      * returns all the items in the database
      *
-     * @return  Task of list of document snapshots
+     * @return Task of list of document snapshots
      */
     public Task<List<DocumentSnapshot>> getAllItems() {
         return itemsCollection.get().continueWith(task -> {
@@ -242,15 +235,15 @@ public class ItemDB {
                 query = query.whereGreaterThanOrEqualTo("dateOfAcquisition", startTimestamp)
                         .whereLessThanOrEqualTo("dateOfAcquisition", endTimestamp);
 
-                Log.d("Firestore", "startTimestamp: " + startTimestamp.toString());
-                Log.d("Firestore", "endTimestamp: " + endTimestamp.toString());
+                Log.d("Firestore", "startTimestamp: " + startTimestamp);
+                Log.d("Firestore", "endTimestamp: " + endTimestamp);
             }
 
 
             if (filterCriteria.getDescriptionKeyWords() != null && !filterCriteria.getDescriptionKeyWords().isEmpty()) {
                 List<String> descriptionKeyWords = filterCriteria.getDescriptionKeyWords();
                 query = query.whereArrayContainsAny("briefDescriptionList", descriptionKeyWords);
-                Log.d("Firestore", "descriptionKeyWords: " + descriptionKeyWords.toString());
+                Log.d("Firestore", "descriptionKeyWords: " + descriptionKeyWords);
             }
         }
         return query;
@@ -259,9 +252,9 @@ public class ItemDB {
     /**
      * sorts the items returned from firestore
      *
-     * @param querySnapshot items returned from the db
+     * @param querySnapshot  items returned from the db
      * @param filterCriteria the filtercriteria to sort/filter
-     * @return  list of document snapshots
+     * @return list of document snapshots
      */
     public List<DocumentSnapshot> sortResults(QuerySnapshot querySnapshot, FilterCriteria filterCriteria) {
         List<DocumentSnapshot> filteredAndSortedResults = querySnapshot.getDocuments();

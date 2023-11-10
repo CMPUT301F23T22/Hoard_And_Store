@@ -1,31 +1,30 @@
 package com.example.hoard;
 
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
+
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Arrays;
 import java.util.Map;
 
 public class SortAdapter extends RecyclerView.Adapter<SortAdapter.SortViewHolder> {
-    private List<String> sortOptions;
-    private Map<String, String> sortOptionsState;
+    private final List<String> sortOptions;
+    private final Map<String, String> sortOptionsState;
     private Map<String, String> sortOptionsEnabled;
 
-    private Map<String, String> userToDatabaseMapping = new HashMap<>();
-    private Map<String, String> databaseToUserMapping = new HashMap<>();
+    private final Map<String, String> userToDatabaseMapping = new HashMap<>();
+    private final Map<String, String> databaseToUserMapping = new HashMap<>();
     private FilterCriteria filterCriteria;
 
     public SortAdapter() {
-        this.sortOptions = Arrays.asList("Date", "Description", "Make", "Estimated Value","Tags");
+        this.sortOptions = Arrays.asList("Date", "Description", "Make", "Estimated Value", "Tags");
         // this is to just inialize all the values
         this.sortOptionsState = new HashMap<>();
 

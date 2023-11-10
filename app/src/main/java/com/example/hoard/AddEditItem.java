@@ -22,7 +22,6 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -43,7 +42,7 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
 
     private TagDBController tagDBController;
 
-    private ActivityResultLauncher<Intent> addTagResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleAddTagResult);
+    private final ActivityResultLauncher<Intent> addTagResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleAddTagResult);
 
     private ArrayList<Tag> selectedTagList;
 
@@ -149,7 +148,7 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         dateInput.setText(sdf.format(currentItem.getDateOfAcquisition()));
     }
 
-    private void selectTags(){
+    private void selectTags() {
         ArrayList<Tag> tags = currentItem.getTags();
         for (int i = 0; i < chipGroupTags.getChildCount(); i++) {
             Chip chip = (Chip) chipGroupTags.getChildAt(i);
@@ -242,7 +241,7 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         }
 
         if (currentItem != null) {
-           // If this is an edit, update the existing item's fields
+            // If this is an edit, update the existing item's fields
             currentItem.setBriefDescription(description);
             currentItem.setMake(make);
             currentItem.setModel(model);

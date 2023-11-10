@@ -1,45 +1,27 @@
 package com.example.hoard;
 
 
-import com.google.android.gms.tasks.Task;
-
-
 import android.app.Activity;
-import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
-import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
-import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -47,6 +29,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.chip.Chip;
@@ -77,9 +60,9 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
     private Menu bottomMenu;
     private MenuItem sort;
     private MenuItem home;
-    private ActivityResultLauncher<Intent> addTagResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleAddTagResult);
+    private final ActivityResultLauncher<Intent> addTagResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleAddTagResult);
 
-    private Item itemToDelete = null;
+    private final Item itemToDelete = null;
     private Menu selectionModeMenu;
     private MenuItem bulkDelete;
     private MenuItem search;
@@ -92,9 +75,10 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
     private TextView totalValueTextView;
 
 
-    private ActivityResultLauncher<Intent> addActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleAddResult);
+    private final ActivityResultLauncher<Intent> addActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleAddResult);
     ChipGroup chipGroupTags;
     FrameLayout tagSelectionLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -248,7 +232,7 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
                                                 for (Tag selectedTag : selectedTags) {
                                                     if (!selectedItem.getTags().contains(selectedTag))
                                                         selectedItem.addTag(selectedTag);
-                                                    }
+                                                }
                                                 // Update each item in the database
                                                 dbController.editItem(selectedItem.getItemID(), selectedItem, task -> {
                                                     if (!task.isSuccessful()) {
@@ -380,7 +364,7 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
         }
     };
 
-//    protected void onResume() {
+    //    protected void onResume() {
 //        super.onResume();
 //
 //        dbController.loadItems(new DataLoadCallbackItem() {

@@ -4,7 +4,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 
 public class ItemDBConnector {
-    private FirebaseFirestore db;
+    private final FirebaseFirestore db;
 
 
     public ItemDBConnector() {

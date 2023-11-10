@@ -1,4 +1,5 @@
 package com.example.hoard;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -26,7 +27,7 @@ public class DetailsActivity extends AppCompatActivity {
     private TextView dateOfAcquisitionTextView, makeTextView, modelTextView, serialNumberTextView, estimatedValueTextView, commentTextView, briefDescriptionTextView;
     private Item selectedItem;
     ChipGroup chipGroup;
-    private ActivityResultLauncher<Intent> editActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleEditResult);
+    private final ActivityResultLauncher<Intent> editActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleEditResult);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -1,20 +1,19 @@
 package com.example.hoard;
+
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
-import android.widget.PopupMenu;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.SimpleDateFormat;
@@ -27,14 +26,15 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
     // used in activity_sort.xml
 
     private List<Item> itemList;
-    private RecyclerView recyclerView;
+    private final RecyclerView recyclerView;
     private List<Item> filteredItems;
     private Context context;
     private double currentSum = 0;
     private SumCallBack sumCallBack;
     private boolean isSelectionMode = false;
     private ItemAdapterListener itemAdapterListener;
-    private SparseBooleanArray selectedItems = new SparseBooleanArray();
+    private final SparseBooleanArray selectedItems = new SparseBooleanArray();
+
     public void setItemAdapterListener(ItemAdapterListener listener) {
         this.itemAdapterListener = listener;
     }
@@ -54,7 +54,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
     }
 
     public void updateEstimatedValue() {
-        for(Item item: itemList){
+        for (Item item : itemList) {
             currentSum = currentSum + item.getEstimatedValue();
         }
 
@@ -94,7 +94,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
      */
     public void setSum() {
         currentSum = 0;
-        for(Item item: itemList){
+        for (Item item : itemList) {
             currentSum = currentSum + item.getEstimatedValue();
         }
         sumCallBack.onSumChanged(currentSum);
@@ -200,7 +200,6 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
 
     /**
      * clear all selected items
-     *
      */
     public void clearSelectedItems() {
         selectedItems.clear();
@@ -226,7 +225,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
         /**
          * create a callback for when the itemSum is changed
          *
-         * @param  sum double: for the sum
+         * @param sum double: for the sum
          */
         void onSumChanged(double sum);
     }
@@ -328,6 +327,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
             estimatedValue = itemView.findViewById(R.id.estimatedValueList);
             detailsArrow = itemView.findViewById(R.id.detailsArrow);
         }
+
         void bind(boolean isSelected) {
             itemView.setBackgroundColor(isSelected ? Color.LTGRAY : Color.WHITE);
         }
@@ -359,14 +359,14 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
         setSum();
     }
 
-    public int getsize(){
+    public int getsize() {
         return itemList.size();
     }
 
     /**
      * get the number of items that are selected
      *
-     * @return  int selection items count
+     * @return int selection items count
      */
     public int getItemsSelectedCount() {
         return selectedItems.size();
@@ -397,12 +397,12 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
 
     }
 
-    public double getSum(){
+    public double getSum() {
         double sum = 0.0;
-        for(Item item: itemList){
+        for (Item item : itemList) {
             sum = sum + item.getEstimatedValue();
         }
-        return  sum;
+        return sum;
     }
 
     // Notify data set changes, and recalculate sum

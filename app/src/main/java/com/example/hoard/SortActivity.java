@@ -5,7 +5,6 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,7 +13,6 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -258,11 +256,13 @@ public class SortActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {
                 addMoreFilters.setVisibility(View.VISIBLE);
-                if(filterCriteria.getMakes() == null ){
+                if (filterCriteria.getMakes() == null) {
                     addMoreFilters.setText("Add");
                 } else {
                     addMoreFilters.setText(String.format("Add (%d)", filterCriteria.getMakes().size()));
-                    if(filterCriteria.getMakes().size() == 0){ addMoreFilters.setText("Add");}
+                    if (filterCriteria.getMakes().size() == 0) {
+                        addMoreFilters.setText("Add");
+                    }
 
                 }
 
@@ -275,7 +275,7 @@ public class SortActivity extends AppCompatActivity {
                     public void onClick(View view) {
                         String enteredMake = search.getText().toString();
                         if (!enteredMake.isEmpty()) {
-                            List<String> multipleMakes = Arrays.asList(enteredMake);
+                            List<String> multipleMakes = Collections.singletonList(enteredMake);
                             filterCriteria.setMakes(multipleMakes);
                             search.setText("");
                             setFiltersCount(addMoreFilters, filterCriteria.getMakes());
@@ -303,12 +303,14 @@ public class SortActivity extends AppCompatActivity {
         return builder.build();
     }
 
-    public <E> void setFiltersCount(Button bttn, List<E> filterList){
-        if(filterList == null ){
+    public <E> void setFiltersCount(Button bttn, List<E> filterList) {
+        if (filterList == null) {
             bttn.setText("Add");
         } else {
             bttn.setText(String.format("Add (%d)", filterList.size()));
-            if(filterList.size() == 0){ addMoreFilters.setText("Add");}
+            if (filterList.size() == 0) {
+                addMoreFilters.setText("Add");
+            }
 
         }
     }
