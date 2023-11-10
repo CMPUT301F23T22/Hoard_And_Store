@@ -30,6 +30,11 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * An activity for adding or editing items, extending AppCompatActivity and implementing
+ * CustomDatePicker.DatePickListener for handling date selections.
+ *
+ */
 public class AddEditItem extends AppCompatActivity implements CustomDatePicker.DatePickListener {
 
     private EditText descriptionInput, makeInput, modelInput, serialNumberInput, valueInput, commentInput, dateInput;

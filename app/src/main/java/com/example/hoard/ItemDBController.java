@@ -13,6 +13,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+/**
+ * Controller for managing item database operations.
+ *
+ * This class serves as a mediator between the application logic and the Firestore database,
+ * handling the creation, retrieval, update, and deletion of items. It utilizes the ItemDB class
+ * for direct database interactions and provides a singleton instance for global access.
+ *
+ */
 public class ItemDBController {
     private static ItemDBController instance;
     private final ItemDB itemDB;

@@ -42,7 +42,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
-
+/**
+ * An activity class for displaying a list of items in the application.
+ *
+ */
 public class ListScreen extends AppCompatActivity implements ItemAdapter.SelectionModeCallback, ItemAdapter.SumCallBack {
 
     private ItemDB itemDB;

@@ -23,6 +23,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A database helper class for managing the 'items' collection in Firebase Firestore.
+ *
+ */
 public class ItemDB {
     private final FirebaseFirestore db;
     private final CollectionReference itemsCollection;
@@ -84,7 +88,17 @@ public class ItemDB {
         return taskCompletionSource.getTask();
     }
 
-
+    /**
+     * This method searches the collection for documents where 'fieldName' equals 'fieldValue'.
+     * If matching documents are found, it proceeds to delete them. The method returns a Task<Void>
+     * that indicates the completion status of the operation.
+     *
+     * @param collectionReference The Firestore CollectionReference where the deletion is to be performed.
+     * @param fieldName           The name of the field to check for the given value.
+     * @param fieldValue          The value to match for the specified field.
+     * @return A Task<Void> representing the asynchronous delete operation.
+     *         The task is successful when all deletions are successful, and it fails if any deletion fails.
+     */
     public Task<Void> deleteItemByField(CollectionReference collectionReference, String fieldName, Object fieldValue) {
         // Create a TaskCompletionSource that you can use to manually set the result of the Task
         TaskCompletionSource<Void> taskCompletionSource = new TaskCompletionSource<>();
@@ -215,7 +229,15 @@ public class ItemDB {
         });
     }
 
-
+    /**
+     * This method builds a query for the 'itemsCollection' using the provided FilterCriteria.
+     * It allows for filtering based on multiple criteria like 'makes', date range (start and end dates),
+     * and keywords in descriptions. The method dynamically adds conditions to the base query
+     * based on the presence of these criteria in the FilterCriteria object.
+     *
+     * @param filterCriteria The criteria to use for filtering, including makes, date range, and description keywords.
+     * @return A Query object that represents the constructed Firestore query based on the provided criteria.
+     */
     private Query constructDynamicQuery(FilterCriteria filterCriteria) {
         Query query = itemsCollection; // Start with the base query
 
