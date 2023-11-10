@@ -23,12 +23,9 @@ import java.util.Date;
 import java.util.Locale;
 
 public class DetailsActivity extends AppCompatActivity {
-
     private TextView dateOfAcquisitionTextView, makeTextView, modelTextView, serialNumberTextView, estimatedValueTextView, commentTextView, briefDescriptionTextView;
     private Item selectedItem;
-
     ChipGroup chipGroup;
-
     private ActivityResultLauncher<Intent> editActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleEditResult);
 
     @Override
@@ -77,7 +74,6 @@ public class DetailsActivity extends AppCompatActivity {
             Toast.makeText(this, "No item provided", Toast.LENGTH_LONG).show();
             finish();
         }
-
 
         closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,6 +124,8 @@ public class DetailsActivity extends AppCompatActivity {
         ArrayList<Tag> tags = selectedItem.getTags();
         // create a chips from tags
         chipGroup.removeAllViews();
+
+        // iterate over the tags and add to chip group
         for (Tag tag : tags) {
             Chip chip = new Chip(DetailsActivity.this);
             chip.setText(tag.getTagName());
