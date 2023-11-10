@@ -33,14 +33,10 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
     private EditText descriptionInput, makeInput, modelInput, serialNumberInput, valueInput, commentInput, dateInput;
     private final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
-    private TextInputLayout dateInputLayout;
     private TextView addEditHeader;
-    private Date selectedDateObject;
     private Item currentItem; // Item to edit
     private boolean isEdit; // To identify whether it's an edit operation
     private ItemDBController itemDBController;
-
-    private TagDBController tagDBController;
 
     private final ActivityResultLauncher<Intent> addTagResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleAddTagResult);
 
@@ -56,7 +52,7 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         selectedTagList = new ArrayList<Tag>();
 
         itemDBController = ItemDBController.getInstance();
-        tagDBController = TagDBController.getInstance();
+        TagDBController tagDBController = TagDBController.getInstance();
 
         // Initialize views
         descriptionInput = findViewById(R.id.descriptionInput);
@@ -66,7 +62,7 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         valueInput = findViewById(R.id.valueInput);
         commentInput = findViewById(R.id.commentInput);
         dateInput = findViewById(R.id.dateInput);
-        dateInputLayout = findViewById(R.id.dateInputLayout);
+        TextInputLayout dateInputLayout = findViewById(R.id.dateInputLayout);
         addEditHeader = findViewById(R.id.addEditHeader);
         chipGroupTags = findViewById(R.id.tagChipGroup);
 
@@ -130,6 +126,9 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         });
     }
 
+    /**
+     * Shows the date picker dialog.
+     */
     private void showDatePicker() {
         // Create an instance of the CustomDatePicker
         CustomDatePicker customDatePicker = new CustomDatePicker(this, this);
@@ -137,6 +136,9 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
 
     }
 
+    /**
+     * Populates the fields with the details of the item to edit.
+     */
     private void populateFields() {
         addEditHeader.setText("EDIT");
         descriptionInput.setText(currentItem.getBriefDescription());
@@ -148,6 +150,9 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         dateInput.setText(sdf.format(currentItem.getDateOfAcquisition()));
     }
 
+    /**
+     * Selects the tags that were previously selected for the item being edited.
+     */
     private void selectTags() {
         ArrayList<Tag> tags = currentItem.getTags();
         for (int i = 0; i < chipGroupTags.getChildCount(); i++) {
@@ -165,6 +170,9 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         }
     }
 
+    /**
+     * Saves the item to the database.
+     */
     private void saveItem() throws ParseException {
         if (isEdit) {
             updateItem();
@@ -173,6 +181,9 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         }
     }
 
+    /**
+     * Creates a new item and adds it to the database.
+     */
     private void createNewItem() throws ParseException {
         Item newItem = getItemFromFields();
         itemDBController.addItem(newItem, task -> {
@@ -197,6 +208,9 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         });
     }
 
+    /**
+     * Updates the item in the database.
+     */
     private void updateItem() throws ParseException {
         Item updatedItem = getItemFromFields();
 
@@ -222,6 +236,11 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         });
     }
 
+    /**
+     * Gets the item details from the fields.
+     *
+     * @return The item object.
+     */
     private Item getItemFromFields() throws ParseException {
         String description = descriptionInput.getText().toString();
         String make = makeInput.getText().toString();
@@ -265,12 +284,26 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
 
     }
 
+    /**
+     * Handles the result from the date picker. If the result is OK, the selected date is set in the
+     * date input field.
+     *
+     * @param year  The year that was picked.
+     * @param month The month that was picked.
+     * @param day   The day that was picked.
+     */
     @Override
     public void onDatePicked(int year, int month, int day) {
-        selectedDateObject = new GregorianCalendar(year, month, day).getTime();
+        Date selectedDateObject = new GregorianCalendar(year, month, day).getTime();
         dateInput.setText(sdf.format(selectedDateObject));
     }
 
+    /**
+     * Handles the result from the add tag activity. If the result is OK, the selected tag is added
+     * to the chip group.
+     *
+     * @param result The result data from the activity.
+     */
     private void handleAddTagResult(ActivityResult result) {
         if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
             Tag returnedTag = (Tag) result.getData().getSerializableExtra("newTag");

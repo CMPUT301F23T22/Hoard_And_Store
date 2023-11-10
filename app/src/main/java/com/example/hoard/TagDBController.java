@@ -11,6 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This class is used to connect to the Firestore database and perform CRUD operations on the
+ * "tags" collection.
+ */
 public class TagDBController {
     private static TagDBController instance;
     private final TagDB tagDB;
@@ -33,6 +37,11 @@ public class TagDBController {
         return instance;
     }
 
+    /**
+     * Gets all tags from the "tags" collection in Firestore.
+     *
+     * @param callback The callback to be called when the operation is complete.
+     */
     public void loadTags(final DataLoadCallBackTag callback) {
         List<Tag> Tags = new ArrayList<>();
         tagDB.getAllTags().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -60,6 +69,12 @@ public class TagDBController {
         });
     }
 
+    /**
+     * Adds a new tag to the "tags" collection in Firestore.
+     *
+     * @param tag                 The tag to be added to the database.
+     * @param onCompleteListener The listener to be called when the operation is complete.
+     */
     public void addTag(Tag tag, OnCompleteListener<Void> onCompleteListener) {
         if (tag != null)
             tagDB.addTag(tag, onCompleteListener);
