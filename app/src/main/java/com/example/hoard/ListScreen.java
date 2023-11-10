@@ -104,7 +104,7 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
         tagSelectionLayout = findViewById(R.id.tagSelectionLayout);
         filterCriteria = FilterCriteria.getInstance();
 
-        itemDB = new ItemDB(new ItemDBConnector());
+//        itemDB = new ItemDB(new ItemDBConnector());
 
         addItemButton = findViewById(R.id.addItemButton);
         topBar = findViewById(R.id.topAppBar);
@@ -380,20 +380,20 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
         }
     };
 
-    protected void onResume() {
-        super.onResume();
-        home.setChecked(true);
-        dbController.loadItems(new DataLoadCallbackItem() {
-            @Override
-            public void onDataLoaded(List<Item> items) {
-//                itemAdapter = new ItemAdapter(items, recyclerView);
-//                recyclerView.setAdapter(itemAdapter);
-                itemAdapter.setSelectionModeCallback(ListScreen.this);
-                itemAdapter.setSumCallback(ListScreen.this);
-            }
-        }, FilterCriteria.getInstance());
-
-    }
+//    protected void onResume() {
+//        super.onResume();
+//
+//        dbController.loadItems(new DataLoadCallbackItem() {
+//            @Override
+//            public void onDataLoaded(List<Item> items) {
+////                itemAdapter = new ItemAdapter(items, recyclerView);
+////                recyclerView.setAdapter(itemAdapter);
+//                itemAdapter.setSelectionModeCallback(ListScreen.this);
+//                itemAdapter.setSumCallback(ListScreen.this);
+//            }
+//        }, FilterCriteria.getInstance());
+//
+//    }
     @Override
     public void onSavedInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -407,6 +407,7 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        home.setChecked(true);
         super.onRestoreInstanceState(savedInstanceState);
         boolean selectionMode = savedInstanceState.getBoolean("selectionMode");
         ArrayList<String> itemIDs = savedInstanceState.getStringArrayList("itemIDs");
@@ -417,6 +418,7 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
                     itemAdapter = new ItemAdapter(items, recyclerView);
                     recyclerView.setAdapter(itemAdapter);
                     itemAdapter.setSelectionMode(selectionMode);
+                    itemAdapter.setSumCallback(ListScreen.this);
                     updateTotalValue();
                     for (String itemID : itemIDs) {
                         itemAdapter.selectItem(itemID);
@@ -473,8 +475,8 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
 
             updateSelectionModeTitle();
         } else {
-            search.setEnabled(true);
-            search.setVisible(true);
+//            search.setEnabled(true);
+//            search.setVisible(true);
 
             bulkDelete.setEnabled(false);
             bulkDelete.setVisible(false);

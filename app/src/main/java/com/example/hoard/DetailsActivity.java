@@ -78,7 +78,9 @@ public class DetailsActivity extends AppCompatActivity {
         closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), ListScreen.class);
                 finish();
+                startActivity(intent);
             }
         });
 

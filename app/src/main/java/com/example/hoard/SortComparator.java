@@ -29,7 +29,7 @@ public class SortComparator implements Comparator<Object> {
             return ((String) value1).toLowerCase().compareTo(((String) value2).toLowerCase( ));
         //compare dobules
         } else if (value1 instanceof Double && value2 instanceof Double) {
-            return Double.compare((Double) value1, (Double) value2);
+            return -1 * (Double.compare((Double) value1, (Double) value2));
         // compare dates
         } else if (value1 instanceof Timestamp && value2 instanceof Timestamp) {
             return ((Timestamp) value1).compareTo((Timestamp) value2);
