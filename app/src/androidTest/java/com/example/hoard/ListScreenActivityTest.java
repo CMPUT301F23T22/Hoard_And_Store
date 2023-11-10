@@ -89,7 +89,7 @@ public class ListScreenActivityTest {
         onView(withId(R.id.makeInput)).perform(ViewActions.typeText("Brand"));
         onView(withId(R.id.modelInput)).perform(ViewActions.typeText("Model XYZ"));
 
-        // Fill out the "Serial Number" field
+        // Fill out the "Serial Number" fields
         onView(withId(R.id.serialNumberInput)).perform(ViewActions.typeText("123456"));
 
         // Fill out the "Estimated Value" field
