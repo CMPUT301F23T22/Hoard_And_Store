@@ -1,29 +1,38 @@
 package com.example.hoard;
 
 
+import org.hamcrest.Matchers;
 import org.junit.runner.RunWith;
 
 import static androidx.test.espresso.Espresso.closeSoftKeyboard;
 import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.clearText;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.longClick;
+import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.action.ViewActions.swipeLeft;
 import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition;
 import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
 import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
+import static androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withChild;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static org.hamcrest.Matchers.allOf;
+import static androidx.test.espresso.matcher.ViewMatchers.withParentIndex;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 import static com.google.common.base.Predicates.instanceOf;
 
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.test.espresso.Espresso;
 import androidx.test.espresso.NoMatchingViewException;
 import androidx.test.espresso.ViewAssertion;
+import androidx.test.espresso.assertion.ViewAssertions;
 import androidx.test.espresso.contrib.RecyclerViewActions;
 //import androidx.test.espresso.contrib.RecyclerViewActions;
 
@@ -34,11 +43,15 @@ import static org.hamcrest.Matchers.hasEntry;
 import static java.util.EnumSet.allOf;
 
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.test.espresso.action.ViewActions;
+import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
+
+import com.google.android.material.textview.MaterialTextView;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -138,7 +151,7 @@ public class ListScreenActivityTest {
         wait(2000);
         onView(withId(R.id.recyclerView))
                 .perform(RecyclerViewActions.scrollToPosition(0))
-                .perform(RecyclerViewActions.actionOnItemAtPosition(0, longClick()));
+                .perform(actionOnItemAtPosition(0, longClick()));
 
         String targetTag = "Dont Delete";
         wait(2000);
@@ -150,9 +163,29 @@ public class ListScreenActivityTest {
                 .perform(scrollTo())
                 .check(matches(hasDescendant(withText(targetTag)))).perform(click());
 
-
         // Verify that the item is no longer in the RecyclerView
         wait(2000);
+
+    }
+
+    @Test
+    public void clickFirstItemInAdapterView() {
+        // Click the first item in the AdapterView (e.g., ListView)
+        String descriptionTextEdit = "EDIT UNIT TEST";
+        wait(2000);
+        onView(withId(R.id.recyclerView)).perform(
+                RecyclerViewActions.actionOnItemAtPosition(0, itemsViewAction.clickChildViewWithId(R.id.detailsArrow)));
+
+        onView(withId(R.id.editButton)).perform(click());
+        onView(withId(R.id.descriptionInput)).perform(clearText(), replaceText(descriptionTextEdit));
+        closeSoftKeyboard();
+        onView(withId(R.id.submitButton)).perform(click());
+        wait(1000);
+        onView(withId(R.id.closeButton)).perform(click());
+
+        onView(withId(R.id.recyclerView))
+                .check(matches(hasDescendant(withText(descriptionTextEdit))));
+
 
     }
 }
