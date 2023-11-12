@@ -15,9 +15,11 @@ import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.text.ParseException;
@@ -28,19 +30,20 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * An activity for adding or editing items, extending AppCompatActivity and implementing
+ * CustomDatePicker.DatePickListener for handling date selections.
+ *
+ */
 public class AddEditItem extends AppCompatActivity implements CustomDatePicker.DatePickListener {
 
     private EditText descriptionInput, makeInput, modelInput, serialNumberInput, valueInput, commentInput, dateInput;
     private final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
-    private TextInputLayout dateInputLayout;
     private TextView addEditHeader;
-    private Date selectedDateObject;
     private Item currentItem; // Item to edit
     private boolean isEdit; // To identify whether it's an edit operation
     private ItemDBController itemDBController;
-
-    private TagDBController tagDBController;
 
     private final ActivityResultLauncher<Intent> addTagResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleAddTagResult);
 
@@ -56,7 +59,7 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         selectedTagList = new ArrayList<Tag>();
 
         itemDBController = ItemDBController.getInstance();
-        tagDBController = TagDBController.getInstance();
+        TagDBController tagDBController = TagDBController.getInstance();
 
         // Initialize views
         descriptionInput = findViewById(R.id.descriptionInput);
@@ -66,7 +69,7 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         valueInput = findViewById(R.id.valueInput);
         commentInput = findViewById(R.id.commentInput);
         dateInput = findViewById(R.id.dateInput);
-        dateInputLayout = findViewById(R.id.dateInputLayout);
+        TextInputLayout dateInputLayout = findViewById(R.id.dateInputLayout);
         addEditHeader = findViewById(R.id.addEditHeader);
         chipGroupTags = findViewById(R.id.tagChipGroup);
 
@@ -130,6 +133,9 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         });
     }
 
+    /**
+     * Shows the date picker dialog.
+     */
     private void showDatePicker() {
         // Create an instance of the CustomDatePicker
         CustomDatePicker customDatePicker = new CustomDatePicker(this, this);
@@ -137,6 +143,9 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
 
     }
 
+    /**
+     * Populates the fields with the details of the item to edit.
+     */
     private void populateFields() {
         addEditHeader.setText("EDIT");
         descriptionInput.setText(currentItem.getBriefDescription());
@@ -148,6 +157,9 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         dateInput.setText(sdf.format(currentItem.getDateOfAcquisition()));
     }
 
+    /**
+     * Selects the tags that were previously selected for the item being edited.
+     */
     private void selectTags() {
         ArrayList<Tag> tags = currentItem.getTags();
         for (int i = 0; i < chipGroupTags.getChildCount(); i++) {
@@ -165,7 +177,96 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         }
     }
 
+    /**
+     * Saves the item to the database.
+     */
     private void saveItem() throws ParseException {
+        TextInputLayout dateInputLayout = findViewById(R.id.dateInputLayout);
+        TextInputEditText dateInput = findViewById(R.id.dateInput);
+        TextInputLayout descriptionInputLayout = findViewById(R.id.descriptionInputLayout);
+        TextInputEditText descriptionInput = findViewById(R.id.descriptionInput);
+        TextInputLayout makeInputLayout = findViewById(R.id.makeInputLayout);
+        TextInputEditText makeInput = findViewById(R.id.makeInput);
+        TextInputLayout modelInputLayout = findViewById(R.id.modelInputLayout);
+        TextInputEditText modelInput = findViewById(R.id.modelInput);
+        TextInputLayout serialNumberInputLayout = findViewById(R.id.serialNumberInputLayout);
+        TextInputEditText serialNumberInput = findViewById(R.id.serialNumberInput);
+        TextInputLayout valueInputLayout = findViewById(R.id.valueInputLayout);
+        TextInputEditText valueInput = findViewById(R.id.valueInput);
+        TextInputLayout commentInputLayout = findViewById(R.id.commentInputLayout);
+        TextInputEditText commentInput = findViewById(R.id.commentInput);
+
+
+        if (isFieldEmpty(dateInput) || !isValidDate(dateInput.getText().toString())) {
+            dateInputLayout.setError("Invalid date format. Use dd/mm/yyyy");
+            dateInputLayout.setErrorEnabled(true);
+            dateInputLayout.setBoxStrokeColor(ContextCompat.getColor(this, R.color.error_color));
+            return;
+        } else {
+            dateInputLayout.setError(null);
+            dateInputLayout.setErrorEnabled(false);
+        }
+
+        if (isFieldEmpty(descriptionInput)) {
+            descriptionInputLayout.setError("Description cannot be empty");
+            descriptionInputLayout.setErrorEnabled(true);
+            descriptionInputLayout.setBoxStrokeColor(ContextCompat.getColor(this, R.color.error_color));
+            return;
+        } else {
+            descriptionInput.setError(null);
+            descriptionInputLayout.setErrorEnabled(false);
+        }
+
+        if (isFieldEmpty(makeInput)) {
+            makeInputLayout.setError("Make cannot be empty");
+            makeInputLayout.setErrorEnabled(true);
+            makeInputLayout.setBoxStrokeColor(ContextCompat.getColor(this, R.color.error_color));
+            return;
+        } else {
+            makeInputLayout.setError(null);
+            makeInputLayout.setErrorEnabled(false);
+        }
+
+        if (isFieldEmpty(modelInput)) {
+            modelInputLayout.setError("Model cannot be empty");
+            modelInputLayout.setErrorEnabled(true);
+            modelInputLayout.setBoxStrokeColor(ContextCompat.getColor(this, R.color.error_color));
+            return;
+        } else {
+            modelInputLayout.setError(null);
+            modelInputLayout.setErrorEnabled(false);
+        }
+
+        if (isFieldEmpty(serialNumberInput)) {
+            serialNumberInputLayout.setError("Serial number cannot be empty");
+            serialNumberInputLayout.setErrorEnabled(true);
+            serialNumberInputLayout.setBoxStrokeColor(ContextCompat.getColor(this, R.color.error_color));
+            return;
+        } else {
+            serialNumberInputLayout.setError(null);
+            serialNumberInputLayout.setErrorEnabled(false);
+        }
+
+        if (isFieldEmpty(valueInput) || !isValidValue(valueInput.getText().toString())) {
+            valueInputLayout.setError("Invalid value");
+            valueInputLayout.setErrorEnabled(true);
+            valueInputLayout.setBoxStrokeColor(ContextCompat.getColor(this, R.color.error_color));
+            return;
+        } else {
+            valueInputLayout.setError(null);
+            valueInputLayout.setErrorEnabled(false);
+        }
+
+        if (isFieldEmpty(commentInput)) {
+            commentInputLayout.setError("Comment cannot be empty");
+            commentInputLayout.setErrorEnabled(true);
+            commentInputLayout.setBoxStrokeColor(ContextCompat.getColor(this, R.color.error_color));
+            return;
+        } else {
+            commentInputLayout.setError(null);
+            commentInputLayout.setErrorEnabled(false);
+        }
+
         if (isEdit) {
             updateItem();
         } else {
@@ -173,6 +274,52 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         }
     }
 
+
+    /**
+     * Checks if the date is in the correct format.
+     *
+     * @param date The date to check.
+     * @return True if the date is in the correct format, false otherwise.
+     */
+    private boolean isValidDate(String date) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            sdf.parse(date);
+            return true;
+        } catch (ParseException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Checks if the value is a valid number.
+     *
+     * @param value The value to check.
+     * @return True if the value is a valid number, false otherwise.
+     */
+    private  boolean isValidValue(String value) {
+        try {
+            double parsedValue = Double.parseDouble(value);
+            return parsedValue >= 0;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Checks if the field is empty.
+     *
+     * @param editText The field to check.
+     * @return True if the field is empty, false otherwise.
+     */
+    private boolean isFieldEmpty(EditText editText) {
+        return editText.getText().toString().trim().isEmpty();
+    }
+
+
+    /**
+     * Creates a new item and adds it to the database.
+     */
     private void createNewItem() throws ParseException {
         Item newItem = getItemFromFields();
         itemDBController.addItem(newItem, task -> {
@@ -197,6 +344,9 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         });
     }
 
+    /**
+     * Updates the item in the database.
+     */
     private void updateItem() throws ParseException {
         Item updatedItem = getItemFromFields();
 
@@ -222,6 +372,11 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         });
     }
 
+    /**
+     * Gets the item details from the fields.
+     *
+     * @return The item object.
+     */
     private Item getItemFromFields() throws ParseException {
         String description = descriptionInput.getText().toString();
         String make = makeInput.getText().toString();
@@ -265,12 +420,26 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
 
     }
 
+    /**
+     * Handles the result from the date picker. If the result is OK, the selected date is set in the
+     * date input field.
+     *
+     * @param year  The year that was picked.
+     * @param month The month that was picked.
+     * @param day   The day that was picked.
+     */
     @Override
     public void onDatePicked(int year, int month, int day) {
-        selectedDateObject = new GregorianCalendar(year, month, day).getTime();
+        Date selectedDateObject = new GregorianCalendar(year, month, day).getTime();
         dateInput.setText(sdf.format(selectedDateObject));
     }
 
+    /**
+     * Handles the result from the add tag activity. If the result is OK, the selected tag is added
+     * to the chip group.
+     *
+     * @param result The result data from the activity.
+     */
     private void handleAddTagResult(ActivityResult result) {
         if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
             Tag returnedTag = (Tag) result.getData().getSerializableExtra("newTag");

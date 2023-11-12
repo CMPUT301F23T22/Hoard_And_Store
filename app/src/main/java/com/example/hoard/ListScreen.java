@@ -42,14 +42,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
-
+/**
+ * An activity class for displaying a list of items in the application.
+ *
+ */
 public class ListScreen extends AppCompatActivity implements ItemAdapter.SelectionModeCallback, ItemAdapter.SumCallBack {
 
     private ItemDB itemDB;
     private Toolbar topBar;
-    private Menu topBarMenu;
-    private BottomNavigationView bottomNav;
-    private BottomAppBar bottomAppBar;
     private FloatingActionButton addItemButton;
     private TextView tvTotalValue;
     private Fragment currentFragment;
@@ -57,7 +57,6 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
     private RecyclerView recyclerView;
     private ItemAdapter itemAdapter;
     private ItemDBController dbController;
-    private Menu bottomMenu;
     private MenuItem sort;
     private MenuItem home;
     private final ActivityResultLauncher<Intent> addTagResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleAddTagResult);
@@ -69,7 +68,6 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
     private MenuItem closeBulkDelete;
     private MenuItem bulkTag;
     private ItemAdapter.SelectionModeCallback selectionModeCallback;
-    private FilterCriteria filterCriteria;
     private TagDBController tagDBController;
     private final int sortingRequestCode = 1;
     private TextView totalValueTextView;
@@ -86,13 +84,13 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
         setContentView(R.layout.activity_list_screen);
         totalValueTextView = findViewById(R.id.tvTotalValueAmount);
         tagSelectionLayout = findViewById(R.id.tagSelectionLayout);
-        filterCriteria = FilterCriteria.getInstance();
+        FilterCriteria filterCriteria = FilterCriteria.getInstance();
 
 //        itemDB = new ItemDB(new ItemDBConnector());
 
         addItemButton = findViewById(R.id.addItemButton);
         topBar = findViewById(R.id.topAppBar);
-        topBarMenu = topBar.getMenu();
+        Menu topBarMenu = topBar.getMenu();
 
         search = topBarMenu.findItem(R.id.search);
         bulkDelete = topBarMenu.findItem(R.id.bulk_delete);
@@ -100,9 +98,9 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
         closeBulkDelete = topBarMenu.findItem(R.id.close_bulk_select);
         tvTotalValue = findViewById(R.id.tvTotalValueAmount);
 
-        bottomNav = findViewById(R.id.bottomNavigationView);
+        BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
 
-        bottomMenu = bottomNav.getMenu();
+        Menu bottomMenu = bottomNav.getMenu();
         sort = bottomMenu.findItem(R.id.nav_sort);
         home = bottomMenu.findItem(R.id.nav_home);
 
@@ -436,8 +434,14 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
         }
     }
 
+    /**
+     * Updates the UI when the selection mode is changed.
+     *
+     * @param selectionMode The new state of selection mode.
+     */
     @Override
     public void onSelectionModeChanged(boolean selectionMode) {
+        BottomAppBar bottomAppBar;
         if (selectionMode) {
             search.setEnabled(false);
             search.setVisible(false);
@@ -483,6 +487,9 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
         }
     }
 
+    /**
+     * Closes the bulk selection mode and resets the UI to its normal state.
+     */
     public void closeBulkSelect() {
         if (itemAdapter != null) {
             itemAdapter.setSelectionMode(false);
@@ -490,12 +497,20 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
         }
     }
 
+    /**
+     * Updates the title of the selection mode to reflect the number of items selected.
+     */
     public void updateSelectionModeTitle() {
         if (itemAdapter != null) {
             topBar.setTitle("Selected (" + itemAdapter.getItemsSelectedCount() + ")");
         }
     }
 
+    /**
+     * Updates the total value of the items selected.
+     *
+     * @param result The result of the operation.
+     */
     private void handleAddTagResult(ActivityResult result) {
 
         if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
@@ -517,6 +532,11 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
     }
 
 
+    /**
+     * Updates the total value of the items selected.
+     *
+     * @param sum The new total value.
+     */
     @Override
     public void onSumChanged(double sum) {
         // Update the total value TextView

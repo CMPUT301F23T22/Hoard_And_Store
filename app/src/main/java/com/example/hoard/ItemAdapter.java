@@ -20,7 +20,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
+/**
+ * An adapter class for RecyclerView to display Item objects.
+ * Extends RecyclerView.Adapter with a custom ViewHolder to bind and present Item data in a list or grid format.
+ * Implements Filterable interface to provide filtering functionality.
+ * This class is responsible for creating ViewHolders and binding them to their data,
+ * defining the layout and behavior of each Item in the RecyclerView.
+ */
 public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> implements Filterable {
     // implements filterable is not for our way of filtering or sorting this is used for the autocomplete view
     // used in activity_sort.xml

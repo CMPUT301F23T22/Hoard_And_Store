@@ -8,14 +8,26 @@ import com.google.android.material.datepicker.MaterialDatePicker;
 
 import java.util.Calendar;
 
+/**
+ * A custom date picker class for selecting dates within the application.
+ *
+ */
 public class CustomDatePicker {
     private final Context context;
     private final DatePickListener listener;
 
+    /**
+     * interface for the date picker
+     */
     public interface DatePickListener {
         void onDatePicked(int year, int month, int day);
     }
 
+    /**
+     * constructor for the custom date picker
+     * @param context the context of the activity
+     * @param listener the listener for the date picker
+     */
     public CustomDatePicker(Context context, DatePickListener listener) {
         this.context = context;
         this.listener = listener;

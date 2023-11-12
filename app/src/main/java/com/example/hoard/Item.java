@@ -12,6 +12,23 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Represents an item with various properties, used in the application for tracking and managing items.
+ * This class is serializable, allowing it to be easily passed between activities or saved to persistent storage.
+ *
+ * Properties:
+ * - dateOfAcquisition (Date): The date when the item was acquired.
+ * - briefDescription (String): A brief description of the item.
+ * - make (String): The make of the item.
+ * - model (String): The model of the item.
+ * - serialNumber (String): The serial number of the item.
+ * - comment (String): Any additional comments about the item.
+ * - estimatedValue (double): The estimated monetary value of the item.
+ * - itemID (String): A unique identifier for the item.
+ * - tags (ArrayList<Tag>): A list of tags associated with the item.
+ * - briefDescriptionList (List<String>): An additional list of brief descriptions, marked for special property name handling in serialization.
+ * - isSelected (boolean): A flag indicating if the item is currently selected in the UI.
+ */
 public class Item implements Serializable {
     private Date dateOfAcquisition;
     private String briefDescription, make, model, serialNumber, comment;
@@ -23,6 +40,17 @@ public class Item implements Serializable {
 
     private boolean isSelected;
 
+    /**
+     * Constructor for the Item class.
+     *
+     * @param dateOfAcquisition The date of acquisition for the item.
+     * @param briefDescription  The brief description of the item.
+     * @param make              The make of the item.
+     * @param model             The model of the item.
+     * @param serialNumber      The serial number of the item.
+     * @param estimatedValue    The estimated value of the item.
+     * @param comment           The comment associated with the item.
+     */
     public Item(Date dateOfAcquisition, String briefDescription, String make, String model, String serialNumber, double estimatedValue, String comment, ArrayList<Tag> tagsList) {
 
         if (!isValidDate(dateOfAcquisition)) {
@@ -76,11 +104,23 @@ public class Item implements Serializable {
 
     }
 
+    /**
+     * Splits the brief description into a list of words.
+     *
+     * @param briefDescription The brief description to be split.
+     * @return A list of words.
+     */
     private List<String> splitBriefDescription(String briefDescription) {
         String[] briefDescriptionArray = briefDescription.split(" ");
         return Arrays.asList(briefDescriptionArray);
     }
 
+    /**
+     * Checks if the provided date is valid (MM/dd/yyyy).
+     *
+     * @param date The date to be validated.
+     * @return True if the date is valid, false otherwise.
+     */
     public static boolean isValidDate(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
         String formattedDate = sdf.format(date);

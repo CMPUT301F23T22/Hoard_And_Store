@@ -15,6 +15,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Adapter for a RecyclerView that displays sorting options.
+ * Users can choose the sorting criteria for the list of items, such as by date, description, etc.
+ */
 public class SortAdapter extends RecyclerView.Adapter<SortAdapter.SortViewHolder> {
     private final List<String> sortOptions;
     private final Map<String, String> sortOptionsState;
@@ -25,6 +29,9 @@ public class SortAdapter extends RecyclerView.Adapter<SortAdapter.SortViewHolder
     private FilterCriteria filterCriteria;
     private int selectedPos = RecyclerView.NO_POSITION;
 
+    /**
+     * Constructor initializes sorting options and mappings.
+     */
     public SortAdapter() {
         this.sortOptions = Arrays.asList("Date", "Description", "Make", "Estimated Value", "Tags");
         // this is to just inialize all the values
@@ -57,6 +64,9 @@ public class SortAdapter extends RecyclerView.Adapter<SortAdapter.SortViewHolder
         return RecyclerView.NO_POSITION; // Item not found
     }
 
+    /**
+     * ViewHolder for the SortAdapter.
+     */
     public static class SortViewHolder extends RecyclerView.ViewHolder {
         public TextView sortTextView;
         public CheckBox sortCheckBox;

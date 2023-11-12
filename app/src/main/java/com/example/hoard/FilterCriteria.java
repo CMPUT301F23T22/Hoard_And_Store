@@ -5,7 +5,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
+/**
+ * Represents the criteria used for filtering items, implementing Serializable for easy data passing.
+ *
+ */
 public class FilterCriteria implements Serializable {
     private List<String> makes;
     private List<String> descriptionKeyWords;
@@ -92,19 +95,38 @@ public class FilterCriteria implements Serializable {
         }
         tags.addAll(newTags);
     }
-
+    /**
+     * Gets the start date for the filter criteria.
+     *
+     * @return The start date of the filter criteria.
+     */
     public Date getStartDate() {
         return startDate;
     }
 
+    /**
+     * Sets the start date for the filter criteria.
+     *
+     * @param startDate The start date to be set for the filter criteria.
+     */
     public void setStartDate(Date startDate) {
         this.startDate = startDate;
     }
 
+    /**
+     * Gets the end date for the filter criteria.
+     *
+     * @return The end date of the filter criteria.
+     */
     public Date getEndDate() {
         return endDate;
     }
 
+    /**
+     * Sets the end date for the filter criteria.
+     *
+     * @param endDate The end date to be set for the filter criteria.
+     */
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }

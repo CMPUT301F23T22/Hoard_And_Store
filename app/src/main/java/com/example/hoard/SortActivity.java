@@ -35,7 +35,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
-
+/**
+ * An activity class dedicated to sorting functionalities within the application.
+ *
+ */
 public class SortActivity extends AppCompatActivity {
     private ArrayList<String> dataList;
     private RecyclerView recyclerView;
@@ -287,6 +290,11 @@ public class SortActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Loads the given adapter into the AutoCompleteTextView.
+     *
+     * @param itemAdapter the adapter to load
+     */
     private void loadAdapter(ItemAdapter itemAdapter) {
         itemMakes.clear();
         int itemCount = itemAdapter.getItemCount();
@@ -297,12 +305,25 @@ public class SortActivity extends AppCompatActivity {
         itemMakes.notifyDataSetChanged();
     }
 
+    /**
+     * Creates and configures a new instance of MaterialDatePicker for date range selection.
+     *
+     * @return Configured instance of MaterialDatePicker.
+     */
     private MaterialDatePicker<Pair<Long, Long>> createMaterialDatePicker() {
         MaterialDatePicker.Builder<Pair<Long, Long>> builder = MaterialDatePicker.Builder.dateRangePicker();
         builder.setTitleText("Select Date Range");
         return builder.build();
     }
 
+
+    /**
+     * Sets the text of the given button to the number of filters applied.
+     *
+     * @param bttn       the button to set the text of
+     * @param filterList the list of filters
+     * @param <E>        the type of the list
+     */
     public <E> void setFiltersCount(Button bttn, List<E> filterList) {
         if (filterList == null) {
             bttn.setText("Add");
