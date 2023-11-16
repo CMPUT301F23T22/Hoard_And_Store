@@ -39,7 +39,7 @@
             android:orientation="vertical">
 
             <!-- Sort By Section -->
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/sortLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
@@ -55,46 +55,140 @@
                 android:layout_height="200dp"
                 android:background="@drawable/selector"/>
 
+<!--            <Switch-->
+<!--                android:id="@+id/Switch1"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_alignParentBottom="true"-->
+<!--                android:layout_centerHorizontal="true"-->
+<!--                android:track="@color/white"-->
+<!--                android:textOn="Ascending"-->
+<!--                android:textOff="Descending"-->
+<!--                android:text="test" />-->
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+<!--            <TextView-->
+<!--                android:id="@+id/filterLabel"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="50dp"-->
+<!--                android:textSize="20dp"-->
+<!--                android:gravity="center|left"-->
+<!--                android:text="Filter By:" />-->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:outlineProvider="background">
+
+                <TextView
+                    android:id="@+id/filterLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:textSize="20dp"
+                    android:gravity="center|left"
+                    android:text="Date Range:" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/start_date_input_layout"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="Start Date"
+                        app:endIconMode="custom"
+                        app:boxBackgroundMode="filled"
+                        app:endIconDrawable="@drawable/calendar_month">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/start_date_edit_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            app:endIconMode="custom"
+                            app:endIconDrawable="@drawable/calendar_month"/>
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/end_date_input_layout"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="End Date"
+                        app:boxBackgroundMode="filled"
+                        app:endIconMode="custom"
+                        app:endIconDrawable="@drawable/calendar_month">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/end_date_edit_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"/>
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                </LinearLayout>
+            </LinearLayout>
+
+
+<!--            <Button-->
+<!--                android:id="@+id/showDateRangePicker"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_gravity="center"-->
+<!--                android:text="Pick From Calendar">-->
+<!--            </Button>-->
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
             <TextView
-                android:id="@+id/filterLabel"
+                android:id="@+id/description_keyword_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
                 android:textSize="20dp"
                 android:gravity="center|left"
-                android:text="Filter By:" />
+                android:text="Description Keywords" />
 
-            <EditText
-                android:id="@+id/start_date_edit_text"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:hint="From Start date MM/DD/YYYY"/>
-
-            <EditText
-                android:id="@+id/end_date_edit_text"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:hint="To end date MM/DD/YYYY"/>
-
-            <Button
-                android:id="@+id/showDateRangePicker"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="Pick From Calendar">
-            </Button>
-
-            <EditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/BriefDescriptionKeyword"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:hint="Brief Description"/>
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tags_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:textSize="20dp"
+                android:gravity="center|left"
+                android:text="Tags" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="test"/>
-            <!-- Chip items will be added dynamically in code -->
+
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/make_filter_text_view"
@@ -103,10 +197,12 @@
                 android:layout_gravity="center|start"
                 android:layout_marginTop="10dp"
                 android:text="Make "
-                android:textSize="18sp" />
+                android:textSize="20sp" />
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
+
 
                 <androidx.appcompat.widget.AppCompatAutoCompleteTextView
                     android:layout_width="0dp"
@@ -153,13 +249,13 @@
 <!--                android:id="@+id/filter_make_edit_text"-->
 <!--                android:hint="Make"></EditText>-->
 
-            <Button
-                android:id="@+id/apply_filter_sort_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="Apply">
-            </Button>
+<!--            <Button-->
+<!--                android:id="@+id/apply_filter_sort_button"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_gravity="center"-->
+<!--                android:text="Apply">-->
+<!--            </Button>-->
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

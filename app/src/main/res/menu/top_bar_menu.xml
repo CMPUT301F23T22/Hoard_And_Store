@@ -26,6 +26,20 @@
         android:enabled="false"
         app:showAsAction="ifRoom"/>
     <item
+        android:id="@+id/action_apply"
+        android:title="Apply"
+        app:showAsAction="always"
+        android:visible="false"
+        android:enabled="false"/>
+
+    <item
+        android:id="@+id/action_reset"
+        android:title="Reset"
+        app:showAsAction="always"
+        android:visible="false"
+        android:enabled="false"/>
+
+    <item
         android:id="@+id/close_bulk_select"
         android:icon="@drawable/close_24px"
         android:title="search"
@@ -33,4 +47,7 @@
         android:visible="false"
         android:enabled="false"
         app:showAsAction="ifRoom"/>
+
+
+
 </menu>

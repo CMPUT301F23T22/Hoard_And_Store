@@ -1,5 +1,6 @@
 package com.example.hoard;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.util.Pair;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,6 +27,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationBarView;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -32,14 +35,15 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
-import java.util.TimeZone;
+
 /**
  * An activity class dedicated to sorting functionalities within the application.
  *
  */
-public class SortActivity extends AppCompatActivity {
+public class SortActivity extends AppCompatActivity implements CustomDatePicker.DatePickListener{
     private ArrayList<String> dataList;
     private RecyclerView recyclerView;
     private SortAdapter sortAdapter;
@@ -61,17 +65,24 @@ public class SortActivity extends AppCompatActivity {
     private Button resetFilters;
     private List<String> appliedMakes;
     private FilterCriteria filterCriteria;
+    private EditText startDateEditText;
+    private  EditText endDateEditText;
+    private Toolbar topBar;
+    private Menu topBarMenu;
+    private  EditText BriefDescriptionKeywordEditText;
+    private final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sort);
+        BriefDescriptionKeywordEditText = findViewById(R.id.BriefDescriptionKeyword);
 
         // Initialize data
         appliedMakes = new ArrayList<>();
         makes = new ArrayList<>();
         ArrayList<String> dataList = new ArrayList<>();
-        FilterCriteria filterCriteria = FilterCriteria.getInstance();
+        filterCriteria = FilterCriteria.getInstance();
 
         // Find views
         recyclerView = findViewById(R.id.sorting);
@@ -80,6 +91,24 @@ public class SortActivity extends AppCompatActivity {
         bottomMenu = bottomNav.getMenu();
         sort = bottomMenu.findItem(R.id.nav_sort);
         sort.setChecked(true);
+        topBar = findViewById(R.id.topAppBar);
+        topBar.setTitle("Filter/Sort");
+        topBarMenu = topBar.getMenu();
+
+        // Assuming you have references to the menu items
+        MenuItem applyMenuItem = topBarMenu.findItem(R.id.action_apply);
+        MenuItem resetMenuItem = topBarMenu.findItem(R.id.action_reset);
+        MenuItem closeMenu = topBarMenu.findItem(R.id.close_bulk_select); // should rename
+
+        // Enable or disable the menu items
+        applyMenuItem.setEnabled(true);
+        resetMenuItem.setEnabled(true);
+        closeMenu.setEnabled(true);
+
+        applyMenuItem.setVisible(true);
+        resetMenuItem.setVisible(true);
+        closeMenu.setVisible(true);
+
 
         // Initialize adapters and layout manager
         itemMakes = new ArrayAdapter<>(this, android.R.layout.select_dialog_item);
@@ -92,12 +121,15 @@ public class SortActivity extends AppCompatActivity {
         recyclerView.setAdapter(sortAdapter);
         dbController = ItemDBController.getInstance();
         fab = findViewById(R.id.addItemButton);
-        applyButton = findViewById(R.id.apply_filter_sort_button);
+//        applyButton = findViewById(R.id.apply_filter_sort_button);
         addMoreFilters = findViewById(R.id.add_more_make_filter);
         resetFilters = findViewById(R.id.reset_make_filter);
+        startDateEditText = findViewById(R.id.start_date_edit_text);
+        endDateEditText = findViewById(R.id.end_date_edit_text);
         //addMoreFilters.setVisibility(View.INVISIBLE);
 
         setFiltersCount(addMoreFilters, filterCriteria.getMakes());
+        setFilterOption();
 
         // Load items and populate the AutoCompleteTextView
         dbController.loadItems(new DataLoadCallbackItem() {
@@ -109,69 +141,147 @@ public class SortActivity extends AppCompatActivity {
             }
         }, null);
 
-        // Set up the "Apply" button click listener
-        applyButton.setOnClickListener(new View.OnClickListener() {
+        topBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
-            public void onClick(View v) {
-                EditText startDateEditText = findViewById(R.id.start_date_edit_text);
-                EditText endDateEditText = findViewById(R.id.end_date_edit_text);
-                String startDateString = startDateEditText.getText().toString();
-                String endDateString = endDateEditText.getText().toString();
-                SimpleDateFormat dateFormatter = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
-                if (!startDateString.isEmpty()) {
-                    try {
-                        Date startDate = dateFormatter.parse(startDateString);
-                        filterCriteria.setStartDate(startDate);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+            public boolean onMenuItemClick(MenuItem item) {
+                int id = item.getItemId();
+
+                if (id == R.id.action_apply) {
+                    EditText startDateEditText = findViewById(R.id.start_date_edit_text);
+                    EditText endDateEditText = findViewById(R.id.end_date_edit_text);
+                    String startDateString = startDateEditText.getText().toString();
+                    String endDateString = endDateEditText.getText().toString();
+                    SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                    if (!startDateString.isEmpty()) {
+                        try {
+                            Date startDate = dateFormatter.parse(startDateString);
+                            filterCriteria.setStartDate(startDate);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        filterCriteria.setStartDate(null);
                     }
-                } else {
-                    filterCriteria.setStartDate(null);
-                }
-                if (!endDateString.isEmpty()) {
-                    try {
-                        Date endDate = dateFormatter.parse(endDateString);
-                        Calendar calendar = Calendar.getInstance();
-                        calendar.setTime(endDate);
-                        calendar.set(Calendar.HOUR_OF_DAY, 23);
-                        calendar.set(Calendar.MINUTE, 59);
-                        calendar.set(Calendar.SECOND, 59);
-                        calendar.set(Calendar.MILLISECOND, 999);
-                        endDate = calendar.getTime();
-                        filterCriteria.setEndDate(endDate);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    if (!endDateString.isEmpty()) {
+                        try {
+                            Date endDate = dateFormatter.parse(endDateString);
+                            Calendar calendar = Calendar.getInstance();
+                            calendar.setTime(endDate);
+                            calendar.set(Calendar.HOUR_OF_DAY, 23);
+                            calendar.set(Calendar.MINUTE, 59);
+                            calendar.set(Calendar.SECOND, 59);
+                            calendar.set(Calendar.MILLISECOND, 999);
+                            endDate = calendar.getTime();
+                            filterCriteria.setEndDate(endDate);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        filterCriteria.setEndDate(null);
                     }
-                } else {
-                    filterCriteria.setEndDate(null);
-                }
 
-                EditText BriefDescriptionKeywordEditText = findViewById(R.id.BriefDescriptionKeyword);
-                String BriefDescriptionKeywordString = BriefDescriptionKeywordEditText.getText().toString();
-                if (!BriefDescriptionKeywordString.isEmpty()) {
-                    List<String> briefDescriptionKeywords = Arrays.asList(BriefDescriptionKeywordString.split("\\s+"));
-                    filterCriteria.setDescriptionKeyWords(briefDescriptionKeywords);
-                } else {
-                    filterCriteria.setDescriptionKeyWords(null);
-                }
+                    EditText BriefDescriptionKeywordEditText = findViewById(R.id.BriefDescriptionKeyword);
+                    String BriefDescriptionKeywordString = BriefDescriptionKeywordEditText.getText().toString();
+                    if (!BriefDescriptionKeywordString.isEmpty()) {
+                        List<String> briefDescriptionKeywords = Arrays.asList(BriefDescriptionKeywordString.split("\\s+"));
+                        filterCriteria.setDescriptionKeyWords(briefDescriptionKeywords);
+                    } else {
+                        filterCriteria.setDescriptionKeyWords(null);
+                    }
 
-                String enteredMake = search.getText().toString();
-                Intent returnIntent = new Intent(getApplicationContext(), ListScreen.class);
-                returnIntent.putExtra("filterCriteria", filterCriteria);
-                setResult(RESULT_OK, returnIntent);
-                finish();
-                if (!enteredMake.isEmpty()) {
-                    appliedMakes.add(enteredMake);
-                    filterCriteria.setMakes(appliedMakes);
+                    String enteredMake = search.getText().toString();
+                    Intent returnIntent = new Intent(getApplicationContext(), ListScreen.class);
+                    returnIntent.putExtra("filterCriteria", filterCriteria);
+                    setResult(RESULT_OK, returnIntent);
+                    finish();
+                    if (!enteredMake.isEmpty()) {
+                        appliedMakes.add(enteredMake);
+                        filterCriteria.setMakes(appliedMakes);
 
-                }
-                //filterCriteria.setMakes(appliedMakes);
+                    }
+                    //filterCriteria.setMakes(appliedMakes);
 //                sortAdapter.getSortOptionsEnabled();
-                filterCriteria.setSortOptions(sortAdapter.getSortOptionsEnabled());
-                Intent listIntent = new Intent(getApplicationContext(), ListScreen.class);
-                startActivity(listIntent);
+                    filterCriteria.setSortOptions(sortAdapter.getSortOptionsEnabled());
+                    Intent listIntent = new Intent(getApplicationContext(), ListScreen.class);
+                    startActivity(listIntent);
+
+                } else if (id == R.id.action_reset) {
+                    filterCriteria.removeAllOptions();
+                    Intent listIntent = new Intent(getApplicationContext(), ListScreen.class);
+                    startActivity(listIntent);
+
+                } else if (id ==R.id.close_bulk_select) {
+                    Intent listIntent = new Intent(getApplicationContext(), ListScreen.class);
+                    startActivity(listIntent);
+                }
+                return false;
             }
+
         });
+
+        // Set up the "Apply" button click listener
+//        applyButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                EditText startDateEditText = findViewById(R.id.start_date_edit_text);
+//                EditText endDateEditText = findViewById(R.id.end_date_edit_text);
+//                String startDateString = startDateEditText.getText().toString();
+//                String endDateString = endDateEditText.getText().toString();
+//                SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+//                if (!startDateString.isEmpty()) {
+//                    try {
+//                        Date startDate = dateFormatter.parse(startDateString);
+//                        filterCriteria.setStartDate(startDate);
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                } else {
+//                    filterCriteria.setStartDate(null);
+//                }
+//                if (!endDateString.isEmpty()) {
+//                    try {
+//                        Date endDate = dateFormatter.parse(endDateString);
+//                        Calendar calendar = Calendar.getInstance();
+//                        calendar.setTime(endDate);
+//                        calendar.set(Calendar.HOUR_OF_DAY, 23);
+//                        calendar.set(Calendar.MINUTE, 59);
+//                        calendar.set(Calendar.SECOND, 59);
+//                        calendar.set(Calendar.MILLISECOND, 999);
+//                        endDate = calendar.getTime();
+//                        filterCriteria.setEndDate(endDate);
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                } else {
+//                    filterCriteria.setEndDate(null);
+//                }
+//
+//                EditText BriefDescriptionKeywordEditText = findViewById(R.id.BriefDescriptionKeyword);
+//                String BriefDescriptionKeywordString = BriefDescriptionKeywordEditText.getText().toString();
+//                if (!BriefDescriptionKeywordString.isEmpty()) {
+//                    List<String> briefDescriptionKeywords = Arrays.asList(BriefDescriptionKeywordString.split("\\s+"));
+//                    filterCriteria.setDescriptionKeyWords(briefDescriptionKeywords);
+//                } else {
+//                    filterCriteria.setDescriptionKeyWords(null);
+//                }
+//
+//                String enteredMake = search.getText().toString();
+//                Intent returnIntent = new Intent(getApplicationContext(), ListScreen.class);
+//                returnIntent.putExtra("filterCriteria", filterCriteria);
+//                setResult(RESULT_OK, returnIntent);
+//                finish();
+//                if (!enteredMake.isEmpty()) {
+//                    appliedMakes.add(enteredMake);
+//                    filterCriteria.setMakes(appliedMakes);
+//
+//                }
+//                //filterCriteria.setMakes(appliedMakes);
+////                sortAdapter.getSortOptionsEnabled();
+//                filterCriteria.setSortOptions(sortAdapter.getSortOptionsEnabled());
+//                Intent listIntent = new Intent(getApplicationContext(), ListScreen.class);
+//                startActivity(listIntent);
+//            }
+//        });
 
         // Set up layout adjustments based on the keyboard visibility
         View rootView = findViewById(android.R.id.content);
@@ -219,33 +329,20 @@ public class SortActivity extends AppCompatActivity {
         });
 
         // Set up date range picker
-        Button showDatePicker = findViewById(R.id.showDateRangePicker);
-        showDatePicker.setOnClickListener(new View.OnClickListener() {
+//        Button showDatePicker = findViewById(R.id.showDateRangePicker);
+        startDateEditText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MaterialDatePicker<Pair<Long, Long>> materialDatePicker = createMaterialDatePicker();
-
-                materialDatePicker.addOnPositiveButtonClickListener(selection -> {
-                    Long startDateInMillis = selection.first;
-                    Long endDateInMillis = selection.second;
-
-                    SimpleDateFormat dateFormatter = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
-                    dateFormatter.setTimeZone(TimeZone.getTimeZone("GMT"));
-                    String startDate = dateFormatter.format(new Date(startDateInMillis));
-                    String endDate = dateFormatter.format(new Date(endDateInMillis));
-
-                    EditText startDateEditText = findViewById(R.id.start_date_edit_text);
-                    EditText endDateEditText = findViewById(R.id.end_date_edit_text);
-
-                    startDateEditText.setText(startDate);
-                    endDateEditText.setText(endDate);
-                });
-
-                materialDatePicker.show(getSupportFragmentManager(), "DATE_PICKER_TAG");
-
+                showDatePicker();
             }
         });
 
+        endDateEditText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showDatePicker();
+            }
+        });
         // Handle AutoCompleteTextView text changes
         search.addTextChangedListener(new TextWatcher() {
             @Override
@@ -288,6 +385,29 @@ public class SortActivity extends AppCompatActivity {
                 });
             }
         });
+    }
+
+    private void setFilterOption() {
+        try {
+            if (filterCriteria.getStartDate() != null) {
+                startDateEditText.setText(sdf.format(filterCriteria.getStartDate()));
+            }
+
+            if (filterCriteria.getEndDate() != null) {
+                endDateEditText.setText(sdf.format(filterCriteria.getEndDate()));
+            }
+
+            List<String> descriptionKeywordsList = filterCriteria.getDescriptionKeyWords();
+            if (descriptionKeywordsList != null && !descriptionKeywordsList.isEmpty()) {
+                // Join the list elements with spaces
+                String joinedKeywords = String.join(" ", descriptionKeywordsList);
+                BriefDescriptionKeywordEditText.setText(joinedKeywords);
+            }
+        } catch (NullPointerException e) {
+            // Handle the exception as needed, e.g., log an error, show a message to the user, etc.
+            e.printStackTrace(); // or log.error("Error setting filter options", e);
+        }
+
     }
 
     /**
@@ -334,6 +454,22 @@ public class SortActivity extends AppCompatActivity {
             }
 
         }
+    }
+
+    private void showDatePicker() {
+        // Create an instance of the CustomDatePicker
+        CustomDatePicker customDatePicker = new CustomDatePicker((Context) this, (CustomDatePicker.DatePickListener) this, true);
+        customDatePicker.showDatePicker();
+
+    }
+
+    @Override
+    public void onDateRangePicked(int startYear, int startMonth, int startDay, int endYear, int endMonth, int endDay) {
+        Date selectedStartDateObject = new GregorianCalendar(startYear, startMonth, startDay+1).getTime();
+        Date selectedEndDateObject = new GregorianCalendar(endYear, endMonth, endDay+1).getTime();
+        startDateEditText.setText(sdf.format(selectedStartDateObject));
+        endDateEditText.setText(sdf.format(selectedEndDateObject));
+
     }
 }
 

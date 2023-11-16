@@ -217,6 +217,15 @@ public class FilterCriteria implements Serializable {
         return result.toString();
     }
 
+    public void removeAllOptions(){
+        makes = null;
+        descriptionKeyWords = null;
+        tags = null;
+        startDate = null;
+        endDate = null;
+        sortOptions = null;
+    }
+
 }
 
 
