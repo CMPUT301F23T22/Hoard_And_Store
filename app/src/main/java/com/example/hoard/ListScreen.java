@@ -71,6 +71,7 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
     private TagDBController tagDBController;
     private final int sortingRequestCode = 1;
     private TextView totalValueTextView;
+    private FilterCriteria filterCriteria;
 
 
     private final ActivityResultLauncher<Intent> addActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleAddResult);
@@ -84,7 +85,7 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
         setContentView(R.layout.activity_list_screen);
         totalValueTextView = findViewById(R.id.tvTotalValueAmount);
         tagSelectionLayout = findViewById(R.id.tagSelectionLayout);
-        FilterCriteria filterCriteria = FilterCriteria.getInstance();
+        filterCriteria = FilterCriteria.getInstance();
 
 //        itemDB = new ItemDB(new ItemDBConnector());
 
@@ -400,7 +401,7 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
                     itemAdapter.notifyDataSetChanged();
 
                 }
-            }, FilterCriteria.getInstance());
+            }, filterCriteria);
         }
     }
 

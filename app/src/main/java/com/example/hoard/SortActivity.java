@@ -14,6 +14,8 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -36,8 +38,10 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * An activity class dedicated to sorting functionalities within the application.
@@ -63,6 +67,8 @@ public class SortActivity extends AppCompatActivity implements CustomDatePicker.
     private Button applyButton;
     private Button addMoreFilters;
     private Button resetFilters;
+    private Button resetDateRange;
+    private Button resetDescriptionKeyWords;
     private List<String> appliedMakes;
     private FilterCriteria filterCriteria;
     private EditText startDateEditText;
@@ -70,8 +76,11 @@ public class SortActivity extends AppCompatActivity implements CustomDatePicker.
     private Toolbar topBar;
     private Menu topBarMenu;
     private  EditText BriefDescriptionKeywordEditText;
+    private RadioGroup sortOrder;
+    private String sortOrderPicked;
     private final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-
+    private RadioButton radioButtonAscending;
+    private RadioButton radioButtonDescending;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,6 +103,15 @@ public class SortActivity extends AppCompatActivity implements CustomDatePicker.
         topBar = findViewById(R.id.topAppBar);
         topBar.setTitle("Filter/Sort");
         topBarMenu = topBar.getMenu();
+        sortOrder = findViewById(R.id.sort_order_radio_button);
+
+        radioButtonAscending = findViewById(R.id.sort_ascedning);
+        radioButtonDescending = findViewById(R.id.sort_descending);
+
+
+
+
+
 
         // Assuming you have references to the menu items
         MenuItem applyMenuItem = topBarMenu.findItem(R.id.action_apply);
@@ -124,6 +142,8 @@ public class SortActivity extends AppCompatActivity implements CustomDatePicker.
 //        applyButton = findViewById(R.id.apply_filter_sort_button);
         addMoreFilters = findViewById(R.id.add_more_make_filter);
         resetFilters = findViewById(R.id.reset_make_filter);
+        resetDateRange = findViewById(R.id.reset_date_range);
+        resetDescriptionKeyWords = findViewById(R.id.reset_description_keywords);
         startDateEditText = findViewById(R.id.start_date_edit_text);
         endDateEditText = findViewById(R.id.end_date_edit_text);
         //addMoreFilters.setVisibility(View.INVISIBLE);
@@ -140,6 +160,26 @@ public class SortActivity extends AppCompatActivity implements CustomDatePicker.
                 search.setAdapter(itemMakes);
             }
         }, null);
+
+        sortOrder.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                if(i == R.id.sort_ascedning){
+                    if(filterCriteria.getSortOption() != null & filterCriteria.getSortOption() == "Ascending"){
+                        radioButtonAscending.setChecked(true);
+                    } else {
+                        sortOrderPicked = "Ascending";
+                    }
+                } else if (i == R.id.sort_descending) {
+                    if(filterCriteria.getSortOption() != null & filterCriteria.getSortOption() == "Descending") {
+                        radioButtonDescending.setChecked(true);
+                    } else {
+                        sortOrderPicked = "Descending";
+                    }
+
+                }
+            }
+        });
 
         topBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
@@ -201,7 +241,18 @@ public class SortActivity extends AppCompatActivity implements CustomDatePicker.
                     }
                     //filterCriteria.setMakes(appliedMakes);
 //                sortAdapter.getSortOptionsEnabled();
-                    filterCriteria.setSortOptions(sortAdapter.getSortOptionsEnabled());
+//                    filterCriteria.setSortOptions(sortAdapter.getSortOptionsEnabled());
+                    String sortBy = sortAdapter.getSortBy();
+                    Map<String, String> sortOptionsEnables = new HashMap<>();
+
+                    if(sortOrderPicked == null){
+                        sortOrderPicked = "Ascending";
+                    }
+                    sortOptionsEnables.put(sortBy, sortOrderPicked);
+                    filterCriteria.setSortBy(sortBy);
+                    filterCriteria.setSortOption(sortOrderPicked);
+                    filterCriteria.setSortOptions(sortOptionsEnables);
+
                     Intent listIntent = new Intent(getApplicationContext(), ListScreen.class);
                     startActivity(listIntent);
 
@@ -312,6 +363,26 @@ public class SortActivity extends AppCompatActivity implements CustomDatePicker.
             }
         });
 
+        resetDateRange.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                filterCriteria.clearEndDate();
+                filterCriteria.clearStartDate();
+
+                startDateEditText.setText("");
+                endDateEditText.setText("");
+            }
+        });
+
+        resetDescriptionKeyWords.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                filterCriteria.clearDescriptionKeyWords();
+                BriefDescriptionKeywordEditText.setText("");
+
+            }
+        });
+
         // Handle bottom navigation item selection
         bottomNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
@@ -389,6 +460,13 @@ public class SortActivity extends AppCompatActivity implements CustomDatePicker.
 
     private void setFilterOption() {
         try {
+            if(filterCriteria.getSortOption() != null & filterCriteria.getSortOption() == "Ascending"){
+                radioButtonAscending.setChecked(true);
+            } else if(filterCriteria.getSortOption() != null & filterCriteria.getSortOption() == "Descending"){
+                radioButtonDescending.setChecked(true);
+            } else {
+                sortOrderPicked = "Ascending";
+            }
             if (filterCriteria.getStartDate() != null) {
                 startDateEditText.setText(sdf.format(filterCriteria.getStartDate()));
             }

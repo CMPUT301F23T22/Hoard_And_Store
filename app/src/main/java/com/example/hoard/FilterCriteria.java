@@ -3,6 +3,7 @@ package com.example.hoard;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 /**
@@ -16,6 +17,8 @@ public class FilterCriteria implements Serializable {
     private Date startDate;
     private Date endDate;
     private Map<String, String> sortOptions;
+    private String sortOption;
+    private String sortBy;
 
 
     private static FilterCriteria instance;
@@ -151,6 +154,9 @@ public class FilterCriteria implements Serializable {
     public void clearMakes() {
         makes.clear();
     }
+    public void clearDescriptionKeyWords(){
+        descriptionKeyWords = null;
+    }
 
     /**
      * Gets the sort options in the filter criteria.
@@ -158,8 +164,15 @@ public class FilterCriteria implements Serializable {
      * @return A map of sort options.
      */
     public Map<String, String> getSortOptions() {
-        return sortOptions;
+        Map<String, String> sortOptions = new HashMap<>();
+        if(sortBy != null & sortOption != null){
+            sortOptions.put(sortBy, sortOption);
+            return sortOptions;
+        }
+
+        return null;
     }
+
 
     /**
      * Sets the sort options in the filter criteria.
@@ -224,6 +237,25 @@ public class FilterCriteria implements Serializable {
         startDate = null;
         endDate = null;
         sortOptions = null;
+        sortOption = null;
+        sortBy = null;
+    }
+
+    public void setSortBy(String sortBy){
+        this.sortBy = sortBy;
+    }
+
+    public void setSortOption(String sortOption){
+        this.sortOption = sortOption;
+
+    }
+
+    public String getSortBy(){
+        return sortBy;
+    }
+
+    public String getSortOption(){
+       return sortOption;
     }
 
 }

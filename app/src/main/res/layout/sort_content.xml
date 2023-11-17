@@ -27,13 +27,13 @@
         android:textColor="@android:color/black" />
 
     <!-- Button for ascending order -->
-    <Button
-        android:id="@+id/sort_type"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity=""
-        android:text="Ascending"
-        android:textColor="@android:color/white" />
+<!--    <Button-->
+<!--        android:id="@+id/sort_type"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:layout_gravity=""-->
+<!--        android:text="Ascending"-->
+<!--        android:textColor="@android:color/white" />-->
 
     <!-- Button for descending order -->
 
