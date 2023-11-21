@@ -2,6 +2,8 @@ package com.example.hoard;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.text.Editable;
@@ -26,6 +28,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationBarView;
@@ -81,12 +85,14 @@ public class SortActivity extends AppCompatActivity implements CustomDatePicker.
     private final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
     private RadioButton radioButtonAscending;
     private RadioButton radioButtonDescending;
+    private ChipGroup chipGroupTags;
+    private ArrayList<Tag> selectedTagList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sort);
         BriefDescriptionKeywordEditText = findViewById(R.id.BriefDescriptionKeyword);
-
+        selectedTagList = new ArrayList<Tag>();
         // Initialize data
         appliedMakes = new ArrayList<>();
         makes = new ArrayList<>();
@@ -107,7 +113,7 @@ public class SortActivity extends AppCompatActivity implements CustomDatePicker.
 
         radioButtonAscending = findViewById(R.id.sort_ascedning);
         radioButtonDescending = findViewById(R.id.sort_descending);
-
+        TagDBController tagDBController = TagDBController.getInstance();
 
 
 
@@ -146,7 +152,25 @@ public class SortActivity extends AppCompatActivity implements CustomDatePicker.
         resetDescriptionKeyWords = findViewById(R.id.reset_description_keywords);
         startDateEditText = findViewById(R.id.start_date_edit_text);
         endDateEditText = findViewById(R.id.end_date_edit_text);
+        chipGroupTags = findViewById(R.id.tagChipGroup);
         //addMoreFilters.setVisibility(View.INVISIBLE);
+
+        tagDBController.loadTags(new DataLoadCallBackTag() {
+            @Override
+            public void onDataLoaded(List<Tag> tags) {
+                // Iterate through the items, creating a chip for each one
+                for (Tag tag : tags) {
+                    Chip chip = new Chip(SortActivity.this);
+                    chip.setText(tag.getTagName());
+                    chip.setChipBackgroundColor(ColorStateList.valueOf(Color.parseColor(tag.getTagColor())));
+                    chip.setCheckedIconVisible(true);
+                    chip.setCheckable(true);
+                    chip.setTag(tag);
+                    // Add the chip to the ChipGroup
+                    chipGroupTags.addView(chip);
+                }
+            }
+        });
 
         setFiltersCount(addMoreFilters, filterCriteria.getMakes());
         setFilterOption();
@@ -160,6 +184,7 @@ public class SortActivity extends AppCompatActivity implements CustomDatePicker.
                 search.setAdapter(itemMakes);
             }
         }, null);
+
 
         sortOrder.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -228,6 +253,16 @@ public class SortActivity extends AppCompatActivity implements CustomDatePicker.
                     } else {
                         filterCriteria.setDescriptionKeyWords(null);
                     }
+
+                    for (int i = 0; i < chipGroupTags.getChildCount(); i++) {
+                        Chip chip = (Chip) chipGroupTags.getChildAt(i);
+                        if (chip.isChecked()) {
+                            Tag selectedtag = (Tag) chip.getTag();
+                            selectedTagList.add(selectedtag);
+
+                        }
+                    }
+                    filterCriteria.setTags(selectedTagList);
 
                     String enteredMake = search.getText().toString();
                     Intent returnIntent = new Intent(getApplicationContext(), ListScreen.class);

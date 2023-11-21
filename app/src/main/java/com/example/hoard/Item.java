@@ -7,7 +7,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,7 +38,7 @@ public class Item implements Serializable {
     private final String itemID;
     private ArrayList<Tag> tags;
     @PropertyName("briefDescriptionList")
-    private final List<String> briefDescriptionList;
+    private final Map<String, Boolean> briefDescriptionList;
 
     private boolean isSelected;
 
@@ -110,9 +112,18 @@ public class Item implements Serializable {
      * @param briefDescription The brief description to be split.
      * @return A list of words.
      */
-    private List<String> splitBriefDescription(String briefDescription) {
+    private Map<String, Boolean> splitBriefDescription(String briefDescription) {
+//        String[] briefDescriptionArray = briefDescription.split(" ");
+//        return Arrays.asList(briefDescriptionArray);
         String[] briefDescriptionArray = briefDescription.split(" ");
-        return Arrays.asList(briefDescriptionArray);
+
+        Map<String, Boolean> keywordsMap = new HashMap<>();
+
+        for (String word : briefDescriptionArray) {
+            keywordsMap.put(word, true);
+        }
+
+        return keywordsMap;
     }
 
     /**
@@ -355,7 +366,7 @@ public class Item implements Serializable {
         }
     }
 
-    public List<String> getBriefDescriptionList() {
+    public Map<String, Boolean> getBriefDescriptionList() {
         return briefDescriptionList;
     }
 

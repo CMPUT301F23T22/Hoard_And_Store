@@ -232,27 +232,6 @@
 
             </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/tags_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:textSize="20dp"
-                android:gravity="center|left"
-                android:text="Tags" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="test"/>
-
-            </LinearLayout>
-
             <TextView
                 android:id="@+id/make_filter_text_view"
                 android:layout_width="wrap_content"
@@ -319,7 +298,28 @@
 <!--                android:layout_gravity="center"-->
 <!--                android:text="Apply">-->
 <!--            </Button>-->
+            <TextView
+                android:id="@+id/tag_filter_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|start"
+                android:layout_marginTop="10dp"
+                android:text="Tags "
+                android:textSize="20sp" />
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="horizontal">
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/tagChipGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp">
+                    <!-- Chips will be added here dynamically -->
+                </com.google.android.material.chip.ChipGroup>
+            </HorizontalScrollView>
         </LinearLayout>
+
     </androidx.core.widget.NestedScrollView>
 
 

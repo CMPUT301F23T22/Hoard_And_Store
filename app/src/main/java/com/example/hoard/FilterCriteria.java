@@ -2,6 +2,7 @@ package com.example.hoard;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -13,12 +14,13 @@ import java.util.Map;
 public class FilterCriteria implements Serializable {
     private List<String> makes;
     private List<String> descriptionKeyWords;
-    private List<Tag> tags;
+    private List<Map<String, Object>> tags;
     private Date startDate;
     private Date endDate;
     private Map<String, String> sortOptions;
     private String sortOption;
     private String sortBy;
+    private List<Map<String, Object>> tagMaps;
 
 
     private static FilterCriteria instance;
@@ -83,7 +85,7 @@ public class FilterCriteria implements Serializable {
      *
      * @return List of tags representing makes.
      */
-    public List<Tag> getTags() {
+    public List<Map<String, Object>> getTags() {
         return tags;
     }
 
@@ -93,10 +95,18 @@ public class FilterCriteria implements Serializable {
      * @param newTags The list of tags to be set.
      */
     public void setTags(List<Tag> newTags) {
-        if (tags == null) {
-            tags = new ArrayList<>();
+        // Clear the existing list
+        tags = new ArrayList<>();
+
+        // Convert list of Tag objects to list of maps
+        for (Tag tag : newTags) {
+            Map<String, Object> tagMap = new HashMap<>();
+            tagMap.put("tagColor", tag.getTagColor());
+            tagMap.put("tagID", tag.getTagID());
+            tagMap.put("tagName", tag.getTagName());
+            // Add other properties as needed
+            tags.add(tagMap);
         }
-        tags.addAll(newTags);
     }
     /**
      * Gets the start date for the filter criteria.

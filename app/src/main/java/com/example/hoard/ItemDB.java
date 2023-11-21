@@ -250,6 +250,15 @@ public class ItemDB {
                 query = query.whereIn("make", makes);
             }
 
+            if (filterCriteria.getTags() != null && !filterCriteria.getTags().isEmpty()) {
+                List<Map<String, Object>> tags = filterCriteria.getTags();
+
+                // Query documents where at least one tag in the list is in the "Tags" array
+                query = query.whereArrayContainsAny("tags", tags);
+
+                Log.d("Firestore", "tags: " + tags);
+            }
+
             if (filterCriteria.getStartDate() != null && filterCriteria.getEndDate() != null) {
                 Timestamp startTimestamp = new Timestamp(filterCriteria.getStartDate());
                 Timestamp endTimestamp = new Timestamp(filterCriteria.getEndDate());
@@ -264,9 +273,12 @@ public class ItemDB {
 
             if (filterCriteria.getDescriptionKeyWords() != null && !filterCriteria.getDescriptionKeyWords().isEmpty()) {
                 List<String> descriptionKeyWords = filterCriteria.getDescriptionKeyWords();
-                query = query.whereArrayContainsAny("briefDescriptionList", descriptionKeyWords);
+                query = query.whereEqualTo("briefDescriptionList." + descriptionKeyWords.get(0), true);
+//                query = query.whereArrayContainsAny("briefDescriptionList", descriptionKeyWords);
                 Log.d("Firestore", "descriptionKeyWords: " + descriptionKeyWords);
             }
+
+
         }
         return query;
     }
