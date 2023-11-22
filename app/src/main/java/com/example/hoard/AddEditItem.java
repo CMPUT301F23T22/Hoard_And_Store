@@ -138,7 +138,7 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
      */
     private void showDatePicker() {
         // Create an instance of the CustomDatePicker
-        CustomDatePicker customDatePicker = new CustomDatePicker(this, this);
+        CustomDatePicker customDatePicker = new CustomDatePicker(this, this, false);
         customDatePicker.showDatePicker();
 
     }
@@ -429,7 +429,7 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
      * @param day   The day that was picked.
      */
     @Override
-    public void onDatePicked(int year, int month, int day) {
+    public void onSingleDatePicked(int year, int month, int day) {
         Date selectedDateObject = new GregorianCalendar(year, month, day).getTime();
         dateInput.setText(sdf.format(selectedDateObject));
     }

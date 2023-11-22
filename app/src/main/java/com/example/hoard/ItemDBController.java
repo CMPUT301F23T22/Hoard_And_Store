@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import android.util.Log;
 
 /**
  * Controller for managing item database operations.
@@ -65,6 +66,9 @@ public class ItemDBController {
                         itemList.add(item);
                     }
                     callback.onDataLoaded(itemList);
+                } else {
+                    // Log an error if the task is unsuccessful
+                    Log.e("YourTag", "Error loading items", task.getException());
                 }
             });
         } else {

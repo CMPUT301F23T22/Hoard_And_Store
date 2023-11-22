@@ -250,6 +250,15 @@ public class ItemDB {
                 query = query.whereIn("make", makes);
             }
 
+            if (filterCriteria.getTags() != null && !filterCriteria.getTags().isEmpty()) {
+                List<Map<String, Object>> tags = filterCriteria.getTags();
+
+                // Query documents where at least one tag in the list is in the "Tags" array
+                query = query.whereArrayContainsAny("tags", tags);
+
+                Log.d("Firestore", "tags: " + tags);
+            }
+
             if (filterCriteria.getStartDate() != null && filterCriteria.getEndDate() != null) {
                 Timestamp startTimestamp = new Timestamp(filterCriteria.getStartDate());
                 Timestamp endTimestamp = new Timestamp(filterCriteria.getEndDate());
@@ -264,9 +273,12 @@ public class ItemDB {
 
             if (filterCriteria.getDescriptionKeyWords() != null && !filterCriteria.getDescriptionKeyWords().isEmpty()) {
                 List<String> descriptionKeyWords = filterCriteria.getDescriptionKeyWords();
-                query = query.whereArrayContainsAny("briefDescriptionList", descriptionKeyWords);
+                query = query.whereEqualTo("briefDescriptionList." + descriptionKeyWords.get(0), true);
+//                query = query.whereArrayContainsAny("briefDescriptionList", descriptionKeyWords);
                 Log.d("Firestore", "descriptionKeyWords: " + descriptionKeyWords);
             }
+
+
         }
         return query;
     }
@@ -283,23 +295,39 @@ public class ItemDB {
 
         Map<String, String> sortOptions = filterCriteria.getSortOptions();
         if (sortOptions != null) {
-            for (Map.Entry<String, String> entry : sortOptions.entrySet()) {
-                String sortField = entry.getKey();
-                String sortOrder = entry.getValue();
+            String sortBy = filterCriteria.getSortBy();
+            String sortOrder = filterCriteria.getSortOption();
 
-                // Sort the results based on the provided field and direction
-                filteredAndSortedResults.sort((doc1, doc2) -> {
-                    Object value1 = doc1.get(sortField);
-                    Object value2 = doc2.get(sortField);
+            // Sort the results based on the provided field and direction
+            filteredAndSortedResults.sort((doc1, doc2) -> {
+                Object value1 = doc1.get(sortBy);
+                Object value2 = doc2.get(sortBy);
 
-                    // Use the CustomComparator for comparison
-                    return new SortComparator().compare(value1, value2);
-                });
+                // Use the CustomComparator for comparison
+                return new SortComparator().compare(value1, value2);
+            });
 
-                if (sortOrder.equalsIgnoreCase("descending")) {
-                    Collections.reverse(filteredAndSortedResults);
-                }
+            if (sortOrder.equalsIgnoreCase("descending")) {
+                Collections.reverse(filteredAndSortedResults);
             }
+
+//            for (Map.Entry<String, String> entry : sortOptions.entrySet()) {
+//                String sortField = entry.getKey();
+//                String sortOrder = entry.getValue();
+//
+//                // Sort the results based on the provided field and direction
+//                filteredAndSortedResults.sort((doc1, doc2) -> {
+//                    Object value1 = doc1.get(sortField);
+//                    Object value2 = doc2.get(sortField);
+//
+//                    // Use the CustomComparator for comparison
+//                    return new SortComparator().compare(value1, value2);
+//                });
+//
+//                if (sortOrder.equalsIgnoreCase("descending")) {
+//                    Collections.reverse(filteredAndSortedResults);
+//                }
+//            }
         }
 
         return filteredAndSortedResults;

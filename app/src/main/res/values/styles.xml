@@ -29,4 +29,6 @@
         <item name="boxStrokeColor">@color/error_color</item>
         <item name="hintTextColor">@color/error_color</item>
     </style>
+
+
 </resources>

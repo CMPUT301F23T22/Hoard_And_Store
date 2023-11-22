@@ -9,5 +9,8 @@
     <color name="grey">#808080</color>
     <color name="purple">#6641A6</color>
     <color name="add_new_filter">#3E859F</color>
+    <color name="pressed_color">#D3D3D3</color>
+    <color name="selected_color">#D3D3D3</color>
+    <color name="focused_color">#D3D3D3</color>
     <color name="error_color">#FF0000</color>
 </resources>

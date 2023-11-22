@@ -71,6 +71,7 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
     private TagDBController tagDBController;
     private final int sortingRequestCode = 1;
     private TextView totalValueTextView;
+    private FilterCriteria filterCriteria;
 
 
     private final ActivityResultLauncher<Intent> addActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleAddResult);
@@ -84,7 +85,7 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
         setContentView(R.layout.activity_list_screen);
         totalValueTextView = findViewById(R.id.tvTotalValueAmount);
         tagSelectionLayout = findViewById(R.id.tagSelectionLayout);
-        FilterCriteria filterCriteria = FilterCriteria.getInstance();
+        filterCriteria = FilterCriteria.getInstance();
 
 //        itemDB = new ItemDB(new ItemDBConnector());
 
@@ -362,20 +363,12 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
         }
     };
 
-    //    protected void onResume() {
-//        super.onResume();
-//
-//        dbController.loadItems(new DataLoadCallbackItem() {
-//            @Override
-//            public void onDataLoaded(List<Item> items) {
-////                itemAdapter = new ItemAdapter(items, recyclerView);
-////                recyclerView.setAdapter(itemAdapter);
-//                itemAdapter.setSelectionModeCallback(ListScreen.this);
-//                itemAdapter.setSumCallback(ListScreen.this);
-//            }
-//        }, FilterCriteria.getInstance());
-//
-//    }
+        protected void onResume() {
+        super.onResume();
+
+       home.setChecked(true);
+
+    }
     @Override
     public void onSavedInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -408,7 +401,7 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
                     itemAdapter.notifyDataSetChanged();
 
                 }
-            }, FilterCriteria.getInstance());
+            }, filterCriteria);
         }
     }
 

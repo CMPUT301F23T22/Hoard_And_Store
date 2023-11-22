@@ -335,7 +335,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
         }
 
         void bind(boolean isSelected) {
-            itemView.setBackgroundColor(isSelected ? Color.LTGRAY : Color.WHITE);
+            itemView.setBackgroundColor(isSelected ? Color.LTGRAY : Color.TRANSPARENT);
         }
     }
 
