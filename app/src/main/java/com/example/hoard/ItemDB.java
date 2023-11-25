@@ -100,11 +100,8 @@ public class ItemDB {
      *         The task is successful when all deletions are successful, and it fails if any deletion fails.
      */
     public Task<Void> deleteItemByField(CollectionReference collectionReference, String fieldName, Object fieldValue) {
-        // Create a TaskCompletionSource that you can use to manually set the result of the Task
         TaskCompletionSource<Void> taskCompletionSource = new TaskCompletionSource<>();
-
-        TaskCompletionSource<Void> tcs = new TaskCompletionSource<>();
-
+    
         collectionReference.whereEqualTo(fieldName, fieldValue)
                 .get()
                 .addOnCompleteListener(task -> {
@@ -112,18 +109,17 @@ public class ItemDB {
                         List<Task<Void>> deletionTasks = new ArrayList<>();
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             String documentId = document.getId();
-                            collectionReference.document(documentId)
-                                    .delete()
-                                    .addOnSuccessListener(aVoid -> {
-                                        Log.d("Firestore", "DocumentSnapshot successfully deleted!");
-                                        tcs.setResult(null); // Successfully deleted
-                                    })
-                                    .addOnFailureListener(e -> {
-                                        Log.w("Firestore", "Error deleting document", e);
-                                        tcs.setException(e);
-                                    });
+                            Task<Void> deleteTask = collectionReference.document(documentId)
+                                    .delete();
+                            
+                            deleteTask.addOnSuccessListener(aVoid -> 
+                                Log.d("Firestore", "DocumentSnapshot successfully deleted!"))
+                                    .addOnFailureListener(e -> 
+                                Log.w("Firestore", "Error deleting document", e));
+    
+                            deletionTasks.add(deleteTask);
                         }
-                        // When all delete tasks are successful, set the TaskCompletionSource result to null
+    
                         Tasks.whenAll(deletionTasks)
                                 .addOnSuccessListener(aVoid -> taskCompletionSource.setResult(null))
                                 .addOnFailureListener(e -> taskCompletionSource.setException(e));
@@ -131,8 +127,7 @@ public class ItemDB {
                         taskCompletionSource.setException(task.getException());
                     }
                 });
-
-        // Return the Task from the TaskCompletionSource
+    
         return taskCompletionSource.getTask();
     }
 
