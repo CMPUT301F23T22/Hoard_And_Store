@@ -2,6 +2,8 @@ package com.example.hoard;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -9,6 +11,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -20,6 +24,7 @@ import com.google.firebase.firestore.SetOptions;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,13 +34,147 @@ import java.util.Map;
  */
 public class ItemDB {
     private final FirebaseFirestore db;
-    private final CollectionReference itemsCollection;
+    private CollectionReference itemsCollection;
+    private final CollectionReference userCollection;
+    private User loggedInUser = UserManager.getInstance().getLoggedInUser();
+    private static final String TAG = "ItemDB";
+    private FirebaseAuth mAuth;
 
+    public interface InitializationCallback {
+        void onInitializationComplete(CollectionReference itemsCollection);
+        void onInitializationFailure(Exception e);
+    }
     public ItemDB(ItemDBConnector dbConnector) {
         db = dbConnector.getDatabase();
-        itemsCollection = db.collection("items");
+        userCollection = db.collection("user");
+        mAuth = FirebaseAuth.getInstance();
+
+//        String uid = mAuth.getUid();
+//        setSubcollection(uid);
+
+//        // Assuming UserManager provides the currently logged-in user
+//        User loggedInUser = UserManager.getInstance().getLoggedInUser();
+//
+//        if (loggedInUser != null) {
+//            initializeUserCollection(loggedInUser.getUsername());
+//        } else {
+//
+//        }
+    }
+//    public Task<QuerySnapshot> login(final FirebaseUser user) {
+//        // Perform any actions needed for "login"
+//        // For example, perform a query and set a subcollection
+//
+//        // Example: Perform a query to get a document ID based on a field and value
+//        String uid = user.getUid();
+//        return getDocumentId("uid", uid)
+//                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+//                    @Override
+//                    public void onSuccess(QuerySnapshot querySnapshot) {
+//                        // Assuming there's only one document matching the query
+//                        if (!querySnapshot.isEmpty()) {
+//                            DocumentSnapshot document = querySnapshot.getDocuments().get(0);
+//                            String documentId = document.getId();
+//
+//                            // Set the subcollection for the user
+//                            setSubcollection(documentId);
+//                        } else {
+//                            // Handle the case where no matching document is found
+//                        }
+//                    }
+//                })
+//                .addOnFailureListener(new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//                        // Handle failure if needed
+//                    }
+//                });
+//    }
+
+
+    public Task<QuerySnapshot> getDocumentId(String field, String value) {
+        Query query = userCollection.whereEqualTo(field, value);
+
+        return query.get();
     }
 
+    // Method to set a subcollection for a specific user document ID
+    public Task<QuerySnapshot> setSubcollection() {
+        FirebaseUser user = mAuth.getCurrentUser();
+        String uid = user.getUid();
+        return getDocumentId("uid", uid)
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot querySnapshot) {
+                        // Assuming there's only one document matching the query
+                        if (!querySnapshot.isEmpty()) {
+                            DocumentSnapshot document = querySnapshot.getDocuments().get(0);
+                            String documentId = document.getId();
+
+                            // Set the subcollection for the user
+                            itemsCollection = userCollection.document(documentId).collection("items");
+                        } else {
+                            // Handle the case where no matching document is found
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // Handle failure if needed
+                    }
+                });
+        // Perform any additional actions if needed
+    }
+
+
+
+
+//    private void initializeUserCollection(String username, ItemDBController.OnInitializationCompleteListener listener) {
+//        User loggedInUser = UserManager.getInstance().getLoggedInUser();
+//        getDocumentIdByUsername(username)
+//                .addOnSuccessListener(documentId -> {
+//                    // Use the documentId to initialize itemsCollection
+//                    loggedInUser.setDocId(documentId);
+//                    itemsCollection = userCollection.document(documentId).collection("items");
+//                    Log.d("User document ID: ", documentId);
+//
+//                    // Notify the listener that initialization is complete
+//                    listener.onInitializationComplete();
+//                })
+//                .addOnFailureListener(e -> {
+//                    // Handle failure
+//                    Log.e("ItemDB", "Failed to initialize itemsCollection", e);
+//                });
+//    }
+
+//    private Task<String> getDocumentIdByUsername(String username) {
+//        // Query to find the user with the given username
+//        Query query = userCollection.whereEqualTo("username", username);
+//
+//        // Return the result of the query
+//        return query.get().continueWith(new Continuation<QuerySnapshot, String>() {
+//            @Override
+//            public String then(@NonNull Task<QuerySnapshot> task) throws Exception {
+//                if (task.isSuccessful()) {
+//                    QuerySnapshot querySnapshot = task.getResult();
+//                    if (querySnapshot != null && !querySnapshot.isEmpty()) {
+//                        // Get the first document in the result set
+//                        DocumentSnapshot document = querySnapshot.getDocuments().get(0);
+//
+//                        // Return the document ID
+//                        return document.getId();
+//                    } else {
+//                        // No matching documents found
+//                        return null;
+//                    }
+//                } else {
+//                    // Handle the error
+//                    throw task.getException();
+//                }
+//            }
+//        });
+//    }
     /**
      * add a given item
      *
@@ -43,12 +182,17 @@ public class ItemDB {
      * @param onCompleteListener listener to verify
      * @return task
      */
-    public Task<Void> addItem(Item item, OnCompleteListener<Void> onCompleteListener) {
-        // Create a new document with a generated ID in the "items" collection
-        DocumentReference newItemRef = itemsCollection.document();
-        // Set the data for the new document based on the item object
-        newItemRef.set(item).addOnCompleteListener(onCompleteListener);
-        return newItemRef.set(item);
+//    public Task<Void> addItem(Item item, OnCompleteListener<Void> onCompleteListener) {
+//        // Create a new document with a generated ID in the "items" collection
+//        DocumentReference newItemRef = itemsCollection.document();
+//        // Set the data for the new document based on the item object
+//        newItemRef.set(item).addOnCompleteListener(onCompleteListener);
+//        return newItemRef.set(item);
+//    }
+
+    public Task<DocumentReference> addItem(Item item, OnCompleteListener<DocumentReference> onCompleteListener) {
+
+        return itemsCollection.add(item).addOnCompleteListener(onCompleteListener);
     }
 
     /**
@@ -169,29 +313,42 @@ public class ItemDB {
         return allTasks;
     }
 
-    /**
-     * Edit a given item
-     *
-     * @param item items to be edited
-     * @return task
-     */
-    public Task<Void> editItem(Item item) {
-        return itemsCollection.document(item.getSerialNumber())
-                .set(item) // Overwrites the document with the new data
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("Firestore", "DocumentSnapshot successfully updated!");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(Exception e) {
-                        Log.w("Firestore", "Error updating document", e);
-                    }
-                });
+    public interface OnItemCollectionInitialized {
+        void onItemCollectionInitialized();
     }
 
+    public void initializeItemCollection(final OnItemCollectionInitialized callback) {
+        FirebaseUser user = mAuth.getCurrentUser();
+        Query query = userCollection.whereEqualTo("uid", user.getUid());
+
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    QuerySnapshot querySnapshot = task.getResult();
+                    if (querySnapshot != null && !querySnapshot.isEmpty()) {
+                        // Get the first document
+                        DocumentSnapshot document = querySnapshot.getDocuments().get(0);
+
+                        // Access the document data
+                        String documentId = document.getId();
+
+                        // Assuming you have a subcollection named "items"
+                        itemsCollection = userCollection.document(documentId).collection("items");
+
+                        // Notify the callback that item collection is initialized
+                        callback.onItemCollectionInitialized();
+                    } else {
+                        // No documents found
+                        Log.d(TAG, "No documents found with the specified UID.");
+                    }
+                } else {
+                    // Handle errors
+                    Log.w(TAG, "Error getting documents: ", task.getException());
+                }
+            }
+        });
+    }
 
     /**
      * returns all the items in the database
@@ -215,7 +372,12 @@ public class ItemDB {
      * @param filterCriteria the filtercriteria to sort/filter
      * @return Task of list of document snapshots
      */
-    public Task<List<DocumentSnapshot>> filter(FilterCriteria filterCriteria) {
+    public Task<List<DocumentSnapshot>> getItems(FilterCriteria filterCriteria) {
+        // find the current logged in user and set itemsCollection approrietly
+//        if(itemsCollection == null){
+//            inializeItemCollection();
+//        }
+
         Query query = constructDynamicQuery(filterCriteria);
 
         return query.get().continueWith(task -> {
@@ -239,7 +401,8 @@ public class ItemDB {
      * @return A Query object that represents the constructed Firestore query based on the provided criteria.
      */
     private Query constructDynamicQuery(FilterCriteria filterCriteria) {
-        Query query = itemsCollection; // Start with the base query
+//        Query query = userCollection.document(userId).collection("items");; // Start with the base query
+        Query query = itemsCollection;
 
         if (filterCriteria != null) {
             if (filterCriteria.getMakes() != null && !filterCriteria.getMakes().isEmpty()) {
@@ -333,4 +496,47 @@ public class ItemDB {
         return filteredAndSortedResults;
     }
 
+    public Task<String> addUser(FirebaseUser firebaseUser, String email, String userName) {
+        // Extract uid from the FirebaseUser
+        String uid = firebaseUser.getUid();
+
+        // Create a new object with only the uid
+        Map<String, Object> userMap = new HashMap<>();
+        userMap.put("uid", uid);
+        userMap.put("email", email);
+        userMap.put("userName", userName);
+
+        // Add the user to userCollection and get the generated document reference
+        return userCollection.add(userMap)
+                .continueWithTask(addUserTask -> {
+                    if (addUserTask.isSuccessful()) {
+                        // User added successfully, return the generated document ID
+                        return Tasks.forResult(addUserTask.getResult().getId());
+                    } else {
+                        // Handle failure during user addition
+                        Exception exception = addUserTask.getException();
+                        // You can handle the exception here
+                        throw new RuntimeException("Error adding user", exception);
+                    }
+                });
+    }
+
+    public void deleteAccount(){
+        FirebaseUser user = mAuth.getCurrentUser();
+        user.delete()
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "User account deleted.");
+                        }
+                    }
+                });
+
+
+    }
+
+    public void signOut(){
+        mAuth.signOut();
+    }
 }

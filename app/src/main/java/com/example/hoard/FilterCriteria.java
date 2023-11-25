@@ -20,10 +20,9 @@ public class FilterCriteria implements Serializable {
     private Map<String, String> sortOptions;
     private String sortOption;
     private String sortBy;
-    private List<Map<String, Object>> tagMaps;
-
 
     private static FilterCriteria instance;
+    private List<Tag> tagList;
 
     private FilterCriteria() {
         // Initialize the fields as needed
@@ -88,13 +87,19 @@ public class FilterCriteria implements Serializable {
     public List<Map<String, Object>> getTags() {
         return tags;
     }
-
+    public List<Tag> getTagList() {
+        return tagList;
+    }
     /**
      * Sets the tags to FilterCriteria for filtering.
      *
      * @param newTags The list of tags to be set.
      */
     public void setTags(List<Tag> newTags) {
+        if(tagList != null){
+            tagList = newTags;
+        }
+        tagList = new ArrayList<Tag>();
         // Clear the existing list
         tags = new ArrayList<>();
 

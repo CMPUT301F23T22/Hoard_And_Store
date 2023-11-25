@@ -5,14 +5,20 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 /**
  * Controller for managing item database operations.
@@ -25,10 +31,15 @@ import android.util.Log;
 public class ItemDBController {
     private static ItemDBController instance;
     private final ItemDB itemDB;
+    private boolean isItemDBInitialized = false;
 
-    private ItemDBController() {
-        itemDB = new ItemDB(new ItemDBConnector());
+    private User loggedInUser = UserManager.getInstance().getLoggedInUser();
+
+    public interface OnInitializationCompleteListener {
+        void onInitializationComplete();
     }
+
+    private ItemDBController() {itemDB = new ItemDB(new ItemDBConnector()); }
 
     /**
      * Singleton for ItemDBController to have an ensured instance
@@ -49,6 +60,33 @@ public class ItemDBController {
     }
 
     /**
+     * Will call the login in method in itemDB which creates and inialzies the user firebase collection
+     * will an items subcollection
+     * @param user
+     * @param OnLoginCompleteListener
+     */
+    public void login(final OnAccountActionComplete callback) {
+        itemDB.initializeItemCollection(new ItemDB.OnItemCollectionInitialized() {
+            @Override
+            public void onItemCollectionInitialized() {
+                // Notify the callback that login is complete
+                callback.OnAccountActionComplete();
+            }
+        });
+    }
+
+    public interface OnAccountActionComplete {
+        void OnAccountActionComplete();
+    }
+
+    public void deleteAccount(){
+        itemDB.deleteAccount();
+    }
+    public void signOut(){
+        itemDB.deleteAccount();
+    }
+
+    /**
      * loads all items from db with filtering and sorting applied
      *
      * @param callback       callback to detect when the query finished
@@ -56,8 +94,9 @@ public class ItemDBController {
      * @return task
      */
     public void loadItems(final DataLoadCallbackItem callback, final FilterCriteria filterCriteria) {
+
         if (filterCriteria != null) {
-            itemDB.filter(filterCriteria).addOnCompleteListener(task -> {
+            itemDB.getItems(filterCriteria).addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     List<DocumentSnapshot> items = task.getResult();
                     List<Item> itemList = new ArrayList<>();
@@ -68,7 +107,7 @@ public class ItemDBController {
                     callback.onDataLoaded(itemList);
                 } else {
                     // Log an error if the task is unsuccessful
-                    Log.e("YourTag", "Error loading items", task.getException());
+                    Log.e("ItemDB", "Error loading items", task.getException());
                 }
             });
         } else {
@@ -146,21 +185,22 @@ public class ItemDBController {
 //        });
     }
 
-    public void addItem(Item item, OnCompleteListener<Void> onCompleteListener) {
+
+
+    public void addItem(Item item, OnCompleteListener<DocumentReference> onCompleteListener) {
         itemDB.addItem(item, onCompleteListener);
     }
 
-    public void deleteItem(Item item) {
-        itemDB.deleteItem(item);
+
+    public void addUser(FirebaseUser user, String email, String userName) {
+        itemDB.addUser(user, email, userName);
     }
+
 
     public Task<Void> bulkDeleteItems(List<Item> items) {
         return itemDB.bulkDeleteItems(items);
     }
 
-    public void editItem(Item item) {
-        itemDB.editItem(item);
-    }
 
     public void deleteItem(Item item, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
         itemDB.deleteItem(item)
@@ -172,4 +212,7 @@ public class ItemDBController {
         itemDB.editItem(itemID, item)
                 .addOnCompleteListener(onCompleteListener);
     }
+
+
+
 }

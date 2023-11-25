@@ -516,6 +516,10 @@ public class SortActivity extends AppCompatActivity implements CustomDatePicker.
                 String joinedKeywords = String.join(" ", descriptionKeywordsList);
                 BriefDescriptionKeywordEditText.setText(joinedKeywords);
             }
+
+            if(filterCriteria.getTagList() != null){
+
+            }
         } catch (NullPointerException e) {
             // Handle the exception as needed, e.g., log an error, show a message to the user, etc.
             e.printStackTrace(); // or log.error("Error setting filter options", e);

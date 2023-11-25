@@ -48,6 +48,19 @@
         android:enabled="false"
         app:showAsAction="ifRoom"/>
 
+    <item
+        android:id="@+id/profile"
+        android:icon="@drawable/profile_24px"
+        app:showAsAction="ifRoom|withText"
+        android:title="profile">
 
-
+        <menu>
+            <item
+                android:id="@+id/sign_out"
+                android:title="Sign Out" />
+            <item
+                android:id="@+id/delete_account"
+                android:title="Delete Account" />
+        </menu>
+    </item>
 </menu>
