@@ -42,6 +42,7 @@ import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +65,7 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
     private ItemDBController dbController;
     private MenuItem sort;
     private MenuItem home;
+    private FirebaseAuth mAuth;
     private final ActivityResultLauncher<Intent> addTagResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleAddTagResult);
 
     private final Item itemToDelete = null;
@@ -91,13 +93,15 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
         totalValueTextView = findViewById(R.id.tvTotalValueAmount);
         tagSelectionLayout = findViewById(R.id.tagSelectionLayout);
         filterCriteria = FilterCriteria.getInstance();
+        mAuth = FirebaseAuth.getInstance();
 
 //        itemDB = new ItemDB(new ItemDBConnector());
 
         addItemButton = findViewById(R.id.addItemButton);
         topBar = findViewById(R.id.topAppBar);
         Menu topBarMenu = topBar.getMenu();
-
+        topBar.setTitle(mAuth.getCurrentUser().getDisplayName());
+        topBar.setTitle(mAuth.getCurrentUser().getDisplayName());
         search = topBarMenu.findItem(R.id.search);
         bulkDelete = topBarMenu.findItem(R.id.bulk_delete);
         bulkTag = topBarMenu.findItem(R.id.bulk_tag);
@@ -454,7 +458,7 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
             addItemButton = findViewById(R.id.addItemButton);
             addItemButton.setVisibility(View.VISIBLE);
 
-            topBar.setTitle("Items");
+            topBar.setTitle(mAuth.getCurrentUser().getDisplayName());
         }
     }
 
@@ -512,7 +516,6 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
     public void onSumChanged(double sum) {
         // Update the total value TextView
         totalValueTextView.setText(String.format(Locale.getDefault(), "%.2f", sum));
-
     }
 
     private interface DialogInterfaceCallback {

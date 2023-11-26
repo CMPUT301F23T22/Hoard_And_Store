@@ -4,6 +4,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -39,6 +40,45 @@ public class ItemDB {
     private User loggedInUser = UserManager.getInstance().getLoggedInUser();
     private static final String TAG = "ItemDB";
     private FirebaseAuth mAuth;
+    private String documentId;
+
+    public Task<String> getUsername() {
+        if (userCollection != null) {
+            return userCollection.document(documentId).get().continueWith(new Continuation<DocumentSnapshot, String>() {
+                @Override
+                public String then(@NonNull Task<DocumentSnapshot> task) throws Exception {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            // Assuming "username" is a field in your Firestore document
+                            String username = document.getString("userName");
+                            if (username != null) {
+                                // Return the username
+                                return username;
+                            } else {
+                                // Handle the case where "username" is not present in the document
+                                return "Username not found in the document";
+                            }
+                        } else {
+                            // Handle the case where the document does not exist
+                            return "Document does not exist";
+                        }
+                    } else {
+                        // Handle the exception
+                        Exception exception = task.getException();
+                        if (exception != null) {
+                            exception.printStackTrace();
+                        }
+                        return "Error fetching username";
+                    }
+                }
+            });
+        } else {
+            // Handle the case where itemsCollection is null
+            return Tasks.forException(new NullPointerException("itemsCollection is null"));
+        }
+    }
+
 
     public interface InitializationCallback {
         void onInitializationComplete(CollectionReference itemsCollection);
@@ -331,7 +371,7 @@ public class ItemDB {
                         DocumentSnapshot document = querySnapshot.getDocuments().get(0);
 
                         // Access the document data
-                        String documentId = document.getId();
+                        documentId = document.getId();
 
                         // Assuming you have a subcollection named "items"
                         itemsCollection = userCollection.document(documentId).collection("items");
@@ -532,11 +572,13 @@ public class ItemDB {
                         }
                     }
                 });
-
-
     }
 
     public void signOut(){
         mAuth.signOut();
+    }
+
+    public Task createAccount(String email, String password, String userName) {
+        return mAuth.createUserWithEmailAndPassword(email, password);
     }
 }

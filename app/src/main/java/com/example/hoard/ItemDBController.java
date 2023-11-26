@@ -8,7 +8,6 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,8 +16,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import android.util.Log;
-
-import androidx.annotation.NonNull;
 
 /**
  * Controller for managing item database operations.
@@ -73,6 +70,10 @@ public class ItemDBController {
                 callback.OnAccountActionComplete();
             }
         });
+    }
+
+    public Task<String> getUsername(){
+        return itemDB.getUsername();
     }
 
     public interface OnAccountActionComplete {

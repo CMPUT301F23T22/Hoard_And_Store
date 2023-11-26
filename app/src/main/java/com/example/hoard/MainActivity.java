@@ -28,6 +28,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -98,7 +99,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String password = passwordText.getText().toString();
                 String email = emailText.getText().toString();
-                signIn(email, password);
+                String username = usernameText.getText().toString();
+                signIn(email, password, username);
 
 //                //if the username is empty raise highlight edit text as red
 //
@@ -125,22 +127,6 @@ public class MainActivity extends AppCompatActivity {
                 String email = emailText.getText().toString();
                 String username = usernameText.getText().toString();
                 createAccount(email, password, username);
-
-//                //if the username is empty raise highlight edit text as red
-//
-//                //else check if username exists
-//                User usr = new User(username.getText().toString().toLowerCase());
-//
-//                dbController = ItemDBController.getInstance();
-//                dbController.login(
-//                        usr,
-//                        aVoid -> {
-//                            // Success logic: Launch the activity
-//                            Intent intent = new Intent(MainActivity.this, ListScreen.class);
-//                            startActivity(intent);
-//                        }
-//                );
-
             }
         });
 
@@ -195,9 +181,8 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 });
-
     }
-    private void signIn(String email, String password){
+    private void signIn(String email, String password, String username){
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -210,8 +195,37 @@ public class MainActivity extends AppCompatActivity {
                                 @Override
                                 public void OnAccountActionComplete() {
                                     // This will be executed only after dbController.login() completes
-                                    // and calls the onLoginComplete() callback.
-                                    homePage();
+                                    // and calls the OnAccountActionComplete() callback.
+                                    dbController.getUsername().addOnCompleteListener(new OnCompleteListener<String>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<String> task) {
+                                            if (task.isSuccessful()) {
+                                                String username = task.getResult();
+                                                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+                                                UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                                        .setDisplayName(username)
+                                                        .build();
+
+                                                user.updateProfile(profileUpdates)
+                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<Void> task) {
+                                                                if (task.isSuccessful()) {
+                                                                    homePage();
+                                                                    Log.d(TAG, "User profile updated.");
+                                                                }
+                                                            }
+                                                        });
+                                            } else {
+                                                // Handle the exception
+                                                Exception exception = task.getException();
+                                                if (exception != null) {
+                                                    exception.printStackTrace();
+                                                }
+                                            }
+                                        }
+                                    });
                                 }
                             });
 
@@ -225,29 +239,4 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
     }
-//    private void signIn() {
-//        Intent signInIntent = gsc.getSignInIntent();
-//        startActivityForResult(signInIntent, 1000);
-//    }
-//
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//
-//        if(requestCode == 1000){
-//            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-//
-//            try {
-//                task.getResult(ApiException.class);
-//                navigateToItems();
-//            } catch (ApiException e) {
-//                Toast.makeText(getApplicationContext(), "Sign In UnSucessfull", Toast.LENGTH_SHORT).show();
-//            }
-//        }
-//    }
-//
-//    private void navigateToItems() {
-//        Intent loggedInSuccess = new Intent(MainActivity.this, ListScreen.class);
-//        startActivity(loggedInSuccess);
-//    }
 }
