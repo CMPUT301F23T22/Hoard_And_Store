@@ -404,7 +404,13 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
             if (returnedItem != null) {
                 itemAdapter.addItem(returnedItem);
                 itemAdapter.notifyDataSetChanged(); // Refresh the RecyclerView
-                updateTotalValue();
+                dbController.loadItems(new DataLoadCallbackItem() {
+                    @Override
+                    public void onDataLoaded(List<Item> items) {
+                        itemAdapter = new ItemAdapter(items, recyclerView);
+                        recyclerView.setAdapter(itemAdapter);
+                    }
+                }, filterCriteria);
             }
         }
     }

@@ -561,8 +561,13 @@ public class ItemDB {
                 });
     }
 
+    public void removeFromUser(String field, String value){
+
+    }
+
     public void deleteAccount(){
         FirebaseUser user = mAuth.getCurrentUser();
+        String uid = user.getUid();
         user.delete()
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
