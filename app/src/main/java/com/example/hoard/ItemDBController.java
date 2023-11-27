@@ -84,7 +84,7 @@ public class ItemDBController {
         itemDB.deleteAccount();
     }
     public void signOut(){
-        itemDB.deleteAccount();
+        itemDB.signOut();
     }
 
     /**

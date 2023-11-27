@@ -79,6 +79,7 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
     private final int sortingRequestCode = 1;
     private TextView totalValueTextView;
     private FilterCriteria filterCriteria;
+    private MenuItem profile;
 
 
     private final ActivityResultLauncher<Intent> addActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleAddResult);
@@ -107,6 +108,7 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
         bulkTag = topBarMenu.findItem(R.id.bulk_tag);
         closeBulkDelete = topBarMenu.findItem(R.id.close_bulk_select);
         tvTotalValue = findViewById(R.id.tvTotalValueAmount);
+        profile = topBarMenu.findItem(R.id.profile);
 
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
 
@@ -426,6 +428,9 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
         if (selectionMode) {
             search.setEnabled(false);
             search.setVisible(false);
+
+            profile.setEnabled(false);
+            profile.setVisible(false);
 
             bulkDelete.setEnabled(true);
             bulkDelete.setVisible(true);
