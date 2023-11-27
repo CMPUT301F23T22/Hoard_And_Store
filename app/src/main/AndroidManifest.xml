@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" tools:replace="android:maxSdkVersion" />
+    <uses-feature android:name="android.hardware.camera" android:required="true"/>
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -24,6 +28,8 @@
         <activity android:name=".SortActivity"
             android:exported="false"/>
         <activity android:name=".TagAddEdit"
+            android:exported="false"/>
+        <activity android:name=".AddImage"
             android:exported="false"/>
         <activity
             android:name=".MainActivity"

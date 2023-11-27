@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -46,6 +47,12 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
     private ItemDBController itemDBController;
 
     private final ActivityResultLauncher<Intent> addTagResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleAddTagResult);
+
+    // ActivityResultLauncher for adding images
+    private final ActivityResultLauncher<Intent> addImageResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            this::handleAddImageResult
+    );
 
     private ArrayList<Tag> selectedTagList;
 
@@ -131,6 +138,15 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
             // Start the new activity.
             addTagResultLauncher.launch(tagIntent);
         });
+
+        Button addImageBtn = findViewById(R.id.AddImageButton);
+        addImageBtn.setOnClickListener(view -> {
+            // Create an intent that will start the TagAddEditActivity.
+            Intent tagIntent = new Intent(this, AddImage.class);
+            // Start the new activity.
+            addImageResultLauncher.launch(tagIntent);
+        });
+
     }
 
     /**
@@ -455,6 +471,11 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
                 // Add the chip to the ChipGroup
                 chipGroupTags.addView(chip);
             }
+        }
+    }
+
+    private void handleAddImageResult(ActivityResult result) {
+        if (result.getResultCode() == RESULT_OK && result.getData() != null) {
         }
     }
 }
