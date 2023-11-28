@@ -214,6 +214,10 @@ public class ItemDBController {
                 .addOnCompleteListener(onCompleteListener);
     }
 
+    public Task<Void> updateUser(String password){
+        return itemDB.updateUser(password);
+    }
+
 
 
 }

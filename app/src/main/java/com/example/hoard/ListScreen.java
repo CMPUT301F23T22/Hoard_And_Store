@@ -145,7 +145,9 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
                 int id = item.getItemId();
                 if (id == R.id.search) {
                     // Implement search functionality
-                } else if (id == R.id.profile){
+                } else if (id == R.id.edit_profile){
+                    Intent intent = new Intent(ListScreen.this, EditProfileActivity.class);
+                    startActivity(intent);
 
                 } else if (id == R.id.sign_out) {
                     showConfirmDialog("Confirm Sign out", "Please Come back Soon!",
@@ -451,6 +453,9 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
         } else {
 //            search.setEnabled(true);
 //            search.setVisible(true);
+
+            profile.setEnabled(true);
+            profile.setVisible(true);
 
             bulkDelete.setEnabled(false);
             bulkDelete.setVisible(false);

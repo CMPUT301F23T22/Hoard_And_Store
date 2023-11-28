@@ -573,6 +573,21 @@ public class ItemDB {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
+                            userCollection.document(documentId)
+                                .delete()
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Log.d(TAG, "DocumentSnapshot successfully deleted!");
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.w(TAG, "Error deleting document", e);
+                                        }
+                                    });
+
                             Log.d(TAG, "User account deleted.");
                         }
                     }
@@ -585,5 +600,10 @@ public class ItemDB {
 
     public Task createAccount(String email, String password, String userName) {
         return mAuth.createUserWithEmailAndPassword(email, password);
+    }
+    public Task<Void> updateUser(String password){
+        FirebaseUser user = mAuth.getCurrentUser();
+        return user.updatePassword(password);
+
     }
 }

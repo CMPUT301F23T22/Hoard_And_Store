@@ -56,6 +56,9 @@
 
         <menu>
             <item
+                android:id="@+id/edit_profile"
+                android:title="Edit Profile" />
+            <item
                 android:id="@+id/sign_out"
                 android:title="Sign Out" />
             <item
