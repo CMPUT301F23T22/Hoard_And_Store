@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -34,29 +33,25 @@ import java.util.Locale;
 /**
  * An activity for adding or editing items, extending AppCompatActivity and implementing
  * CustomDatePicker.DatePickListener for handling date selections.
- *
  */
 public class AddEditItem extends AppCompatActivity implements CustomDatePicker.DatePickListener {
 
-    private EditText descriptionInput, makeInput, modelInput, serialNumberInput, valueInput, commentInput, dateInput;
     private final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-
-    private TextView addEditHeader;
-    private Item currentItem; // Item to edit
-    private boolean isEdit; // To identify whether it's an edit operation
-    private ItemDBController itemDBController;
-
-    private final ActivityResultLauncher<Intent> addTagResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleAddTagResult);
-
     // ActivityResultLauncher for adding images
     private final ActivityResultLauncher<Intent> addImageResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             this::handleAddImageResult
     );
-
-    private ArrayList<Tag> selectedTagList;
-
     ChipGroup chipGroupTags;
+    private final ActivityResultLauncher<Intent> addTagResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            this::handleAddTagResult);
+    private EditText descriptionInput, makeInput, modelInput, serialNumberInput, valueInput, commentInput, dateInput;
+    private TextView addEditHeader;
+    private Item currentItem; // Item to edit
+    private boolean isEdit; // To identify whether it's an edit operation
+    private ItemDBController itemDBController;
+    private ArrayList<Tag> selectedTagList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -313,7 +308,7 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
      * @param value The value to check.
      * @return True if the value is a valid number, false otherwise.
      */
-    private  boolean isValidValue(String value) {
+    private boolean isValidValue(String value) {
         try {
             double parsedValue = Double.parseDouble(value);
             return parsedValue >= 0;
