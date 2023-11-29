@@ -617,7 +617,7 @@ public class ItemDB {
         return updateUsernameTask;
     }
 
-    public Task<Void> updateUserPassword(String currentPassword, String newPassword) {
+    public Task<Void> updateUserPassword(String currentPassword, String newPassword, String email) {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user == null) {
             // Handle the case where the user is not authenticated
@@ -626,7 +626,6 @@ public class ItemDB {
         }
 
         // Reauthenticate the user with their current email and password
-        String email = user.getEmail();
         AuthCredential credential = EmailAuthProvider.getCredential(email, currentPassword);
 
         return user.reauthenticate(credential)

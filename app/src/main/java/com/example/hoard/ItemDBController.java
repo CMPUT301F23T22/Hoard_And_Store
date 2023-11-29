@@ -220,7 +220,12 @@ public class ItemDBController {
 //    }
 
     public Task<Void> updateUserName(String username){
+
         return itemDB.updateUserName(username);
+    }
+
+    public Task<Void> updateUserPassword (String currentPassword, String newPassword, String email){
+        return itemDB.updateUserPassword(currentPassword, newPassword, email);
     }
 
     public Task<Void> updateUser(String currentPassword, String newPassword, String username, String email) {
@@ -231,7 +236,7 @@ public class ItemDBController {
 
         // Check if password is not empty before updating
         if (!newPassword.isEmpty()) {
-            updatePasswordTask = itemDB.updateUserPassword(currentPassword, newPassword);
+            updatePasswordTask = itemDB.updateUserPassword(currentPassword, newPassword, email);
         }
 
         // Check if username is not empty before updating
