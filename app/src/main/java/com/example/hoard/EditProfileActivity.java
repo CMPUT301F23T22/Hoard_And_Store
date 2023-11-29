@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -80,109 +81,44 @@ public class EditProfileActivity extends AppCompatActivity {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                validateUsernameUpdate();
-                validateCurrentPassword();
+                validateUpdate();
             }
         });
     }
 
-
-//    private void saveProfileChanges() {
-//        // Get user input
-//        String newUsername = usernameEditText.getText().toString();
-//        String newPassword = passwordEditText.getText().toString();
-//        String newEmail = emailEditText.getText().toString();
-//
-//        // Implement your logic to save the changes to the user profile
-//        // For simplicity, let's just print the changes for now
-//        System.out.println("New Username: " + newUsername);
-//        System.out.println("New Password: " + newPassword);
-//        System.out.println("New Email: " + newEmail);
-//
-//        // You can also save the changes to your backend server or local storage
-//        // Add your logic here based on your application's requirements
-//    }
-
-    private void validateUsernameUpdate(){
-        String username = usernameEditText.getText().toString();
-        if (!username.isEmpty()){
-            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                    .setDisplayName(username)
-                    .build();
-
-            user.updateProfile(profileUpdates)
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                Log.d(TAG, "User profile updated.");
-                            } else {
-                                Toast.makeText(EditProfileActivity.this, "User Name Updated Failed",
-                                        Toast.LENGTH_SHORT).show();
-                                Exception exception = task.getException();
-                                handleUserNameError(exception);
-                            }
-                        }
-                    });
-
-        }
-
-    }
-
-    private void validateCurrentPassword() {
+    private void validateUpdate(){
         String username = usernameEditText.getText().toString();
         String currentPassword = currentPasswordEditText.getText().toString();
         String newPassword = newPasswordEditText.getText().toString();
         String confirmPassword = confirmPasswordEditText.getText().toString();
+        String email = emailEditText.getText().toString();
 
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        final String email = user.getEmail();
-        AuthCredential credential = EmailAuthProvider.getCredential(email, currentPassword);
-
-
-        user.reauthenticate(credential).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()) {
-                    if (!(newPassword.equals(confirmPassword))) {
-                        try {
-                            passwordUpdated = false;
-                            throw new Exception("Password does not match");
-                        } catch (Exception e) {
-                            handlePasswordError(e);
-                        }
+        //check if passwords match
+        if (!(newPassword.equals(confirmPassword)) | newPassword.length() <= 6) {
+            try {
+                passwordUpdated = false;
+                throw new Exception("Password does not match");
+            } catch (Exception e) {
+                handlePasswordError(e);
+            }
+        } else {
+            dbController.updateUser(currentPassword, newPassword, username,email).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()){
+                        Intent intent = new Intent(EditProfileActivity.this, ListScreen.class);
+                        startActivity(intent);
                     } else {
-                        passwordUpdated = true;
-                    }
-
-                        if (passwordUpdated) {
-                            dbController.updateUser(newPassword).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        passwordUpdated = true;
-                                        Intent intent = new Intent(EditProfileActivity.this, ListScreen.class);
-                                        startActivity(intent);
-                                    } else {
-                                        // Handle the exception
-                                        Exception exception = task.getException();
-                                        handlePasswordError(exception);
-                                    }
-                                }
-                            });
-                        }
-
-                    } else {
-                        Toast.makeText(EditProfileActivity.this, "Reauthentication failed",
-                            Toast.LENGTH_SHORT).show();
                         Exception exception = task.getException();
                         handlePasswordError(exception);
-
                     }
-
                 }
-        });
+            });
+        }
+
     }
+
+
     private void handleUserNameError(Exception exception){
         Toast.makeText(EditProfileActivity.this, "Username change unsuccesfull",
                 Toast.LENGTH_SHORT).show();
@@ -196,16 +132,16 @@ public class EditProfileActivity extends AppCompatActivity {
             // The user with the provided email does not exist
             Toast.makeText(EditProfileActivity.this, "Current Password is Incorrect",
                     Toast.LENGTH_SHORT).show();
-            currentPasswordInputLayout.setError("Password does not match current");
+            currentPasswordInputLayout.setError("Password is Incorrect");
             currentPasswordInputLayout.setErrorEnabled(true);
             currentPasswordInputLayout.setBoxStrokeColor(Color.RED);
 
         } else {
-            newPasswordInputLayout.setError("Passwords do not match");
+            newPasswordInputLayout.setError("Make sure password matches and is greater than 6 characters");
             newPasswordInputLayout.setErrorEnabled(true);
             newPasswordInputLayout.setBoxStrokeColor(Color.RED);
 
-            confirmPasswordInputLayout.setError("Passwords do not match");
+            confirmPasswordInputLayout.setError("Make sure password matches and is greater than 6 characters");
             confirmPasswordInputLayout.setErrorEnabled(true);
             confirmPasswordInputLayout.setBoxStrokeColor(Color.RED);
 

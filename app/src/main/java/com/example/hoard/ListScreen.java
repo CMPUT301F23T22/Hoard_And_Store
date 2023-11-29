@@ -358,6 +358,7 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
     @Override
     public void onSavedInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        topBar.setTitle(mAuth.getCurrentUser().getDisplayName());
         outState.putBoolean("selectionMode", itemAdapter.getSelectionMode());
         ArrayList<String> itemIDs = new ArrayList<>();
         for (Item item : itemAdapter.getItemList()) {

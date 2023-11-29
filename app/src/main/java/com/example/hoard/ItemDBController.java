@@ -4,6 +4,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -214,10 +215,53 @@ public class ItemDBController {
                 .addOnCompleteListener(onCompleteListener);
     }
 
-    public Task<Void> updateUser(String password){
-        return itemDB.updateUser(password);
+//    public Task<Void> updateUserPassword(String password){
+//        return itemDB.updateUserPassword(password);
+//    }
+
+    public Task<Void> updateUserName(String username){
+        return itemDB.updateUserName(username);
     }
 
+    public Task<Void> updateUser(String currentPassword, String newPassword, String username, String email) {
+        // Initialize tasks with null values
+        Task<Void> updatePasswordTask = null;
+        Task<Void> updateUsernameTask = null;
+        Task<Void> updateEmailTask = null;
 
+        // Check if password is not empty before updating
+        if (!newPassword.isEmpty()) {
+            updatePasswordTask = itemDB.updateUserPassword(currentPassword, newPassword);
+        }
 
+        // Check if username is not empty before updating
+        if (!username.isEmpty()) {
+            updateUsernameTask = itemDB.updateUserName(username);
+        }
+
+        if (!email.isEmpty()) {
+            updateEmailTask = itemDB.updateUserEmail(email, currentPassword);
+        }
+
+        // Check for null tasks and combine them using Tasks.whenAll
+        List<Task<Void>> tasks = new ArrayList<>();
+        if (updatePasswordTask != null) {
+            tasks.add(updatePasswordTask);
+        }
+        if (updateUsernameTask != null) {
+            tasks.add(updateUsernameTask);
+        }
+
+        if (updateEmailTask != null) {
+            tasks.add(updateEmailTask);
+        }
+
+        if (tasks.isEmpty()) {
+            // No tasks to execute, return a completed task
+            return Tasks.forResult(null);
+        }
+
+        return Tasks.whenAll(tasks)
+                .continueWith(task -> null);
+    }
 }

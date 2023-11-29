@@ -12,8 +12,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.Timestamp;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -601,9 +604,97 @@ public class ItemDB {
     public Task createAccount(String email, String password, String userName) {
         return mAuth.createUserWithEmailAndPassword(email, password);
     }
-    public Task<Void> updateUser(String password){
+    public Task<Void> OLDupdateUserPassword(String password){
         FirebaseUser user = mAuth.getCurrentUser();
         return user.updatePassword(password);
 
     }
+
+    private Task<Void> updateEmailInDatabase(String newEmail) {
+        DocumentReference userDocRef = userCollection.document(documentId);
+        Task<Void> updateUsernameTask = userDocRef.update("email", newEmail);
+
+        return updateUsernameTask;
+    }
+
+    public Task<Void> updateUserPassword(String currentPassword, String newPassword) {
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user == null) {
+            // Handle the case where the user is not authenticated
+            // You might want to return a failed task or handle it differently
+            return Tasks.forException(new Exception("User not authenticated"));
+        }
+
+        // Reauthenticate the user with their current email and password
+        String email = user.getEmail();
+        AuthCredential credential = EmailAuthProvider.getCredential(email, currentPassword);
+
+        return user.reauthenticate(credential)
+                .continueWithTask(reauthTask -> {
+                    if (reauthTask.isSuccessful()) {
+                        // Reauthentication successful, update the password
+                        return user.updatePassword(newPassword);
+                    } else {
+                        // Reauthentication failed, handle the failure
+                        // You might want to return a failed task or handle it differently
+                        return Tasks.forException(reauthTask.getException());
+                    }
+                });
+    }
+
+    public Task<Void> updateUserEmail(String email, String password) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user == null) {
+            // Handle the case where the user is not authenticated
+            // You might want to return a failed task or handle it differently
+            return Tasks.forException(new Exception("User not authenticated"));
+        }
+
+        String currentEmail = user.getEmail();
+        // Replace with the user's current password
+
+        // Create credentials for reauthentication
+        AuthCredential credential = EmailAuthProvider.getCredential(currentEmail, password);
+
+        // Reauthenticate the user
+        return user.reauthenticate(credential)
+                .onSuccessTask(reauthTask -> {
+                    // Reauthentication successful, update the email in Firebase Authentication
+                    return user.updateEmail(email);
+                })
+                .onSuccessTask(emailUpdateTask -> {
+                    // Email update successful, now update the email in the Firestore database
+                    return updateEmailInDatabase(email);
+                })
+                .addOnFailureListener(e -> {
+                    // Handle the failure
+                    // You might want to return a failed task or handle it differently
+                    // Tasks.forException is not needed here as it's handled by onFailureListener
+                });
+    }
+
+    public Task<Void> updateUserName(String username) {
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user == null) {
+            // Handle the case where the user is not authenticated
+            // You might want to return a failed task or handle it differently
+            return Tasks.forException(new Exception("User not authenticated"));
+        }
+
+        // Update the user's display name in Firebase Auth
+        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                .setDisplayName(username)
+                .build();
+
+        Task<Void> updateProfileTask = user.updateProfile(profileUpdates);
+
+        // Update the username in the Firestore database
+        DocumentReference userDocRef = userCollection.document(documentId);
+        Task<Void> updateUsernameTask = userDocRef.update("userName", username);
+
+        // Combine the tasks using Tasks.whenAll
+        return Tasks.whenAll(updateProfileTask, updateUsernameTask);
+    }
+
 }
