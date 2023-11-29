@@ -2,6 +2,7 @@ package com.example.hoard;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -10,11 +11,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import android.Manifest;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.material.chip.Chip;
@@ -48,6 +51,7 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
     private final ActivityResultLauncher<Intent> addTagResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleAddTagResult);
 
     private ArrayList<Tag> selectedTagList;
+    private static final int REQUEST_CAMERA_PERMISSION = 201;
 
     ChipGroup chipGroupTags;
 
@@ -55,7 +59,7 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.item_add_edit);
-
+        TextInputLayout serialNumberInputLayout = findViewById(R.id.serialNumberInputLayout);
         selectedTagList = new ArrayList<Tag>();
 
         itemDBController = ItemDBController.getInstance();
@@ -119,6 +123,21 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
                 Toast.makeText(this, "Error parsing date", Toast.LENGTH_SHORT).show();
             }
         });
+        // Camera button listener
+        serialNumberInputLayout.setEndIconOnClickListener(view -> {
+            if (ContextCompat.checkSelfPermission(AddEditItem.this, Manifest.permission.CAMERA)
+                    != PackageManager.PERMISSION_GRANTED) {
+                // Request Camera Permission
+                ActivityCompat.requestPermissions(AddEditItem.this,
+                        new String[]{Manifest.permission.CAMERA},
+                        REQUEST_CAMERA_PERMISSION);
+            } else {
+                // Permission already granted, start the Scan activity
+                Intent scanIntent = new Intent(AddEditItem.this, Scan.class);
+                startActivity(scanIntent);
+            }
+        });
+
 
         // Cancel button listener
         Button cancelButton = findViewById(R.id.closeButton);
@@ -131,6 +150,21 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
             // Start the new activity.
             addTagResultLauncher.launch(tagIntent);
         });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CAMERA_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, start the Scan activity
+                Intent scanIntent = new Intent(AddEditItem.this, Scan.class);
+                startActivity(scanIntent);
+            } else {
+                // Permission denied, handle the scenario (e.g., show a message)
+                Toast.makeText(AddEditItem.this, "Camera Permission is required for scanning", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     /**

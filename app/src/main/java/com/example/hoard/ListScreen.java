@@ -37,6 +37,7 @@ import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,7 +82,6 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_list_screen);
         totalValueTextView = findViewById(R.id.tvTotalValueAmount);
         tagSelectionLayout = findViewById(R.id.tagSelectionLayout);
