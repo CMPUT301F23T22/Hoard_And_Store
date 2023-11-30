@@ -274,9 +274,7 @@ public class SortActivity extends AppCompatActivity implements CustomDatePicker.
                         filterCriteria.setMakes(appliedMakes);
 
                     }
-                    //filterCriteria.setMakes(appliedMakes);
-//                sortAdapter.getSortOptionsEnabled();
-//                    filterCriteria.setSortOptions(sortAdapter.getSortOptionsEnabled());
+
                     String sortBy = sortAdapter.getSortBy();
                     Map<String, String> sortOptionsEnables = new HashMap<>();
 
@@ -304,70 +302,6 @@ public class SortActivity extends AppCompatActivity implements CustomDatePicker.
             }
 
         });
-
-        // Set up the "Apply" button click listener
-//        applyButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                EditText startDateEditText = findViewById(R.id.start_date_edit_text);
-//                EditText endDateEditText = findViewById(R.id.end_date_edit_text);
-//                String startDateString = startDateEditText.getText().toString();
-//                String endDateString = endDateEditText.getText().toString();
-//                SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-//                if (!startDateString.isEmpty()) {
-//                    try {
-//                        Date startDate = dateFormatter.parse(startDateString);
-//                        filterCriteria.setStartDate(startDate);
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                } else {
-//                    filterCriteria.setStartDate(null);
-//                }
-//                if (!endDateString.isEmpty()) {
-//                    try {
-//                        Date endDate = dateFormatter.parse(endDateString);
-//                        Calendar calendar = Calendar.getInstance();
-//                        calendar.setTime(endDate);
-//                        calendar.set(Calendar.HOUR_OF_DAY, 23);
-//                        calendar.set(Calendar.MINUTE, 59);
-//                        calendar.set(Calendar.SECOND, 59);
-//                        calendar.set(Calendar.MILLISECOND, 999);
-//                        endDate = calendar.getTime();
-//                        filterCriteria.setEndDate(endDate);
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                } else {
-//                    filterCriteria.setEndDate(null);
-//                }
-//
-//                EditText BriefDescriptionKeywordEditText = findViewById(R.id.BriefDescriptionKeyword);
-//                String BriefDescriptionKeywordString = BriefDescriptionKeywordEditText.getText().toString();
-//                if (!BriefDescriptionKeywordString.isEmpty()) {
-//                    List<String> briefDescriptionKeywords = Arrays.asList(BriefDescriptionKeywordString.split("\\s+"));
-//                    filterCriteria.setDescriptionKeyWords(briefDescriptionKeywords);
-//                } else {
-//                    filterCriteria.setDescriptionKeyWords(null);
-//                }
-//
-//                String enteredMake = search.getText().toString();
-//                Intent returnIntent = new Intent(getApplicationContext(), ListScreen.class);
-//                returnIntent.putExtra("filterCriteria", filterCriteria);
-//                setResult(RESULT_OK, returnIntent);
-//                finish();
-//                if (!enteredMake.isEmpty()) {
-//                    appliedMakes.add(enteredMake);
-//                    filterCriteria.setMakes(appliedMakes);
-//
-//                }
-//                //filterCriteria.setMakes(appliedMakes);
-////                sortAdapter.getSortOptionsEnabled();
-//                filterCriteria.setSortOptions(sortAdapter.getSortOptionsEnabled());
-//                Intent listIntent = new Intent(getApplicationContext(), ListScreen.class);
-//                startActivity(listIntent);
-//            }
-//        });
 
         // Set up layout adjustments based on the keyboard visibility
         View rootView = findViewById(android.R.id.content);
