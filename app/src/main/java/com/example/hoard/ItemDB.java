@@ -91,49 +91,7 @@ public class ItemDB {
         db = dbConnector.getDatabase();
         userCollection = db.collection("user");
         mAuth = FirebaseAuth.getInstance();
-
-//        String uid = mAuth.getUid();
-//        setSubcollection(uid);
-
-//        // Assuming UserManager provides the currently logged-in user
-//        User loggedInUser = UserManager.getInstance().getLoggedInUser();
-//
-//        if (loggedInUser != null) {
-//            initializeUserCollection(loggedInUser.getUsername());
-//        } else {
-//
-//        }
     }
-//    public Task<QuerySnapshot> login(final FirebaseUser user) {
-//        // Perform any actions needed for "login"
-//        // For example, perform a query and set a subcollection
-//
-//        // Example: Perform a query to get a document ID based on a field and value
-//        String uid = user.getUid();
-//        return getDocumentId("uid", uid)
-//                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-//                    @Override
-//                    public void onSuccess(QuerySnapshot querySnapshot) {
-//                        // Assuming there's only one document matching the query
-//                        if (!querySnapshot.isEmpty()) {
-//                            DocumentSnapshot document = querySnapshot.getDocuments().get(0);
-//                            String documentId = document.getId();
-//
-//                            // Set the subcollection for the user
-//                            setSubcollection(documentId);
-//                        } else {
-//                            // Handle the case where no matching document is found
-//                        }
-//                    }
-//                })
-//                .addOnFailureListener(new OnFailureListener() {
-//                    @Override
-//                    public void onFailure(@NonNull Exception e) {
-//                        // Handle failure if needed
-//                    }
-//                });
-//    }
-
 
     public Task<QuerySnapshot> getDocumentId(String field, String value) {
         Query query = userCollection.whereEqualTo(field, value);
@@ -170,54 +128,6 @@ public class ItemDB {
         // Perform any additional actions if needed
     }
 
-
-
-
-//    private void initializeUserCollection(String username, ItemDBController.OnInitializationCompleteListener listener) {
-//        User loggedInUser = UserManager.getInstance().getLoggedInUser();
-//        getDocumentIdByUsername(username)
-//                .addOnSuccessListener(documentId -> {
-//                    // Use the documentId to initialize itemsCollection
-//                    loggedInUser.setDocId(documentId);
-//                    itemsCollection = userCollection.document(documentId).collection("items");
-//                    Log.d("User document ID: ", documentId);
-//
-//                    // Notify the listener that initialization is complete
-//                    listener.onInitializationComplete();
-//                })
-//                .addOnFailureListener(e -> {
-//                    // Handle failure
-//                    Log.e("ItemDB", "Failed to initialize itemsCollection", e);
-//                });
-//    }
-
-//    private Task<String> getDocumentIdByUsername(String username) {
-//        // Query to find the user with the given username
-//        Query query = userCollection.whereEqualTo("username", username);
-//
-//        // Return the result of the query
-//        return query.get().continueWith(new Continuation<QuerySnapshot, String>() {
-//            @Override
-//            public String then(@NonNull Task<QuerySnapshot> task) throws Exception {
-//                if (task.isSuccessful()) {
-//                    QuerySnapshot querySnapshot = task.getResult();
-//                    if (querySnapshot != null && !querySnapshot.isEmpty()) {
-//                        // Get the first document in the result set
-//                        DocumentSnapshot document = querySnapshot.getDocuments().get(0);
-//
-//                        // Return the document ID
-//                        return document.getId();
-//                    } else {
-//                        // No matching documents found
-//                        return null;
-//                    }
-//                } else {
-//                    // Handle the error
-//                    throw task.getException();
-//                }
-//            }
-//        });
-//    }
     /**
      * add a given item
      *
@@ -614,7 +524,7 @@ public class ItemDB {
         DocumentReference userDocRef = userCollection.document(documentId);
         Task<Void> updateUsernameTask = userDocRef.update("email", newEmail);
 
-        return updateUsernameTask;
+        return userCollection.document(documentId).update("email", newEmail);
     }
 
     public Task<Void> updateUserPassword(String currentPassword, String newPassword, String email) {
@@ -641,37 +551,29 @@ public class ItemDB {
                 });
     }
 
-    public Task<Void> updateUserEmail(String email, String password) {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
+    public Task<Void> updateUserEmail(String email, String newEmail, String password) {
+        FirebaseUser user = mAuth.getCurrentUser();
         if (user == null) {
             // Handle the case where the user is not authenticated
             // You might want to return a failed task or handle it differently
             return Tasks.forException(new Exception("User not authenticated"));
         }
 
-        String currentEmail = user.getEmail();
-        // Replace with the user's current password
+        // Reauthenticate the user with their current email and password
+        AuthCredential credential = EmailAuthProvider.getCredential(email, password);
 
-        // Create credentials for reauthentication
-        AuthCredential credential = EmailAuthProvider.getCredential(currentEmail, password);
-
-        // Reauthenticate the user
         return user.reauthenticate(credential)
-                .onSuccessTask(reauthTask -> {
-                    // Reauthentication successful, update the email in Firebase Authentication
-                    return user.updateEmail(email);
-                })
-                .onSuccessTask(emailUpdateTask -> {
-                    // Email update successful, now update the email in the Firestore database
-                    return updateEmailInDatabase(email);
-                })
-                .addOnFailureListener(e -> {
-                    // Handle the failure
-                    // You might want to return a failed task or handle it differently
-                    // Tasks.forException is not needed here as it's handled by onFailureListener
+                .continueWithTask(reauthTask -> {
+                    if (reauthTask.isSuccessful()) {
+                        return user.verifyBeforeUpdateEmail(newEmail);
+                    } else {
+                        // Reauthentication failed, handle the failure
+                        // You might want to return a failed task or handle it differently
+                        return Tasks.forException(reauthTask.getException());
+                    }
                 });
     }
+
 
     public Task<Void> updateUserName(String username) {
         FirebaseUser user = mAuth.getCurrentUser();

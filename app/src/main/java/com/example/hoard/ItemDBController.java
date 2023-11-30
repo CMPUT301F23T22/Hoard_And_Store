@@ -9,6 +9,7 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -228,45 +229,12 @@ public class ItemDBController {
         return itemDB.updateUserPassword(currentPassword, newPassword, email);
     }
 
-    public Task<Void> updateUser(String currentPassword, String newPassword, String username, String email) {
-        // Initialize tasks with null values
-        Task<Void> updatePasswordTask = null;
-        Task<Void> updateUsernameTask = null;
-        Task<Void> updateEmailTask = null;
-
-        // Check if password is not empty before updating
-        if (!newPassword.isEmpty()) {
-            updatePasswordTask = itemDB.updateUserPassword(currentPassword, newPassword, email);
-        }
-
-        // Check if username is not empty before updating
-        if (!username.isEmpty()) {
-            updateUsernameTask = itemDB.updateUserName(username);
-        }
-
-        if (!email.isEmpty()) {
-            updateEmailTask = itemDB.updateUserEmail(email, currentPassword);
-        }
-
-        // Check for null tasks and combine them using Tasks.whenAll
-        List<Task<Void>> tasks = new ArrayList<>();
-        if (updatePasswordTask != null) {
-            tasks.add(updatePasswordTask);
-        }
-        if (updateUsernameTask != null) {
-            tasks.add(updateUsernameTask);
-        }
-
-        if (updateEmailTask != null) {
-            tasks.add(updateEmailTask);
-        }
-
-        if (tasks.isEmpty()) {
-            // No tasks to execute, return a completed task
-            return Tasks.forResult(null);
-        }
-
-        return Tasks.whenAll(tasks)
-                .continueWith(task -> null);
+    public Task<Void> updateUserEmail (String email, String newEmail, String password){
+        return itemDB.updateUserEmail(email, newEmail, password);
     }
+
+    public Task<QuerySnapshot> reauth(){
+        return itemDB.setSubcollection();
+    }
+
 }
