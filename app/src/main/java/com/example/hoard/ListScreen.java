@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +29,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -146,6 +149,7 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
                 if (id == R.id.search) {
                     // Implement search functionality
                 } else if (id == R.id.edit_profile){
+                    home.setChecked(false);
                     Intent intent = new Intent(ListScreen.this, EditProfileActivity.class);
                     startActivity(intent);
 

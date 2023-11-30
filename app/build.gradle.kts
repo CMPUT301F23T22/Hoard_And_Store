@@ -34,6 +34,8 @@ android {
 
 dependencies {
     implementation("com.github.skydoves:colorpickerview:2.3.0")
+    implementation("com.github.blackfizz:eazegraph:1.2.5l@aar")
+    implementation("com.nineoldandroids:library:2.4.0")
     implementation(platform("com.google.firebase:firebase-bom:32.4.0"))
     implementation("com.google.firebase:firebase-firestore:24.9.0")
     implementation("androidx.appcompat:appcompat:1.6.1")

@@ -4,9 +4,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -17,6 +19,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -28,7 +31,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
 
-public class EditProfileActivity extends AppCompatActivity {
+public class EditProfileFragment extends Fragment {
 
     private TextInputEditText usernameEditText;
     private TextInputLayout usernameInputLayout;
@@ -53,21 +56,16 @@ public class EditProfileActivity extends AppCompatActivity {
     private BottomNavigationView bottomNav;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_profile);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.edit_profile_fragment, container, false);
 
-        bottomNav = findViewById(R.id.bottomNavigationView);
-        Menu bottomMenu = bottomNav.getMenu();
-        sort = bottomMenu.findItem(R.id.nav_sort);
-        home = bottomMenu.findItem(R.id.nav_home);
 
-        ListView listViewProfileOptions = findViewById(R.id.listViewProfileOptions);
-        closeButton = findViewById(R.id.closeButton);
+        ListView listViewProfileOptions = rootView.findViewById(R.id.listViewProfileOptions);
+        closeButton = rootView.findViewById(R.id.closeButton);
 
         dbController = ItemDBController.getInstance();
         String[] profileOptions = {"Change Username", "Change Email", "Change Password"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, profileOptions);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireActivity(), android.R.layout.simple_list_item_1, profileOptions);
 
         listViewProfileOptions.setAdapter(adapter);
 
@@ -98,26 +96,27 @@ public class EditProfileActivity extends AppCompatActivity {
         closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(EditProfileActivity.this, ListScreen.class);
-                startActivity(intent);
+//                Intent intent = new Intent(EditProfileActivity.this, ListScreen.class);
+//                startActivity(intent);
             }
         });
 
-        bottomNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int id = item.getItemId();
-                if (id == R.id.nav_home) {
-
-                } else if (id == R.id.nav_sort) {
-                    Intent sortIntent = new Intent(getApplicationContext(), SortActivity.class);
-                    startActivity(sortIntent);
-                    return true;
-                }
-
-                return true;
-            }
-        });
+//        bottomNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
+//            @Override
+//            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+//                int id = item.getItemId();
+//                if (id == R.id.nav_home) {
+//
+//                } else if (id == R.id.nav_sort) {
+////                    Intent sortIntent = new Intent(getApplicationContext(), SortActivity.class);
+////                    startActivity(sortIntent);
+//                    return true;
+//                }
+//
+//                return true;
+//            }
+//        });
+        return rootView;
     }
 
 
@@ -125,7 +124,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
     private void showChangeUsernameDialog() {
         View dialogView = getLayoutInflater().inflate(R.layout.change_username, null);
-        final AlertDialog builder = new AlertDialog.Builder(this)
+        final AlertDialog builder = new AlertDialog.Builder(requireActivity())
                 .setView(dialogView)
                 .setTitle("Change Username")
                 .setPositiveButton("Change", null)
@@ -189,7 +188,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
     private void showChangeEmailDialog() {
         View dialogView = getLayoutInflater().inflate(R.layout.change_email, null);
-        final AlertDialog builder = new AlertDialog.Builder(this)
+        final AlertDialog builder = new AlertDialog.Builder(requireActivity())
                 .setView(dialogView)
                 .setTitle("Change Email")
                 .setPositiveButton("Change", null)
@@ -239,12 +238,12 @@ public class EditProfileActivity extends AppCompatActivity {
     private void showChangePasswordDialog() {
         // Create a custom AlertDialog
         View dialogView = getLayoutInflater().inflate(R.layout.change_password, null);
-        final AlertDialog builder = new AlertDialog.Builder(this)
-            .setView(dialogView)
-            .setTitle("Change Password")
-            .setPositiveButton("Change", null) //Set to null. We override the onclick
-            .setNegativeButton("Cancel", null)
-            .create();
+        final AlertDialog builder = new AlertDialog.Builder(requireActivity())
+                .setView(dialogView)
+                .setTitle("Change Password")
+                .setPositiveButton("Change", null) //Set to null. We override the onclick
+                .setNegativeButton("Cancel", null)
+                .create();
 
 
         // Set positive button and its click listener
@@ -297,8 +296,7 @@ public class EditProfileActivity extends AppCompatActivity {
                                         showSnackbar("Password updated successfully");
                                     } else {
                                         Exception exception = task.getException();
-                                        Toast.makeText(EditProfileActivity.this, "Current Password is Incorrect",
-                                                Toast.LENGTH_SHORT).show();
+                                        showSnackbar("Current Password is Incorrect");
 
                                         emailInputLayout.setError(getString(R.string.email_and_or_password_incorrect));
                                         emailInputLayout.setErrorEnabled(true);
@@ -321,6 +319,8 @@ public class EditProfileActivity extends AppCompatActivity {
     }
 
     private void showSnackbar(String message) {
-        Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG).show();
+        View rootView = getView();
+        Snackbar.make(rootView.findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG).show();
     }
+
 }

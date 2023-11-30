@@ -33,6 +33,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -156,48 +157,19 @@ public class MainActivity extends AppCompatActivity {
                     String password = passwordInputLayout.getEditText().getText().toString();
                     String email = emailInputLayout.getEditText().getText().toString();
                     String username = usernameInputLayout.getEditText().getText().toString();
-                    createAccount(email,password,username);
-                    setupSignInMode();
+
+                    if(username.length() > 15){
+                        usernameInputLayout.setError(getString(R.string.username_length_error));
+                        usernameInputLayout.setErrorEnabled(true);
+                        usernameInputLayout.setBoxStrokeColor(Color.RED);
+                    } else {
+                        createAccount(email,password,username);
+                        setupSignInMode();
+                    }
+
                 }
-
-
-
-//                //if the username is empty raise highlight edit text as red
-//
-//                //else check if username exists
-//                User usr = new User(username.getText().toString().toLowerCase());
-//
-//                dbController = ItemDBController.getInstance();
-//                dbController.login(
-//                        usr,
-//                        aVoid -> {
-//                            // Success logic: Launch the activity
-//                            Intent intent = new Intent(MainActivity.this, ListScreen.class);
-//                            startActivity(intent);
-//                        }
-//                );
-
             }
         });
-
-//        createAccountButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (isSignInMode) {
-//                    // Switch to sign-up mode
-//                    setupSignUpMode();
-//                } else {
-//                    // Switch to sign-in mode
-//                    setupSignInMode();
-//                }
-//                String password = passwordInputLayout.toString();
-//                String email = emailInputLayout.toString();
-//                String username = usernameInputLayout.toString();
-//                createAccount(email, password, username);
-//            }
-//        });
-
-
     }
 
     private void setupSignInMode() {
@@ -285,14 +257,22 @@ public class MainActivity extends AppCompatActivity {
                             FirebaseUser user = mAuth.getCurrentUser();
                             dbController = ItemDBController.getInstance();
                             dbController.addUser(user,email, userName);
-                            Toast.makeText(MainActivity.this, "Account Created Please Sign In",
-                                    Toast.LENGTH_SHORT).show();
+                            showSnackbar("Account created, please sign in!");
                             updateUI(null);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(MainActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
+                            emailInputLayout.setError("Email may not be formatted correctly");
+                            emailInputLayout.setErrorEnabled(true);
+                            emailInputLayout.setBoxStrokeColor(Color.RED);
+
+                            passwordInputLayout.setError("Password may be too short, must be greater then 6 characters");
+                            passwordInputLayout.setErrorEnabled(true);
+                            passwordInputLayout.setBoxStrokeColor(Color.RED);
+
+
+
+                            showSnackbar("Authentication failed.");
                             updateUI(null);
                         }
                     }
@@ -346,7 +326,6 @@ public class MainActivity extends AppCompatActivity {
                         } else {
                             // If sign in fails, display a message to the user.
                             handleError(task.getException());
-                            signInFailed();
                         }
                     }
                 });
@@ -355,14 +334,13 @@ public class MainActivity extends AppCompatActivity {
     private void handleError(Exception exception){
         if (exception instanceof FirebaseAuthInvalidUserException) {
             // The user with the provided email does not exist
-            Toast.makeText(MainActivity.this, "Email address not registered. Create a new account.",
-                    Toast.LENGTH_SHORT).show();
+            showSnackbar("Email address not registered. Create a new account.");
+
             // You may want to redirect the user to the registration page
             setupSignUpMode();
         } else if (exception instanceof FirebaseAuthInvalidCredentialsException) {
             // The provided email and password combination is invalid
-            Toast.makeText(MainActivity.this, "Invalid email or password. Please try again.",
-                    Toast.LENGTH_SHORT).show();
+            showSnackbar("Invalid email or password. Please try again.");
 
             emailInputLayout.setError("Incorrect Email");
             emailInputLayout.setErrorEnabled(true);
@@ -375,11 +353,14 @@ public class MainActivity extends AppCompatActivity {
 
         } else {
             // Handle other exceptions
-            Toast.makeText(MainActivity.this, "Authentication failed. Please try again.",
-                    Toast.LENGTH_SHORT).show();
+            showSnackbar("Authentication failed. Please try again.");
             exception.printStackTrace();
         }
 
+    }
+
+    private void showSnackbar(String message) {
+        Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG).show();
     }
 
 }
