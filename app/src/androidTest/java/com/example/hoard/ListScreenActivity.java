@@ -43,19 +43,37 @@ public class ListScreenActivity {
     public ActivityScenarioRule<ListScreen> scenario = new ActivityScenarioRule<>(ListScreen.class);
 
     public static ViewAction selectChipWithTag(final String tagName) {
+        /**
+         * This method selects the chip with the specified tag name.
+         * @param tagName The name of the tag to select.
+         * @return ViewAction
+         */
         return new ViewAction() {
             @Override
             public Matcher<View> getConstraints() {
+                /**
+                 * This method returns the constraints for the view.
+                 * @return Matcher<View>
+                 */
                 return isAssignableFrom(ChipGroup.class);
             }
 
             @Override
             public String getDescription() {
+                /**
+                 * This method returns a description of the view action.
+                 * @return String
+                 */
                 return "Select chip with tag name: " + tagName;
             }
 
             @Override
             public void perform(UiController uiController, View view) {
+                /**
+                 * This method cycles through the chips in the chip group and selects the chip with the specified tag name.
+                 * @param uiController The UiController instance.
+                 * @param view The view to perform the action on.
+                 */
                 ChipGroup chipGroup = (ChipGroup) view;
                 for (int i = 0; i < chipGroup.getChildCount(); i++) {
                     Chip chip = (Chip) chipGroup.getChildAt(i);
@@ -72,19 +90,37 @@ public class ListScreenActivity {
     }
 
     public static ViewAction clickOnViewChildWithId(final int viewId) {
+        /**
+         * This method clicks on a child view with the specified ID.
+         * @param viewId The ID of the view to click on.
+         * @return ViewAction
+         */
         return new ViewAction() {
             @Override
             public Matcher<View> getConstraints() {
+                /**
+                 * This method returns the constraints for the view.
+                 * @return Matcher<View>
+                 */
                 return allOf(isDisplayed(), isAssignableFrom(ViewGroup.class));
             }
 
             @Override
             public String getDescription() {
+                /**
+                 * This method returns a description of the view action.
+                 * @return String
+                 */
                 return "Click on a child view with specified ID.";
             }
 
             @Override
             public void perform(UiController uiController, View view) {
+                /**
+                 * This method finds the child view with the specified ID and clicks on it.
+                 * @param uiController The UiController instance.
+                 * @param view The view to perform the action on.
+                 */
                 View childView = view.findViewById(viewId);
                 if (childView != null && childView.isShown()) {
                     childView.performClick();
@@ -94,19 +130,37 @@ public class ListScreenActivity {
     }
 
     public static ViewAction scrollToChip(final String tagName) {
+        /**
+         * This method scrolls the HorizontalScrollView to display the chip with the specified tag name.
+         * @param tagName The name of the tag to scroll to.
+         * @return ViewAction
+         */
         return new ViewAction() {
             @Override
             public Matcher<View> getConstraints() {
+                /**
+                 * This method returns the constraints for the view.
+                 * @return Matcher<View>
+                 */
                 return allOf(isDisplayed(), isAssignableFrom(HorizontalScrollView.class));
             }
 
             @Override
             public String getDescription() {
+                /**
+                 * This method returns a description of the view action.
+                 * @return String
+                 */
                 return "Scroll HorizontalScrollView to display: " + tagName;
             }
 
             @Override
             public void perform(UiController uiController, View view) {
+                /**
+                 * This method scrolls the HorizontalScrollView to display the chip with the specified tag name.
+                 * @param uiController The UiController instance.
+                 * @param view The view to perform the action on.
+                 */
                 HorizontalScrollView scrollView = (HorizontalScrollView) view;
                 ChipGroup chipGroup = (ChipGroup) scrollView.getChildAt(0);
                 for (int i = 0; i < chipGroup.getChildCount(); i++) {
@@ -120,10 +174,10 @@ public class ListScreenActivity {
         };
     }
 
-    public void wait(int mili){
-
+    public void wait(int milliseconds){
+        // program pauses for milliseconds
         try {
-            Thread.sleep(mili);
+            Thread.sleep(milliseconds);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -131,19 +185,24 @@ public class ListScreenActivity {
 
     @Test
     public void testAddTag() {
+        // Add tag
         onView(withId(R.id.addItemButton)).perform(click());
         onView(withId(R.id.AddTagButton)).perform(click());
         onView(withId(R.id.tagNameInput)).perform(ViewActions.typeText("Test Tag 2"));
         onView(withId(R.id.tagColorInput)).perform(ViewActions.typeText("#FF0000"));
         closeSoftKeyboard();
         onView(withId(R.id.submitButton)).perform(click());
+
+        // Check if tag is present
         wait(2000);
         onView(isAssignableFrom(HorizontalScrollView.class)).perform(scrollToChip("Test Tag 2"));
         onView(withText("Test Tag 2")).check(matches(isDisplayed()));
     }
 
+    // Run this test first before running testEditItem() and testDeleteItem()
     @Test
     public void testAddItem() {
+        // Add item
         onView(withId(R.id.addItemButton)).perform(click());
         onView(withId(R.id.dateInput)).perform(ViewActions.typeText("01/01/2023"));
         onView(withId(R.id.descriptionInput)).perform(ViewActions.typeText("Test Item"));
@@ -153,6 +212,8 @@ public class ListScreenActivity {
         onView(withId(R.id.valueInput)).perform(ViewActions.typeText("100"));
         onView(withId(R.id.commentInput)).perform(ViewActions.typeText("Comment"));
         closeSoftKeyboard();
+
+        // Add tag
         onView(withId(R.id.AddTagButton)).perform(click());
         onView(withId(R.id.tagNameInput)).perform(ViewActions.typeText("Test Tag 1"));
         onView(withId(R.id.tagColorInput)).perform(ViewActions.typeText("#FF0000"));
@@ -160,6 +221,8 @@ public class ListScreenActivity {
         onView(withId(R.id.submitButton)).perform(click());
         wait(2000);
         onView(withId(R.id.submitButton)).perform(click());
+
+        // Check if item is present
         wait(2000);
         onView(withId(R.id.recyclerView))
                 .perform(RecyclerViewActions.scrollTo(hasDescendant(withText("Test Item"))))
@@ -176,6 +239,7 @@ public class ListScreenActivity {
 
     @Test
     public void testEditItem() {
+        // Edit item
         wait(2000);
         onView(withId(R.id.recyclerView))
                 .perform(RecyclerViewActions.scrollTo(hasDescendant(withText("Test Item"))))
@@ -192,6 +256,8 @@ public class ListScreenActivity {
         onView(withId(R.id.tagChipGroup)).perform(selectChipWithTag("Test Tag 2"));
         closeSoftKeyboard();
         onView(withId(R.id.submitButton)).perform(click());
+
+        // Check if item is edited
         wait(2000);
         onView(withId(R.id.dateOfAcquisitionTextView)).check(matches(withText("Date Of Purchase: 2023-12-31")));
         onView(withId(R.id.briefDescriptionTextView)).check(matches(withText("Description: Test Item Edited")));
@@ -206,17 +272,21 @@ public class ListScreenActivity {
 
     @Test
     public void testDeleteItem() {
+        // Delete item
         wait(2000);
         Espresso.onView(ViewMatchers.withId(R.id.recyclerView))
                 .perform(RecyclerViewActions.actionOnItem(
                         ViewMatchers.hasDescendant(ViewMatchers.withText("Test Item Edited")),
                         ViewActions.swipeLeft()));
+
+        // Check if item is deleted
         wait(4000);
         onView(withText("Test Item Edited")).check(doesNotExist());
     }
 
     @Test
     public void testBulkDelete() {
+        // Add 2 items
         onView(withId(R.id.addItemButton)).perform(click());
         onView(withId(R.id.dateInput)).perform(ViewActions.typeText("01/01/2023"));
         onView(withId(R.id.descriptionInput)).perform(ViewActions.typeText("Test Bulk Delete Item 1"));
@@ -240,11 +310,15 @@ public class ListScreenActivity {
         onView(withId(R.id.tagChipGroup)).perform(selectChipWithTag("Test Tag 2"));
         closeSoftKeyboard();
         onView(withId(R.id.submitButton)).perform(click());
+
+        //Perform bulk delete
         wait(2000);
         onView(withText("Test Bulk Delete Item 1")).perform(longClick());
         onView(withText("Test Bulk Delete Item 2")).perform(click());
         onView(withId(R.id.bulk_delete)).perform(click());
         onView(withText("Yes")).perform(click());
+
+        // Check if items are deleted
         wait(2000);
         onView(withText("Test Bulk Delete Item 1")).check(doesNotExist());
         onView(withText("Test Bulk Delete Item 2")).check(doesNotExist());
