@@ -44,6 +44,21 @@ public class ItemBreakdown extends AppCompatActivity {
         tagDBController = TagDBController.getInstance();
         chipGroupTags = findViewById(R.id.tagChipGroup);
 
+        pieChart = findViewById(R.id.piechart);
+        pieChart.addPieSlice(
+                new PieModel(
+                        "Place Holder",
+                        Integer.parseInt("1"),
+                        R.color.white)
+        );
+
+        for (int i = 0; i < 5; i++) {
+            View placeholderLayout = findViewById(getResources().getIdentifier("place_holder_colour_" + (i + 1), "id", getPackageName()));
+            TextView placeholderText = findViewById(getResources().getIdentifier("place_holder_text_" + (i + 1), "id", getPackageName()));
+            placeholderLayout.setVisibility(View.GONE);
+            placeholderText.setText("");
+        }
+
 
         tagDBController.loadTags(new DataLoadCallBackTag() {
             @Override
@@ -90,18 +105,18 @@ public class ItemBreakdown extends AppCompatActivity {
         itemDBController.getTagCounts(selectedTagList, new ItemDBController.TagCountsCallback() {
             @Override
             public void onTagCountsReady(Map<Tag, Integer> tagCounts) {
-                tvR = findViewById(R.id.tvR);
-                tvPython = findViewById(R.id.tvPython);
-                tvCPP = findViewById(R.id.tvCPP);
-                tvJava = findViewById(R.id.tvJava);
-                pieChart = findViewById(R.id.piechart);
+                if(pieChart != null){
+                    pieChart.clearChart();
+                }
+
 
                 for (Tag tag : tagCounts.keySet()) {
                     pieChart.addPieSlice(
                             new PieModel(
                                     tag.getTagName().toString(),
                                     Integer.parseInt(tagCounts.get(tag).toString()),
-                                    Color.parseColor(tag.getTagColor())));
+                                    Color.parseColor(tag.getTagColor()))
+                    );
                 }
 
                 setUpUI(tagCounts);
@@ -143,15 +158,15 @@ public class ItemBreakdown extends AppCompatActivity {
             placeholderText.setText(entry.getKey().getTagName());
             placeholderLayout.setBackgroundColor(Color.parseColor(entry.getKey().getTagColor()));
 
-
-            // Increment the counter
             i++;
         }
 
         // Hide any remaining placeholders if the map size is less than maxElementsToShow
         for (; i < maxElementsToShow; i++) {
             View placeholderLayout = findViewById(getResources().getIdentifier("place_holder_colour_" + (i + 1), "id", getPackageName()));
+            TextView placeholderText = findViewById(getResources().getIdentifier("place_holder_text_" + (i + 1), "id", getPackageName()));
             placeholderLayout.setVisibility(View.GONE);
+            placeholderText.setText("");
         }
     }
 
