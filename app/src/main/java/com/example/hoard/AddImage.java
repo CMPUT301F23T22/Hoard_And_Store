@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.Toast;
+import android.util.Base64;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
@@ -19,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.viewpager2.widget.ViewPager2;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -115,7 +117,19 @@ public class AddImage extends AppCompatActivity {
      * Handles the action after confirming the selection of images.
      */
     private void confirmSelection() {
-        // Implementation depends on specific use-case
+        if (!images.isEmpty()) {
+            Intent resultIntent = new Intent();
+            Bitmap selectedImage = images.get(0);
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            selectedImage.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            byte[] byteArray = stream.toByteArray();
+
+            String base64Image = Base64.encodeToString(byteArray, Base64.DEFAULT);
+
+            resultIntent.putExtra("selectedImageData", base64Image);
+            setResult(Activity.RESULT_OK, resultIntent);
+            finish();
+        }
     }
 
     /**
@@ -126,9 +140,13 @@ public class AddImage extends AppCompatActivity {
     private void handleCaptureResult(ActivityResult result) {
         if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
             byte[] byteArray = result.getData().getByteArrayExtra("capturedImage");
-            Bitmap imageBitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
-            images.add(imageBitmap);
-            adapter.notifyDataSetChanged();
+
+            String base64Image = Base64.encodeToString(byteArray, Base64.DEFAULT);
+
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("selectedImageData", base64Image);
+            setResult(Activity.RESULT_OK, resultIntent);
+            finish();
         } else if (result.getResultCode() == IMAGE_CAPTURE_FAILURE_RESULT_CODE) {
             String errorMessage = result.getData() != null ? result.getData().getStringExtra("error_message") : "Unknown error";
             Toast.makeText(this, "Error capturing image: " + errorMessage, Toast.LENGTH_LONG).show();

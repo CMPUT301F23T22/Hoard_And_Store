@@ -47,6 +47,7 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
             new ActivityResultContracts.StartActivityForResult(),
             this::handleAddTagResult);
     private EditText descriptionInput, makeInput, modelInput, serialNumberInput, valueInput, commentInput, dateInput;
+    private String imageData;
     private TextView addEditHeader;
     private Item currentItem; // Item to edit
     private boolean isEdit; // To identify whether it's an edit operation
@@ -405,7 +406,6 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
                 selectedTagList.add(selectedtag);
             }
         }
-
         if (currentItem != null) {
             // If this is an edit, update the existing item's fields
             currentItem.setBriefDescription(description);
@@ -416,6 +416,7 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
             currentItem.setComment(comment);
             currentItem.setDateOfAcquisition(acquisitionDate);
             currentItem.setTags(selectedTagList);
+            currentItem.setImageData(imageData);
             return currentItem;
         }
 
@@ -427,7 +428,8 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
                 serialNumber,
                 value,
                 comment,
-                selectedTagList);
+                selectedTagList,
+                imageData);
 
     }
 
@@ -471,6 +473,9 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
 
     private void handleAddImageResult(ActivityResult result) {
         if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+            if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                imageData = result.getData().getStringExtra("selectedImageData");
+            }
         }
     }
 }
