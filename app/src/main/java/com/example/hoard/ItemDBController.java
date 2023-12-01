@@ -9,12 +9,15 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 import android.util.Log;
@@ -80,6 +83,11 @@ public class ItemDBController {
 
     public interface OnAccountActionComplete {
         void OnAccountActionComplete();
+    }
+
+    public interface TagCountsCallback {
+        void onTagCountsReady(Map<Tag, Integer> tagCounts);
+        void onError(Exception e);
     }
 
     public void deleteAccount(){
@@ -237,4 +245,57 @@ public class ItemDBController {
         return itemDB.setSubcollection();
     }
 
+    public void getTagCounts(ArrayList<Tag> selectedTagList, final TagCountsCallback callback) {
+        itemDB.getItemTags().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    QuerySnapshot querySnapshot = task.getResult();
+                    Map<Tag, Integer> tagCounts = new HashMap<>();
+                    List<Tag> itemTags = new ArrayList<>();
+                    for (QueryDocumentSnapshot document : querySnapshot) {
+                        // Assuming "Tags" is the field containing the tags
+                        Map<String, Object> data = document.getData();
+                        if (document.contains("tags")) {
+                            List<Map<String, Object>> tagsList = (List<Map<String, Object>>) data.get("tags");
+                            if (tagsList != null) {
+                                for (Map<String, Object> tagMap : tagsList) {
+                                    String tagName = (String) tagMap.get("tagName");
+                                    String tagColor = (String) tagMap.get("tagColor");
+                                    String tagID = (String) tagMap.get("tagID");
+                                    Tag tag = new Tag(tagName, tagColor, tagID);
+
+                                    itemTags.add(tag);
+
+
+                                }
+                            }
+                        }
+
+                    }
+
+                    if (itemTags != null) {
+                        for (Tag tag : itemTags) {
+                            if (selectedTagList.contains(tag)) {
+
+                                if (tagCounts.containsKey(tag)) {
+                                    // Update count if the tag is present
+                                    tagCounts.put(tag, tagCounts.get(tag) + 1);
+                                } else {
+                                    // Put the tag with count 1 if it's not present
+                                    tagCounts.put(tag, 1);
+                                }
+                            }
+                        }
+                    }
+
+                    // Call the callback when the operation is complete
+                    callback.onTagCountsReady(tagCounts);
+                } else {
+                    // Call the callback with an error if there's an issue
+                    callback.onError(task.getException());
+                }
+            }
+        });
+    }
 }

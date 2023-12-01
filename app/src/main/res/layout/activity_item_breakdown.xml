@@ -53,31 +53,34 @@
                     android:layout_height="15dp"
                     android:layout_gravity="center_vertical">
 
-                    <!--View to display the yellow color icon-->
+
                     <View
                         android:layout_width="15dp"
                         android:layout_height="match_parent"
+                        android:id="@+id/place_holder_colour_1"
                         android:background="@color/R"/>
 
-                    <!--Text view to display R -->
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="R"
+                        android:id="@+id/place_holder_text_1"
+                        android:text="Place Holder 1"
                         android:paddingLeft="10dp"/>
 
                 </LinearLayout>
 
-                <!--Linear layout to display Python-->
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="15dp"
                     android:layout_gravity="center_vertical"
                     android:layout_marginTop="5dp">
 
-                    <!--View to display the green color icon-->
+
                     <View
                         android:layout_width="15dp"
+                        android:id="@+id/place_holder_colour_2"
                         android:layout_height="match_parent"
                         android:background="@color/Python"/>
 
@@ -85,21 +88,22 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Python"
+                        android:id="@+id/place_holder_text_2"
+                        android:text="Place Holder 2"
                         android:paddingLeft="10dp"/>
 
                 </LinearLayout>
 
-                <!--Linear layout to display C++-->
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="15dp"
                     android:layout_gravity="center_vertical"
                     android:layout_marginTop="5dp">
 
-                    <!--View to display the red color icon-->
                     <View
                         android:layout_width="15dp"
+                        android:id="@+id/place_holder_colour_3"
                         android:layout_height="match_parent"
                         android:background="@color/CPP"/>
 
@@ -107,20 +111,43 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="C++"
+                        android:id="@+id/place_holder_text_3"
+                        android:text="Place Holder 3"
                         android:paddingLeft="10dp"/>
 
                 </LinearLayout>
 
-                <!--Linear layout to display Java-->
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="15dp"
                     android:layout_gravity="center_vertical"
                     android:layout_marginTop="5dp">
 
-                    <!--View to display the blue color icon-->
                     <View
+                        android:layout_width="15dp"
+                        android:id="@+id/place_holder_colour_4"
+                        android:layout_height="match_parent"
+                        android:background="@color/Java"/>
+
+                    <!--Text view to display Java text -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/place_holder_text_4"
+                        android:text="Place Holder 4"
+                        android:paddingLeft="10dp"/>
+
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="15dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginTop="5dp">
+
+
+                    <View
+                        android:id="@+id/place_holder_colour_5"
                         android:layout_width="15dp"
                         android:layout_height="match_parent"
                         android:background="@color/Java"/>
@@ -129,7 +156,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Java"
+                        android:id="@+id/place_holder_text_5"
+                        android:text="Place Holder 5"
                         android:paddingLeft="10dp"/>
 
                 </LinearLayout>
@@ -312,9 +340,55 @@
                     android:layout_alignParentRight="true"/>
 
             </RelativeLayout>
-
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="260dp"
+        android:layout_below="@+id/details"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:elevation="10dp"
+        app:cardCornerRadius="10dp"
+        android:id="@+id/tags">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/materialTextViewWithIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/tag"
+            android:drawablePadding="8dp"
+            android:text="Select Tags To Apply"
+            android:layout_gravity="center"/>
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="horizontal">
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/tagChipGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp">
+                <!-- Chips will be added here dynamically -->
+            </com.google.android.material.chip.ChipGroup>
+        </HorizontalScrollView>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/apply_tags"
+            android:text="Apply Tags"
+            android:layout_gravity="bottom">
+
+        </Button>
+
+    </androidx.cardview.widget.CardView>
+
+
 
 </RelativeLayout>

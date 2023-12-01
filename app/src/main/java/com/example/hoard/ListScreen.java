@@ -266,6 +266,10 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
                     Intent sortIntent = new Intent(getApplicationContext(), SortActivity.class);
                     startActivity(sortIntent);
                     return true;
+                } else if (id == R.id.nav_chart) {
+                    Intent chartIntent = new Intent(getApplicationContext(), ItemBreakdown.class);
+                    startActivity(chartIntent);
+
                 }
 
                 return true;

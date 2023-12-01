@@ -43,11 +43,11 @@ public class ItemDB {
     private User loggedInUser = UserManager.getInstance().getLoggedInUser();
     private static final String TAG = "ItemDB";
     private FirebaseAuth mAuth;
-    private String documentId;
+    private String userDocumentId;
 
     public Task<String> getUsername() {
         if (userCollection != null) {
-            return userCollection.document(documentId).get().continueWith(new Continuation<DocumentSnapshot, String>() {
+            return userCollection.document(userDocumentId).get().continueWith(new Continuation<DocumentSnapshot, String>() {
                 @Override
                 public String then(@NonNull Task<DocumentSnapshot> task) throws Exception {
                     if (task.isSuccessful()) {
@@ -110,10 +110,10 @@ public class ItemDB {
                         // Assuming there's only one document matching the query
                         if (!querySnapshot.isEmpty()) {
                             DocumentSnapshot document = querySnapshot.getDocuments().get(0);
-                            String documentId = document.getId();
+                            userDocumentId = document.getId();
 
                             // Set the subcollection for the user
-                            itemsCollection = userCollection.document(documentId).collection("items");
+                            itemsCollection = userCollection.document(userDocumentId).collection("items");
                         } else {
                             // Handle the case where no matching document is found
                         }
@@ -284,10 +284,10 @@ public class ItemDB {
                         DocumentSnapshot document = querySnapshot.getDocuments().get(0);
 
                         // Access the document data
-                        documentId = document.getId();
+                        userDocumentId = document.getId();
 
                         // Assuming you have a subcollection named "items"
-                        itemsCollection = userCollection.document(documentId).collection("items");
+                        itemsCollection = userCollection.document(userDocumentId).collection("items");
 
                         // Notify the callback that item collection is initialized
                         callback.onItemCollectionInitialized();
@@ -339,7 +339,7 @@ public class ItemDB {
                 List<DocumentSnapshot> sortedResults = sortResults(querySnapshot, filterCriteria);
                 return sortedResults;
             } else {
-                throw task.getException();
+                return Collections.emptyList();
             }
         });
     }
@@ -486,7 +486,7 @@ public class ItemDB {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            userCollection.document(documentId)
+                            userCollection.document(userDocumentId)
                                 .delete()
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
@@ -521,10 +521,10 @@ public class ItemDB {
     }
 
     private Task<Void> updateEmailInDatabase(String newEmail) {
-        DocumentReference userDocRef = userCollection.document(documentId);
+        DocumentReference userDocRef = userCollection.document(userDocumentId);
         Task<Void> updateUsernameTask = userDocRef.update("email", newEmail);
 
-        return userCollection.document(documentId).update("email", newEmail);
+        return userCollection.document(userDocumentId).update("email", newEmail);
     }
 
     public Task<Void> updateUserPassword(String currentPassword, String newPassword, String email) {
@@ -591,11 +591,15 @@ public class ItemDB {
         Task<Void> updateProfileTask = user.updateProfile(profileUpdates);
 
         // Update the username in the Firestore database
-        DocumentReference userDocRef = userCollection.document(documentId);
+        DocumentReference userDocRef = userCollection.document(userDocumentId);
         Task<Void> updateUsernameTask = userDocRef.update("userName", username);
 
         // Combine the tasks using Tasks.whenAll
         return Tasks.whenAll(updateProfileTask, updateUsernameTask);
+    }
+
+    public Task<QuerySnapshot> getItemTags() {
+        return itemsCollection.get();
     }
 
 }
