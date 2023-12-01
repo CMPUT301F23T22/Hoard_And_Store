@@ -355,6 +355,10 @@ public class ItemDB {
      */
     private Query constructDynamicQuery(FilterCriteria filterCriteria) {
 //        Query query = userCollection.document(userId).collection("items");; // Start with the base query
+        if (itemsCollection == null) {
+            setSubcollection();
+        }
+
         Query query = itemsCollection;
 
         if (filterCriteria != null) {

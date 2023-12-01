@@ -1,17 +1,23 @@
 package com.example.hoard;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.eazegraph.lib.charts.PieChart;
@@ -31,6 +37,12 @@ public class ItemBreakdown extends AppCompatActivity {
     private Button  applyButton;
     private Map<Tag, Integer> selectedTagMap;
     private ArrayList<Tag> selectedTagList;
+    private BottomNavigationView bottomNav;
+    private Menu bottomMenu;
+    private MenuItem sortMenuItem;
+    private MenuItem homeMenuItem;
+    private MenuItem profileMenuItem;
+    private MenuItem chartMenuItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +51,18 @@ public class ItemBreakdown extends AppCompatActivity {
 
         applyButton = findViewById(R.id.apply_tags);
         selectedTagList = new ArrayList<Tag>();
+
+        bottomNav = findViewById(R.id.bottomNavigationView);
+        Menu bottomMenu = bottomNav.getMenu();
+
+        sortMenuItem = bottomMenu.findItem(R.id.nav_sort);
+        homeMenuItem = bottomMenu.findItem(R.id.nav_home);
+        chartMenuItem = bottomMenu.findItem(R.id.nav_chart);
+        profileMenuItem = bottomMenu.findItem(R.id.nav_profile);
+
+        //we are in the chartMenu
+        chartMenuItem.setChecked(true);
+
 
         itemDBController = ItemDBController.getInstance();
         tagDBController = TagDBController.getInstance();
@@ -58,6 +82,34 @@ public class ItemBreakdown extends AppCompatActivity {
             placeholderLayout.setVisibility(View.GONE);
             placeholderText.setText("");
         }
+
+        bottomNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int id = item.getItemId();
+                if (id == R.id.nav_home) {
+                    Intent homeIntent = new Intent(getApplicationContext(), ListScreen.class);
+                    homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(homeIntent);
+                } else if (id == R.id.nav_sort) {
+                    Intent sortIntent = new Intent(getApplicationContext(), SortActivity.class);
+                    sortIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(sortIntent);
+                    return true;
+                } else if (id == R.id.nav_chart) {
+//                    Intent chartIntent = new Intent(getApplicationContext(), ItemBreakdown.class);
+//                    chartIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                    startActivity(chartIntent);
+
+                } else if (id == R.id.nav_profile){
+                    Intent profileIntent = new Intent(getApplicationContext(), EditProfileActivity.class);
+                    profileIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(profileIntent);
+                }
+
+                return true;
+            }
+        });
 
 
         tagDBController.loadTags(new DataLoadCallBackTag() {

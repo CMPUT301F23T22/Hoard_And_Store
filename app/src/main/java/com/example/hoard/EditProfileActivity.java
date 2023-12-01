@@ -51,6 +51,11 @@ public class EditProfileActivity extends AppCompatActivity {
     private MenuItem sort;
     private MenuItem home;
     private BottomNavigationView bottomNav;
+    private Menu bottomMenu;
+    private MenuItem sortMenuItem;
+    private MenuItem homeMenuItem;
+    private MenuItem profileMenuItem;
+    private MenuItem chartMenuItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,13 +68,59 @@ public class EditProfileActivity extends AppCompatActivity {
         home = bottomMenu.findItem(R.id.nav_home);
 
         ListView listViewProfileOptions = findViewById(R.id.listViewProfileOptions);
-        closeButton = findViewById(R.id.closeButton);
+        ListView listViewProfileAuth = findViewById(R.id.profileAuthOptions);
 
         dbController = ItemDBController.getInstance();
         String[] profileOptions = {"Change Username", "Change Email", "Change Password"};
+        String[] profileAuth = {"Sign Out", "Delete Account"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, profileOptions);
+        ArrayAdapter<String> adapter1 = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, profileAuth);
+
+
+        bottomNav = findViewById(R.id.bottomNavigationView);
+        bottomMenu = bottomNav.getMenu();
+
+        sortMenuItem = bottomMenu.findItem(R.id.nav_sort);
+        homeMenuItem = bottomMenu.findItem(R.id.nav_home);
+        chartMenuItem = bottomMenu.findItem(R.id.nav_chart);
+        profileMenuItem = bottomMenu.findItem(R.id.nav_profile);
+
+        profileMenuItem.setChecked(true);
 
         listViewProfileOptions.setAdapter(adapter);
+        listViewProfileAuth.setAdapter(adapter1);
+
+        listViewProfileAuth.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // Handle item click
+                switch (position) {
+                    case 0:
+                        showConfirmDialog("Confirm Sign out", "Please Come back Soon!",
+                                new EditProfileActivity.DialogInterfaceCallback() {
+                                    @Override
+                                    public void onPositiveButtonClick(DialogInterface dialog) {
+                                        // Delete the selected items from Firestore and update UI
+                                        handleAccountSignOut();
+                                    }
+
+                                });
+                        break;
+                    case 1:
+                        showConfirmDialog("Confirm Account Deletion", "Are you sure you want to leave this great app?",
+                                new EditProfileActivity.DialogInterfaceCallback() {
+                                    @Override
+                                    public void onPositiveButtonClick(DialogInterface dialog) {
+                                        // Delete the selected items from Firestore and update UI
+                                        handleAccountDeletion();
+                                    }
+
+                                });
+                        break;
+                    // Add cases for other options
+                }
+            }
+        });
 
         listViewProfileOptions.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -95,24 +146,29 @@ public class EditProfileActivity extends AppCompatActivity {
             }
         });
 
-        closeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(EditProfileActivity.this, ListScreen.class);
-                startActivity(intent);
-            }
-        });
 
         bottomNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
                 if (id == R.id.nav_home) {
-
+                    Intent homeIntent = new Intent(getApplicationContext(), ListScreen.class);
+                    homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(homeIntent);
                 } else if (id == R.id.nav_sort) {
                     Intent sortIntent = new Intent(getApplicationContext(), SortActivity.class);
+                    sortIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(sortIntent);
                     return true;
+                } else if (id == R.id.nav_chart) {
+                    Intent chartIntent = new Intent(getApplicationContext(), ItemBreakdown.class);
+                    chartIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(chartIntent);
+
+                } else if (id == R.id.nav_profile){
+//                    Intent profileIntent = new Intent(getApplicationContext(), EditProfileActivity.class);
+//                    profileIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                    startActivity(profileIntent);
                 }
 
                 return true;
@@ -322,5 +378,38 @@ public class EditProfileActivity extends AppCompatActivity {
 
     private void showSnackbar(String message) {
         Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG).show();
+    }
+
+    private void handleAccountDeletion(){
+        dbController.deleteAccount();
+        Intent accountDeletionIntent = new Intent(getApplicationContext(), MainActivity.class);
+        accountDeletionIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(accountDeletionIntent);
+    }
+
+    private void handleAccountSignOut(){
+        dbController.signOut();
+        Intent signOutIntent = new Intent(getApplicationContext(), MainActivity.class);
+        signOutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(signOutIntent);
+
+    }
+
+    private interface DialogInterfaceCallback {
+        void onPositiveButtonClick(DialogInterface dialog);
+    }
+
+    private void showConfirmDialog(String title, String message, EditProfileActivity.DialogInterfaceCallback callback) {
+        new android.app.AlertDialog.Builder(EditProfileActivity.this, R.style.PurpleAlertDialog)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    if (callback != null) {
+                        callback.onPositiveButtonClick(dialog);
+                    }
+                })
+                .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
     }
 }

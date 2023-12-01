@@ -357,13 +357,26 @@ public class SortActivity extends AppCompatActivity implements CustomDatePicker.
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
-                if (id == R.id.nav_sort) {
+                if (id == R.id.nav_home) {
+                    Intent homeIntent = new Intent(getApplicationContext(), ListScreen.class);
+                    homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(homeIntent);
+                } else if (id == R.id.nav_sort) {
+                    Intent sortIntent = new Intent(getApplicationContext(), SortActivity.class);
+                    sortIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(sortIntent);
+                    return true;
+                } else if (id == R.id.nav_chart) {
+                    Intent chartIntent = new Intent(getApplicationContext(), ItemBreakdown.class);
+                    chartIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(chartIntent);
 
-
-                } else if (id == R.id.nav_home) {
-                    // Navigate to the home screen
-                    finish();
+                } else if (id == R.id.nav_profile){
+                    Intent profileIntent = new Intent(getApplicationContext(), EditProfileActivity.class);
+                    profileIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(profileIntent);
                 }
+
                 return true;
             }
         });

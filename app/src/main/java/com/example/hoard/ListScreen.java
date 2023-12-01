@@ -83,6 +83,8 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
     private TextView totalValueTextView;
     private FilterCriteria filterCriteria;
     private MenuItem profile;
+    private MenuItem profileMenuItem;
+    private MenuItem chartMenuItem;
 
 
     private final ActivityResultLauncher<Intent> addActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleAddResult);
@@ -111,14 +113,16 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
         bulkTag = topBarMenu.findItem(R.id.bulk_tag);
         closeBulkDelete = topBarMenu.findItem(R.id.close_bulk_select);
         tvTotalValue = findViewById(R.id.tvTotalValueAmount);
-        profile = topBarMenu.findItem(R.id.profile);
 
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
 
         Menu bottomMenu = bottomNav.getMenu();
         sort = bottomMenu.findItem(R.id.nav_sort);
         home = bottomMenu.findItem(R.id.nav_home);
+        chartMenuItem = bottomMenu.findItem(R.id.nav_chart);
+        profileMenuItem = bottomMenu.findItem(R.id.nav_profile);
 
+        //we are in home screen
         home.setChecked(true);
 
         //to get the current users info
@@ -148,32 +152,7 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
                 int id = item.getItemId();
                 if (id == R.id.search) {
                     // Implement search functionality
-                } else if (id == R.id.edit_profile){
-                    home.setChecked(false);
-                    Intent intent = new Intent(ListScreen.this, EditProfileActivity.class);
-                    startActivity(intent);
 
-                } else if (id == R.id.sign_out) {
-                    showConfirmDialog("Confirm Sign out", "Please Come back Soon!",
-                            new DialogInterfaceCallback() {
-                                @Override
-                                public void onPositiveButtonClick(DialogInterface dialog) {
-                                    // Delete the selected items from Firestore and update UI
-                                    handleAccountSignOut();
-                                }
-
-                            });
-                } else if (id == R.id.delete_account) {
-                    showConfirmDialog("Confirm Account Deletion", "Are you sure you want to leave this great app?",
-                            new DialogInterfaceCallback() {
-                                @Override
-                                public void onPositiveButtonClick(DialogInterface dialog) {
-                                    // Delete the selected items from Firestore and update UI
-                                    handleAccountDeletion();
-                                }
-
-                            });
-                    
                 } else if (id == R.id.bulk_delete) {
                     if (itemAdapter.getItemsSelectedCount() == 0) {
                         Toast.makeText(ListScreen.this, "No items selected.", Toast.LENGTH_SHORT).show();
@@ -261,16 +240,24 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
                 if (id == R.id.nav_home) {
-
+//                    Intent homeIntent = new Intent(getApplicationContext(), ListScreen.class);
+//                    homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                    startActivity(homeIntent);
                 } else if (id == R.id.nav_sort) {
                     Intent sortIntent = new Intent(getApplicationContext(), SortActivity.class);
+                    sortIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK );
                     startActivity(sortIntent);
                     return true;
                 } else if (id == R.id.nav_chart) {
                     Intent chartIntent = new Intent(getApplicationContext(), ItemBreakdown.class);
+                    chartIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(chartIntent);
 
-                }
+                } else if (id == R.id.nav_profile){
+                    Intent profileIntent = new Intent(getApplicationContext(), EditProfileActivity.class);
+                    profileIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(profileIntent);
+            }
 
                 return true;
             }
@@ -440,9 +427,6 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
             search.setEnabled(false);
             search.setVisible(false);
 
-            profile.setEnabled(false);
-            profile.setVisible(false);
-
             bulkDelete.setEnabled(true);
             bulkDelete.setVisible(true);
 
@@ -463,8 +447,6 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
 //            search.setEnabled(true);
 //            search.setVisible(true);
 
-            profile.setEnabled(true);
-            profile.setVisible(true);
 
             bulkDelete.setEnabled(false);
             bulkDelete.setVisible(false);
