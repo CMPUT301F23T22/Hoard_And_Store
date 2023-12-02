@@ -37,6 +37,7 @@ public class Item implements Serializable {
     private double estimatedValue;
     private final String itemID;
     private ArrayList<Tag> tags;
+    private String imageData;
     @PropertyName("briefDescriptionList")
     private final Map<String, Boolean> briefDescriptionList;
 
@@ -53,7 +54,7 @@ public class Item implements Serializable {
      * @param estimatedValue    The estimated value of the item.
      * @param comment           The comment associated with the item.
      */
-    public Item(Date dateOfAcquisition, String briefDescription, String make, String model, String serialNumber, double estimatedValue, String comment, ArrayList<Tag> tagsList) {
+    public Item(Date dateOfAcquisition, String briefDescription, String make, String model, String serialNumber, double estimatedValue, String comment, ArrayList<Tag> tagsList, String imageData) {
 
         if (!isValidDate(dateOfAcquisition)) {
             throw new IllegalArgumentException("Invalid date format.");
@@ -87,6 +88,7 @@ public class Item implements Serializable {
         this.briefDescriptionList = splitBriefDescription(this.briefDescription);
         this.itemID = UUID.randomUUID().toString();
         this.tags = tagsList;
+        this.imageData = imageData;
     }
 
     public Item(Date dateOfAcquisition, String briefDescription, String make, String model, String serialNumber, double estimatedValue, String comment, String itemID, ArrayList<Tag> tagsList) {
@@ -364,6 +366,14 @@ public class Item implements Serializable {
         if (tags != null) {
             tags.remove(tag);
         }
+    }
+
+    public void setImageData(String imageData) {
+        this.imageData = imageData;
+    }
+
+    public String getImageData() {
+        return imageData;
     }
 
     public Map<String, Boolean> getBriefDescriptionList() {

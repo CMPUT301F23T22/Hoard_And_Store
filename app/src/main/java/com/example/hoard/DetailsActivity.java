@@ -5,10 +5,15 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
@@ -147,6 +152,12 @@ public class DetailsActivity extends AppCompatActivity {
         // create a chips from tags
         chipGroup.removeAllViews();
 
+
+        ImageView itemImageView = findViewById(R.id.itemImage);
+        // showing nothing rn
+        Log.d("DetailsActivity", "Image data: " + selectedItem.getImageData());
+
+
         // iterate over the tags and add to chip group
         for (Tag tag : tags) {
             Chip chip = new Chip(DetailsActivity.this);
@@ -157,4 +168,8 @@ public class DetailsActivity extends AppCompatActivity {
         }
     }
 
+    private Bitmap convertBase64ToBitmap(String base64Str) {
+        byte[] decodedBytes = Base64.decode(base64Str, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+    }
 }
