@@ -61,7 +61,7 @@
                     app:boxBackgroundMode="outline">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/serialNumberInput"
+                        android:id="@+id/scannedBarcode"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
 

@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -33,6 +35,8 @@ public class BarcodeScannerActivity extends AppCompatActivity {
     private static final String API_KEY = "pfhjpg9m2en2k2e8sv2va0x55wxmeg";
     private TextView barcodeNumberText;
     private Button scanButton;
+    private TextView AutogenDescription;
+    private Button getDescriptionBtn;
     private final ActivityResultLauncher<ScanOptions> barcodeLauncher = registerForActivityResult(
             new ScanContract(),
             result -> {
@@ -49,7 +53,7 @@ public class BarcodeScannerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_barcode_scanner);
 
-        barcodeNumberText = findViewById(R.id.serialNumberInput);
+        barcodeNumberText = findViewById(R.id.scannedBarcode);
         scanButton = findViewById(R.id.BarcodeScan);
 
         scanButton.setOnClickListener(view -> {
@@ -58,6 +62,17 @@ public class BarcodeScannerActivity extends AppCompatActivity {
                 ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.CAMERA}, 123);
             } else {
                 startScanning();
+            }
+        });
+
+        getDescriptionBtn = findViewById(R.id.GetDescriptionBtn);
+
+        getDescriptionBtn.setOnClickListener(view -> {
+            String barcodeValue = barcodeNumberText.getText().toString();
+            if (!barcodeValue.isEmpty()) {
+                fetchProductInfo(barcodeValue);
+            } else {
+                Toast.makeText(BarcodeScannerActivity.this, "No barcode scanned", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -83,7 +98,7 @@ public class BarcodeScannerActivity extends AppCompatActivity {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
+                runOnUiThread(() -> Toast.makeText(BarcodeScannerActivity.this, "Failed to auto-gen description", Toast.LENGTH_SHORT).show());
             }
 
             @Override
