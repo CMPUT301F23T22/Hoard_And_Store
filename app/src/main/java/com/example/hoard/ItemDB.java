@@ -45,6 +45,18 @@ public class ItemDB {
     private FirebaseAuth mAuth;
     private String userDocumentId;
 
+    public CollectionReference getUserCollection() {
+        return userCollection;
+    }
+
+    public String getUserDocumentId() {
+        return userDocumentId;
+    }
+
+    public void setUserDocumentId(String userDocumentId) {
+        this.userDocumentId = userDocumentId;
+    }
+
     public Task<String> getUsername() {
         if (userCollection != null) {
             return userCollection.document(userDocumentId).get().continueWith(new Continuation<DocumentSnapshot, String>() {
@@ -83,23 +95,31 @@ public class ItemDB {
     }
 
 
-    public interface InitializationCallback {
-        void onInitializationComplete(CollectionReference itemsCollection);
-        void onInitializationFailure(Exception e);
-    }
+
     public ItemDB(ItemDBConnector dbConnector) {
         db = dbConnector.getDatabase();
         userCollection = db.collection("user");
         mAuth = FirebaseAuth.getInstance();
     }
 
+    /**
+     * returns document snapshot containg doc id for a certain field and value
+     *
+     * @param field field in firestore
+     * @param value value at specified field
+     * @return Task<QuerySnapshot> containing the docID
+     */
     public Task<QuerySnapshot> getDocumentId(String field, String value) {
         Query query = userCollection.whereEqualTo(field, value);
 
         return query.get();
     }
 
-    // Method to set a subcollection for a specific user document ID
+    /**
+     * sets the users subCollection
+     *
+     * @return Task<QuerySnapshot> containing the docID
+     */
     public Task<QuerySnapshot> setSubcollection() {
         FirebaseUser user = mAuth.getCurrentUser();
         String uid = user.getUid();
@@ -128,20 +148,6 @@ public class ItemDB {
         // Perform any additional actions if needed
     }
 
-    /**
-     * add a given item
-     *
-     * @param item               items to be edited
-     * @param onCompleteListener listener to verify
-     * @return task
-     */
-//    public Task<Void> addItem(Item item, OnCompleteListener<Void> onCompleteListener) {
-//        // Create a new document with a generated ID in the "items" collection
-//        DocumentReference newItemRef = itemsCollection.document();
-//        // Set the data for the new document based on the item object
-//        newItemRef.set(item).addOnCompleteListener(onCompleteListener);
-//        return newItemRef.set(item);
-//    }
 
     public Task<DocumentReference> addItem(Item item, OnCompleteListener<DocumentReference> onCompleteListener) {
 
@@ -270,6 +276,10 @@ public class ItemDB {
         void onItemCollectionInitialized();
     }
 
+    /**
+     * inializtxes the users item subcollection
+     * @see OnItemCollectionInitialized
+     */
     public void initializeItemCollection(final OnItemCollectionInitialized callback) {
         FirebaseUser user = mAuth.getCurrentUser();
         Query query = userCollection.whereEqualTo("uid", user.getUid());
@@ -431,23 +441,6 @@ public class ItemDB {
                 Collections.reverse(filteredAndSortedResults);
             }
 
-//            for (Map.Entry<String, String> entry : sortOptions.entrySet()) {
-//                String sortField = entry.getKey();
-//                String sortOrder = entry.getValue();
-//
-//                // Sort the results based on the provided field and direction
-//                filteredAndSortedResults.sort((doc1, doc2) -> {
-//                    Object value1 = doc1.get(sortField);
-//                    Object value2 = doc2.get(sortField);
-//
-//                    // Use the CustomComparator for comparison
-//                    return new SortComparator().compare(value1, value2);
-//                });
-//
-//                if (sortOrder.equalsIgnoreCase("descending")) {
-//                    Collections.reverse(filteredAndSortedResults);
-//                }
-//            }
         }
 
         return filteredAndSortedResults;
@@ -478,10 +471,11 @@ public class ItemDB {
                 });
     }
 
-    public void removeFromUser(String field, String value){
-
-    }
-
+    /**
+     * deletes the signed in users account
+     *
+     * @return Task to be continued and handle on success/oncomplete
+     */
     public void deleteAccount(){
         FirebaseUser user = mAuth.getCurrentUser();
         String uid = user.getUid();
@@ -511,31 +505,41 @@ public class ItemDB {
                 });
     }
 
+
+    /**
+     * Signs out the current user
+     */
     public void signOut(){
         mAuth.signOut();
     }
 
-    public Task createAccount(String email, String password, String userName) {
-        return mAuth.createUserWithEmailAndPassword(email, password);
-    }
-    public Task<Void> OLDupdateUserPassword(String password){
-        FirebaseUser user = mAuth.getCurrentUser();
-        return user.updatePassword(password);
+//    public Task createAccount(String email, String password, String userName) {
+//        return mAuth.createUserWithEmailAndPassword(email, password);
+//    }
+//    public Task<Void> OLDupdateUserPassword(String password){
+//        FirebaseUser user = mAuth.getCurrentUser();
+//        return user.updatePassword(password);
+//
+//    }
 
-    }
+//    private Task<Void> updateEmailInDatabase(String newEmail) {
+//        DocumentReference userDocRef = userCollection.document(userDocumentId);
+//        Task<Void> updateUsernameTask = userDocRef.update("email", newEmail);
+//
+//        return userCollection.document(userDocumentId).update("email", newEmail);
+//    }
 
-    private Task<Void> updateEmailInDatabase(String newEmail) {
-        DocumentReference userDocRef = userCollection.document(userDocumentId);
-        Task<Void> updateUsernameTask = userDocRef.update("email", newEmail);
-
-        return userCollection.document(userDocumentId).update("email", newEmail);
-    }
-
+    /**
+     * updates the signed in users password
+     * @param currentPassword current password
+     * @param newPassword new password
+     * @param email current email
+     * @return Task to be continued and handle on success/oncomplete
+     */
     public Task<Void> updateUserPassword(String currentPassword, String newPassword, String email) {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user == null) {
             // Handle the case where the user is not authenticated
-            // You might want to return a failed task or handle it differently
             return Tasks.forException(new Exception("User not authenticated"));
         }
 
@@ -549,12 +553,19 @@ public class ItemDB {
                         return user.updatePassword(newPassword);
                     } else {
                         // Reauthentication failed, handle the failure
-                        // You might want to return a failed task or handle it differently
                         return Tasks.forException(reauthTask.getException());
                     }
                 });
     }
 
+
+    /**
+     * updates the signed in users email
+     * @param email current email
+     * @param newEmail new email
+     * @param password current password
+     * @return Task to be continued and handle on success/oncomplete
+     */
     public Task<Void> updateUserEmail(String email, String newEmail, String password) {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user == null) {
@@ -579,6 +590,11 @@ public class ItemDB {
     }
 
 
+    /**
+     * updates the signed in users user name
+     * @param username current username
+     * @return Task to be continued and handle on success/oncomplete
+     */
     public Task<Void> updateUserName(String username) {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user == null) {

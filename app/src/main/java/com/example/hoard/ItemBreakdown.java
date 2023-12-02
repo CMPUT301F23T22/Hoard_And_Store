@@ -1,8 +1,5 @@
 package com.example.hoard;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -11,8 +8,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.chip.Chip;
@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 
 public class ItemBreakdown extends AppCompatActivity {
-    private TextView tvR, tvPython, tvCPP, tvJava;
     PieChart pieChart;
     private ItemDBController itemDBController;
     private TagDBController tagDBController;
@@ -38,11 +37,12 @@ public class ItemBreakdown extends AppCompatActivity {
     private Map<Tag, Integer> selectedTagMap;
     private ArrayList<Tag> selectedTagList;
     private BottomNavigationView bottomNav;
-    private Menu bottomMenu;
     private MenuItem sortMenuItem;
     private MenuItem homeMenuItem;
     private MenuItem profileMenuItem;
+    private List<Map.Entry<Tag, Integer>> selectedTagMapList;
     private MenuItem chartMenuItem;
+    private ItemBreakDownAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +51,15 @@ public class ItemBreakdown extends AppCompatActivity {
 
         applyButton = findViewById(R.id.apply_tags);
         selectedTagList = new ArrayList<Tag>();
+        selectedTagMap = new HashMap<>();
+
+        selectedTagMapList = new ArrayList<>(selectedTagMap.entrySet());
+
+        adapter = new ItemBreakDownAdapter(this, selectedTagMapList);
+
+        // Set up the ListView
+        ListView listView = findViewById(R.id.tag_breakdown_list); // Replace with your ListView id
+        listView.setAdapter(adapter);
 
         bottomNav = findViewById(R.id.bottomNavigationView);
         Menu bottomMenu = bottomNav.getMenu();
@@ -88,20 +97,21 @@ public class ItemBreakdown extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
                 if (id == R.id.nav_home) {
+                    // switch to the expected activity Make sure to clear activity
                     Intent homeIntent = new Intent(getApplicationContext(), ListScreen.class);
                     homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(homeIntent);
                 } else if (id == R.id.nav_sort) {
+                    // switch to the expected activity Make sure to clear activity
                     Intent sortIntent = new Intent(getApplicationContext(), SortActivity.class);
                     sortIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(sortIntent);
                     return true;
                 } else if (id == R.id.nav_chart) {
-//                    Intent chartIntent = new Intent(getApplicationContext(), ItemBreakdown.class);
-//                    chartIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                    startActivity(chartIntent);
+                    // already in this activity do nothing
 
                 } else if (id == R.id.nav_profile){
+                    // switch to the expected activity Make sure to clear activity
                     Intent profileIntent = new Intent(getApplicationContext(), EditProfileActivity.class);
                     profileIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(profileIntent);
@@ -132,15 +142,18 @@ public class ItemBreakdown extends AppCompatActivity {
         applyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // clear any previous  tags that were selected
                 selectedTagList.clear();
+                // grab the selected tags
                 for (int i = 0; i < chipGroupTags.getChildCount(); i++) {
                     Chip chip = (Chip) chipGroupTags.getChildAt(i);
                     if (chip.isChecked()) {
                         Tag selectedtag = (Tag) chip.getTag();
                         selectedTagList.add(selectedtag);
-//                        selectedTagMap.put(selectedtag, 0);
+                        selectedTagMap.put(selectedtag, 0);
                     }
                 }
+                // we only support 5
                 if(selectedTagList.size() > 5){
                     showSnackbar("Only 5 tags can be selected");
                 } else {
@@ -153,25 +166,52 @@ public class ItemBreakdown extends AppCompatActivity {
         });
     }
 
+
+    /**
+     * Uses the selectedTags to generate a pie-chart displaying the # of items
+     * using a particular tag
+     *
+     */
     private void setData() {
         itemDBController.getTagCounts(selectedTagList, new ItemDBController.TagCountsCallback() {
             @Override
-            public void onTagCountsReady(Map<Tag, Integer> tagCounts) {
+            public void onTagCountsReady(List<Item> itemWithSelectedTags) {
+                // check if piechart is not null
+                selectedTagMap.clear();
                 if(pieChart != null){
                     pieChart.clearChart();
+                    pieChart.clearAnimation();
                 }
 
+                // add the counts for each tag (# of occurences)
+                for(Item selectedItem : itemWithSelectedTags){
+                    for(Tag selectedTags: selectedItem.getTags()){
+                        if(selectedTagList.contains(selectedTags)){
+                            if (!selectedTagMap.containsKey(selectedTags)){
+                                selectedTagMap.put(selectedTags, 1);
+                            } else {
+                                selectedTagMap.put(selectedTags, selectedTagMap.get(selectedTags) + 1);
+                            }
+                        }
+                    }
+                }
 
-                for (Tag tag : tagCounts.keySet()) {
+                // create the pie slices for each tag Selected.
+                for (Map.Entry<Tag, Integer> entry : selectedTagMap.entrySet()) {
                     pieChart.addPieSlice(
                             new PieModel(
-                                    tag.getTagName().toString(),
-                                    Integer.parseInt(tagCounts.get(tag).toString()),
-                                    Color.parseColor(tag.getTagColor()))
+                                    entry.getKey().getTagName().toString(),
+                                    Integer.parseInt(entry.getValue().toString()),
+                                    Color.parseColor(entry.getKey().getTagColor()))
                     );
                 }
 
-                setUpUI(tagCounts);
+                // update the adapter to the new data
+                selectedTagMapList.clear();
+                selectedTagMapList.addAll(selectedTagMap.entrySet());
+                adapter.notifyDataSetChanged();
+
+                setUpUI(selectedTagMap);
 
 
             }
@@ -186,10 +226,21 @@ public class ItemBreakdown extends AppCompatActivity {
 
     }
 
+
+    /**
+     * Shows a snackbar with a certain message
+     *
+     * @param  message message to display
+     */
     private void showSnackbar(String message) {
         Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG).show();
     }
 
+    /**
+     * updates our placeholder textView and sets/unsets them to be visible to the user
+     *
+     * @param  tagCounts a map indicating the Tag and the number of occurences in a users item collection
+     */
     private void setUpUI(Map<Tag, Integer> tagCounts){
         int maxElementsToShow = 5;
 

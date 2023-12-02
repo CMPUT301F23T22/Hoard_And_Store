@@ -409,6 +409,7 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
                     public void onDataLoaded(List<Item> items) {
                         itemAdapter = new ItemAdapter(items, recyclerView);
                         recyclerView.setAdapter(itemAdapter);
+                        itemAdapter.setSumCallback(ListScreen.this);
                     }
                 }, filterCriteria);
             }
@@ -566,18 +567,6 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
 
     }
 
-    private void handleAccountDeletion(){
-        dbController.deleteAccount();
-        Intent intent = new Intent(ListScreen.this, MainActivity.class);
-        startActivity(intent);
-    }
-
-    private void handleAccountSignOut(){
-        dbController.signOut();
-        Intent intent = new Intent(ListScreen.this, MainActivity.class);
-        startActivity(intent);
-
-    }
     private void handleBulkTag() {
         List<Tag> selectedTags = new ArrayList<>();
         for (int i = 0; i < chipGroupTags.getChildCount(); i++) {

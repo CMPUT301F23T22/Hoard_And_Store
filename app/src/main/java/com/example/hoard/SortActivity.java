@@ -113,6 +113,7 @@ public class SortActivity extends AppCompatActivity implements CustomDatePicker.
 
         radioButtonAscending = findViewById(R.id.sort_ascedning);
         radioButtonDescending = findViewById(R.id.sort_descending);
+        dbController = ItemDBController.getInstance();
         TagDBController tagDBController = TagDBController.getInstance();
 
 
@@ -143,7 +144,7 @@ public class SortActivity extends AppCompatActivity implements CustomDatePicker.
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(sortAdapter);
-        dbController = ItemDBController.getInstance();
+
         fab = findViewById(R.id.addItemButton);
 //        applyButton = findViewById(R.id.apply_filter_sort_button);
         addMoreFilters = findViewById(R.id.add_more_make_filter);

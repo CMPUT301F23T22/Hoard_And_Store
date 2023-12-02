@@ -36,7 +36,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:id="@+id/list_content"
-            android:paddingBottom="80dp"
+            android:paddingBottom="20dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <com.google.android.material.card.MaterialCardView
@@ -82,7 +82,7 @@
                     android:id="@+id/recyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:paddingBottom="80dp"
+                    android:paddingBottom="30dp"
                     android:clipToPadding="false" />
             </androidx.core.widget.NestedScrollView>
         </LinearLayout>

@@ -3,6 +3,7 @@ package com.example.hoard;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -15,7 +16,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 public class TagDB {
     private final FirebaseFirestore db;
     private final CollectionReference tagsCollection;
-
+    private FirebaseAuth mAuth;
     /**
      * Constructor for the TagDB class.
      *
@@ -23,7 +24,13 @@ public class TagDB {
      */
     public TagDB(ItemDBConnector dbConnector) {
         db = dbConnector.getDatabase();
-        tagsCollection = db.collection("tags");
+        ItemDBController itemdbController = ItemDBController.getInstance();
+
+        String userDocumentId = itemdbController.getUserDocID();
+        CollectionReference userCollection = itemdbController.getUserCollection();
+
+        userCollection.document(userDocumentId).collection("items");
+        tagsCollection =userCollection.document(userDocumentId).collection("tags");
     }
 
     /**

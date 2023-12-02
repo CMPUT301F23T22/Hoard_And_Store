@@ -23,35 +23,14 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
-import com.google.firebase.auth.FirebaseUser;
 
 public class EditProfileActivity extends AppCompatActivity {
-
-    private TextInputEditText usernameEditText;
-    private TextInputLayout usernameInputLayout;
     private ItemDBController dbController;
-    private TextInputEditText currentPasswordEditText;
-    private TextInputLayout currentPasswordInputLayout;
-    private TextInputEditText newPasswordEditText;
-    private TextInputLayout newPasswordInputLayout;
-    private TextInputEditText confirmPasswordEditText;
-    private TextInputLayout confirmPasswordInputLayout;
-    private TextInputEditText emailEditText;
-    private Button saveButton;
-    private FirebaseUser user;
-    private Boolean validatedCurrPass = false;
-    private Boolean validatedNewPassMatch = false;
-    private Button closeButton;
     private boolean passwordUpdated = false;
-    private boolean usernameUpdated = false;
-    private View dialogView;
     private MenuItem sort;
     private MenuItem home;
     private BottomNavigationView bottomNav;
-    private Menu bottomMenu;
     private MenuItem sortMenuItem;
     private MenuItem homeMenuItem;
     private MenuItem profileMenuItem;
@@ -178,7 +157,10 @@ public class EditProfileActivity extends AppCompatActivity {
 
 
 
-
+    /**
+     * Shows an alert dialog for the user to change their username
+     * Will need to verify password/email
+     */
     private void showChangeUsernameDialog() {
         View dialogView = getLayoutInflater().inflate(R.layout.change_username, null);
         final AlertDialog builder = new AlertDialog.Builder(this)
@@ -243,6 +225,11 @@ public class EditProfileActivity extends AppCompatActivity {
         builder.show();
     }
 
+
+    /**
+     * Shows an alert dialog for the user to change their email
+     * Will need to verify password/email
+     */
     private void showChangeEmailDialog() {
         View dialogView = getLayoutInflater().inflate(R.layout.change_email, null);
         final AlertDialog builder = new AlertDialog.Builder(this)
@@ -292,6 +279,10 @@ public class EditProfileActivity extends AppCompatActivity {
         builder.show();
     }
 
+    /**
+     * Shows an alert dialog for the user to change their password
+     * Will need to verify password/email ans that new password matches confirm password
+     */
     private void showChangePasswordDialog() {
         // Create a custom AlertDialog
         View dialogView = getLayoutInflater().inflate(R.layout.change_password, null);
@@ -332,7 +323,6 @@ public class EditProfileActivity extends AppCompatActivity {
                         //check if passwords match
                         if (!(newPassword.equals(confirmPassword)) | newPassword.length() <= 6) {
                             try {
-                                passwordUpdated = false;
                                 throw new Exception("Password does not match");
                             } catch (Exception e) {
                                 newPasswordInputLayout.setError(getString(R.string.password_match_and_length_error));
@@ -380,17 +370,23 @@ public class EditProfileActivity extends AppCompatActivity {
         Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG).show();
     }
 
+    /**
+     * Handles the delete account process for the user account.
+     */
     private void handleAccountDeletion(){
         dbController.deleteAccount();
         Intent accountDeletionIntent = new Intent(getApplicationContext(), MainActivity.class);
-        accountDeletionIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        accountDeletionIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(accountDeletionIntent);
     }
 
+    /**
+     * Handles the sign-out process for the user account.
+     */
     private void handleAccountSignOut(){
         dbController.signOut();
         Intent signOutIntent = new Intent(getApplicationContext(), MainActivity.class);
-        signOutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        signOutIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(signOutIntent);
 
     }
@@ -399,6 +395,12 @@ public class EditProfileActivity extends AppCompatActivity {
         void onPositiveButtonClick(DialogInterface dialog);
     }
 
+    /**
+     * basic alert dialog that is updated and changed depending on what we are doing
+     *
+     * @param  title title for the alert dialog
+     * @param  message message indicating a some confirmation or other message to show user
+     */
     private void showConfirmDialog(String title, String message, EditProfileActivity.DialogInterfaceCallback callback) {
         new android.app.AlertDialog.Builder(EditProfileActivity.this, R.style.PurpleAlertDialog)
                 .setTitle(title)
