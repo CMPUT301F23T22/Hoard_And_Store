@@ -323,4 +323,80 @@ public class ListScreenActivity {
         onView(withText("Test Bulk Delete Item 1")).check(doesNotExist());
         onView(withText("Test Bulk Delete Item 2")).check(doesNotExist());
     }
+
+    // Sorting and Filtering tests
+    // #	Date	Description	Make	Model	Serial Number	Value	Comment
+    //1	01/01/2023	Initial Test Item	AlphaMake	AlphaModel	ALPH123	500	Initial Entry
+    //2	15/02/2023	Mid-Quarter Sample	BetaMake	BetaModel	BETA456	750	Mid-Quarter
+    //3	30/03/2023	End of Quarter Test	GammaMake	GammaModel	GAMM789	1000	Quarter End
+    //4	10/04/2023	Spring Check Item	DeltaMake	DeltaModel	DELT012	300	Spring Check
+    //5	20/05/2023	Pre-Summer Review	EpsilonMake	EpsModel	EPSI345	600	Pre-Summer
+
+    //Create items to tests sorting and filtering
+    @Test
+    public void createItems() {
+        // Add item number 1
+        onView(withId(R.id.addItemButton)).perform(click());
+        onView(withId(R.id.dateInput)).perform(ViewActions.typeText("01/01/2023"));
+        onView(withId(R.id.descriptionInput)).perform(ViewActions.typeText("Initial Test Item"));
+        onView(withId(R.id.makeInput)).perform(ViewActions.typeText("AlphaMake"));
+        onView(withId(R.id.modelInput)).perform(ViewActions.typeText("AlphaModel"));
+        onView(withId(R.id.serialNumberInput)).perform(ViewActions.typeText("ALPH123"));
+        onView(withId(R.id.valueInput)).perform(ViewActions.typeText("500"));
+        onView(withId(R.id.commentInput)).perform(ViewActions.typeText("Initial Entry"));
+        closeSoftKeyboard();
+        onView(withId(R.id.submitButton)).perform(click());
+        wait(2000);
+
+        // Add item number 2
+        onView(withId(R.id.addItemButton)).perform(click());
+        onView(withId(R.id.dateInput)).perform(ViewActions.typeText("15/02/2023"));
+        onView(withId(R.id.descriptionInput)).perform(ViewActions.typeText("Mid-Quarter Sample"));
+        onView(withId(R.id.makeInput)).perform(ViewActions.typeText("BetaMake"));
+        onView(withId(R.id.modelInput)).perform(ViewActions.typeText("BetaModel"));
+        onView(withId(R.id.serialNumberInput)).perform(ViewActions.typeText("BETA456"));
+        onView(withId(R.id.valueInput)).perform(ViewActions.typeText("750"));
+        onView(withId(R.id.commentInput)).perform(ViewActions.typeText("Mid-Quarter"));
+        closeSoftKeyboard();
+        onView(withId(R.id.submitButton)).perform(click());
+        wait(2000);
+
+        // Add item number 3
+        onView(withId(R.id.addItemButton)).perform(click());
+        onView(withId(R.id.dateInput)).perform(ViewActions.typeText("30/03/2023"));
+        onView(withId(R.id.descriptionInput)).perform(ViewActions.typeText("End of Quarter Test"));
+        onView(withId(R.id.makeInput)).perform(ViewActions.typeText("GammaMake"));
+        onView(withId(R.id.modelInput)).perform(ViewActions.typeText("GammaModel"));
+        onView(withId(R.id.serialNumberInput)).perform(ViewActions.typeText("GAMM789"));
+        onView(withId(R.id.valueInput)).perform(ViewActions.typeText("1000"));
+        onView(withId(R.id.commentInput)).perform(ViewActions.typeText("Quarter End"));
+        closeSoftKeyboard();
+        onView(withId(R.id.submitButton)).perform(click());
+        wait(2000);
+
+        // Add item number 4
+        onView(withId(R.id.addItemButton)).perform(click());
+        onView(withId(R.id.dateInput)).perform(ViewActions.typeText("10/04/2023"));
+        onView(withId(R.id.descriptionInput)).perform(ViewActions.typeText("Spring Check Item"));
+        onView(withId(R.id.makeInput)).perform(ViewActions.typeText("DeltaMake"));
+        onView(withId(R.id.modelInput)).perform(ViewActions.typeText("DeltaModel"));
+        onView(withId(R.id.serialNumberInput)).perform(ViewActions.typeText("DELT012"));
+        onView(withId(R.id.valueInput)).perform(ViewActions.typeText("300"));
+        onView(withId(R.id.commentInput)).perform(ViewActions.typeText("Spring Check"));
+        closeSoftKeyboard();
+        onView(withId(R.id.submitButton)).perform(click());
+        wait(2000);
+
+        // Add item number 5
+        onView(withId(R.id.addItemButton)).perform(click());
+        onView(withId(R.id.dateInput)).perform(ViewActions.typeText("20/05/2023"));
+        onView(withId(R.id.descriptionInput)).perform(ViewActions.typeText("Pre-Summer Review"));
+        onView(withId(R.id.makeInput)).perform(ViewActions.typeText("EpsilonMake"));
+        onView(withId(R.id.modelInput)).perform(ViewActions.typeText("EpsModel"));
+        onView(withId(R.id.serialNumberInput)).perform(ViewActions.typeText("EPSI345"));
+        onView(withId(R.id.valueInput)).perform(ViewActions.typeText("600"));
+        onView(withId(R.id.commentInput)).perform(ViewActions.typeText("Pre-Summer"));
+        closeSoftKeyboard();
+        onView(withId(R.id.submitButton)).perform(click());
+        wait(2000);
 }
