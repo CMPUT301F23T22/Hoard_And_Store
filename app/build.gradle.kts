@@ -40,7 +40,7 @@ dependencies {
     implementation("com.google.android.material:material:1.9.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation ("androidx.activity:activity:1.7.0")
-    implementation ("com.google.mlkit:barcode-scanning:17.2.0")
+    implementation ("com.journeyapps:zxing-android-embedded:4.3.0")
     implementation ("com.squareup.okhttp3:okhttp:4.9.0")
     implementation ("org.json:json:20210307")
     var cameraxversion = "1.1.0-beta01"
