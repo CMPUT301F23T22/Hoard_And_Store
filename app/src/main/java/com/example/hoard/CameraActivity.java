@@ -46,6 +46,9 @@ public class CameraActivity extends AppCompatActivity {
 
         // Setup button for capturing photo
         Button captureButton = findViewById(R.id.captureButton);
+        if (getIntent().getBooleanExtra("fromBarcodeScanner", false)) {
+            captureButton.setText("Auto Gen Description");
+        }
         captureButton.setOnClickListener(v -> takePhoto());
 
         // Button to close the activity

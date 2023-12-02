@@ -42,6 +42,7 @@ dependencies {
     implementation ("androidx.activity:activity:1.7.0")
     implementation ("com.google.mlkit:barcode-scanning:17.2.0")
     implementation ("com.squareup.okhttp3:okhttp:4.9.0")
+    implementation ("org.json:json:20210307")
     var cameraxversion = "1.1.0-beta01"
     implementation ("androidx.camera:camera-camera2:$cameraxversion")
     implementation ("androidx.camera:camera-lifecycle:$cameraxversion")

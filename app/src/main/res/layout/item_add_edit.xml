@@ -78,6 +78,8 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
                 android:hint="Brief Description"
+                app:endIconDrawable="@drawable/photo_camera"
+                app:endIconMode="custom"
                 app:hintEnabled="true"
                 app:hintAnimationEnabled="true"
                 app:boxBackgroundMode="outline">
