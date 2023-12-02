@@ -54,6 +54,17 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
     private ItemDBController itemDBController;
     private ArrayList<Tag> selectedTagList;
 
+    // ActivityResultLauncher for the barcode scanner
+    private final ActivityResultLauncher<Intent> barcodeScannerResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                    String description = result.getData().getStringExtra("productDescription");
+                    descriptionInput.setText(description); // Set the scanned product description
+                }
+            }
+    );
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,6 +123,11 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         dateInput.setOnClickListener(v -> showDatePicker());
         dateInputLayout.setEndIconOnClickListener(v -> showDatePicker());
 
+        // Listener for the barcode scanner
+        TextInputLayout descriptionInputLayout = findViewById(R.id.descriptionInputLayout);
+        descriptionInputLayout.setEndIconOnClickListener(v -> launchBarcodeScanner());
+
+
         // Save button listener
         Button saveButton = findViewById(R.id.submitButton);
         saveButton.setOnClickListener(v -> {
@@ -143,6 +159,11 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
             addImageResultLauncher.launch(tagIntent);
         });
 
+    }
+
+    private void launchBarcodeScanner() {
+        Intent intent = new Intent(this, BarcodeScannerActivity.class);
+        barcodeScannerResultLauncher.launch(intent);
     }
 
     /**
