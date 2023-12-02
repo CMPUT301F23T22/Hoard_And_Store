@@ -184,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
         passwordInputLayout.setHint("Password");
         signInButton.setText("Sign In");
 //        createAccountButton.setText("Create Account");
-        singupSpannableString.setSpan(signUpClickable, 23 , 29, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        singupSpannableString.setSpan(signUpClickable, 23 , 30, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         clickableAccountOption.setText(singupSpannableString);
         clickableAccountOption.setMovementMethod(LinkMovementMethod.getInstance());
     }
