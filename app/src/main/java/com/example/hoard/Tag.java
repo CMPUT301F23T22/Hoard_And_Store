@@ -1,6 +1,7 @@
 package com.example.hoard;
 
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -95,6 +96,13 @@ public class Tag implements Serializable {
             return false;
         }
         Tag tag = (Tag) o;
-        return tagID.equals(tag.tagID);
+        return tagID.equals(tag.tagID) &&
+                tagName.equals(tag.tagName) &&
+                tagColor.equals(tag.tagColor);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(tagID, tagName, tagColor);
     }
 }

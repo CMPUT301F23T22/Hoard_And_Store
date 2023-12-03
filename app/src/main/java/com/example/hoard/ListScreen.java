@@ -3,16 +3,21 @@ package com.example.hoard;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,8 +26,11 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -37,6 +45,7 @@ import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +68,7 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
     private ItemDBController dbController;
     private MenuItem sort;
     private MenuItem home;
+    private FirebaseAuth mAuth;
     private final ActivityResultLauncher<Intent> addTagResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleAddTagResult);
 
     private final Item itemToDelete = null;
@@ -72,6 +82,9 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
     private final int sortingRequestCode = 1;
     private TextView totalValueTextView;
     private FilterCriteria filterCriteria;
+    private MenuItem profile;
+    private MenuItem profileMenuItem;
+    private MenuItem chartMenuItem;
 
 
     private final ActivityResultLauncher<Intent> addActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleAddResult);
@@ -86,13 +99,15 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
         totalValueTextView = findViewById(R.id.tvTotalValueAmount);
         tagSelectionLayout = findViewById(R.id.tagSelectionLayout);
         filterCriteria = FilterCriteria.getInstance();
+        mAuth = FirebaseAuth.getInstance();
 
 //        itemDB = new ItemDB(new ItemDBConnector());
 
         addItemButton = findViewById(R.id.addItemButton);
         topBar = findViewById(R.id.topAppBar);
         Menu topBarMenu = topBar.getMenu();
-
+        topBar.setTitle(mAuth.getCurrentUser().getDisplayName());
+        topBar.setTitle(mAuth.getCurrentUser().getDisplayName());
         search = topBarMenu.findItem(R.id.search);
         bulkDelete = topBarMenu.findItem(R.id.bulk_delete);
         bulkTag = topBarMenu.findItem(R.id.bulk_tag);
@@ -104,14 +119,19 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
         Menu bottomMenu = bottomNav.getMenu();
         sort = bottomMenu.findItem(R.id.nav_sort);
         home = bottomMenu.findItem(R.id.nav_home);
+        chartMenuItem = bottomMenu.findItem(R.id.nav_chart);
+        profileMenuItem = bottomMenu.findItem(R.id.nav_profile);
 
+        //we are in home screen
         home.setChecked(true);
 
+        //to get the current users info
 
         chipGroupTags = findViewById(R.id.tagChipGroup);
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         dbController = ItemDBController.getInstance();
+
         dbController.loadItems(new DataLoadCallbackItem() {
             @Override
             public void onDataLoaded(List<Item> items) {
@@ -125,48 +145,29 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
             }
         }, filterCriteria);
 
+
         topBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 int id = item.getItemId();
                 if (id == R.id.search) {
                     // Implement search functionality
+
                 } else if (id == R.id.bulk_delete) {
                     if (itemAdapter.getItemsSelectedCount() == 0) {
                         Toast.makeText(ListScreen.this, "No items selected.", Toast.LENGTH_SHORT).show();
                     } else {
                         // Implement bulk delete functionality
                         if (itemAdapter.getSelectionMode()) {
-                            new AlertDialog.Builder(ListScreen.this, R.style.PurpleAlertDialog)
-                                    .setTitle("Confirm Delete")
-                                    .setMessage("Are you sure you want to delete these items?")
-                                    .setPositiveButton("Yes", (dialog, which) -> {
-                                        // Delete the selected items from Firestore
-                                        List<Item> selectedItems = itemAdapter.getSelectedItems();
-                                        Task<Void> deleteTask = dbController.bulkDeleteItems(selectedItems);
+                            showConfirmDialog("Confirm Delete", "Are you sure you want delete the selected items?",
+                                    new DialogInterfaceCallback() {
+                                        @Override
+                                        public void onPositiveButtonClick(DialogInterface dialog) {
+                                            // Delete the selected items from Firestore and update UI
+                                            handleBulkDelete();
+                                        }
 
-                                        deleteTask.addOnSuccessListener(aVoid -> {
-                                            // After successful deletion from Firestore, remove items from the adapter list.
-                                            for (Item selectedItem : selectedItems) {
-                                                int index = itemAdapter.getItemList().indexOf(selectedItem);
-                                                if (index != -1) {
-                                                    itemAdapter.removeItem(index);
-                                                }
-                                            }
-                                            // Update the UI after items have been removed from the adapter.
-                                            itemAdapter.notifyDataSetChanged();
-                                            closeBulkSelect(); // Call this method to update UI and exit selection mode.
-                                            Toast.makeText(ListScreen.this, "Items deleted.", Toast.LENGTH_SHORT).show();
-                                        }).addOnFailureListener(e -> {
-                                            // Handle the failure scenario, perhaps by showing a message to the user.
-                                            Toast.makeText(ListScreen.this, "Error while deleting items.", Toast.LENGTH_SHORT).show();
-                                        });
-                                    })
-                                    .setNegativeButton("No", (dialog, which) -> {
-                                        dialog.dismiss();
-                                    })
-                                    .setIcon(android.R.drawable.ic_dialog_alert)
-                                    .show();
+                                    });
                         }
 
                     }
@@ -211,48 +212,14 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
                         });
                         applyTagsButton.setOnClickListener(view -> {
                             if (itemAdapter.getSelectionMode()) {
-                                new AlertDialog.Builder(ListScreen.this, R.style.PurpleAlertDialog)
-                                        .setTitle("Confirm Tags")
-                                        .setMessage("Are you sure you want to add the selected tags to these items?")
-                                        .setPositiveButton("Yes", (dialog, which) -> {
-                                            // Get selected tags
-                                            List<Tag> selectedTags = new ArrayList<>();
-                                            for (int i = 0; i < chipGroupTags.getChildCount(); i++) {
-                                                Chip chip = (Chip) chipGroupTags.getChildAt(i);
-                                                if (chip.isChecked()) {
-                                                    Tag tag = (Tag) chip.getTag();
-                                                    selectedTags.add(tag);
-                                                }
+                                showConfirmDialog("Confirm Tags", "Are you sure you want apply tags to selected items?",
+                                        new DialogInterfaceCallback() {
+                                            @Override
+                                            public void onPositiveButtonClick(DialogInterface dialog) {
+                                                handleBulkTag();
                                             }
 
-                                            // Now you have the selected tags, iterate over selected items and update them
-                                            List<Item> selectedItems = itemAdapter.getSelectedItems();
-                                            for (Item selectedItem : selectedItems) {
-                                                for (Tag selectedTag : selectedTags) {
-                                                    if (!selectedItem.getTags().contains(selectedTag))
-                                                        selectedItem.addTag(selectedTag);
-                                                }
-                                                // Update each item in the database
-                                                dbController.editItem(selectedItem.getItemID(), selectedItem, task -> {
-                                                    if (!task.isSuccessful()) {
-                                                        Exception e = task.getException();
-                                                        Log.e("BulkTag", "Failed to update item tags", e);
-                                                        Toast.makeText(ListScreen.this, "Failed to update item tags" + (e != null ? ": " + e.getMessage() : ""), Toast.LENGTH_SHORT).show();
-                                                    }
-                                                });
-                                            }
-                                            itemAdapter.notifyDataSetChanged();
-
-                                            // Inform the user
-                                            Toast.makeText(ListScreen.this, "Tags applied to selected items.", Toast.LENGTH_SHORT).show();
-
-                                            // Update UI and hide the tag selection layout
-                                            itemAdapter.notifyDataSetChanged();
-                                            tagSelectionLayout.setVisibility(View.GONE);
-                                            closeBulkSelect(); // Close the bulk selection mode
-                                        }).setNegativeButton("No", (dialog, which) -> {
-                                            dialog.dismiss();
-                                        }).setIcon(android.R.drawable.ic_dialog_alert).show();
+                                        });
                             }
                         });
                     }
@@ -273,12 +240,24 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
                 if (id == R.id.nav_home) {
-
+//                    Intent homeIntent = new Intent(getApplicationContext(), ListScreen.class);
+//                    homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                    startActivity(homeIntent);
                 } else if (id == R.id.nav_sort) {
                     Intent sortIntent = new Intent(getApplicationContext(), SortActivity.class);
+                    sortIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK );
                     startActivity(sortIntent);
                     return true;
-                }
+                } else if (id == R.id.nav_chart) {
+                    Intent chartIntent = new Intent(getApplicationContext(), ItemBreakdown.class);
+                    chartIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(chartIntent);
+
+                } else if (id == R.id.nav_profile){
+                    Intent profileIntent = new Intent(getApplicationContext(), EditProfileActivity.class);
+                    profileIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(profileIntent);
+            }
 
                 return true;
             }
@@ -292,6 +271,8 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
             }
         });
     }
+
+
 
     ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
         @Override
@@ -372,6 +353,7 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
     @Override
     public void onSavedInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        topBar.setTitle(mAuth.getCurrentUser().getDisplayName());
         outState.putBoolean("selectionMode", itemAdapter.getSelectionMode());
         ArrayList<String> itemIDs = new ArrayList<>();
         for (Item item : itemAdapter.getItemList()) {
@@ -422,7 +404,14 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
             if (returnedItem != null) {
                 itemAdapter.addItem(returnedItem);
                 itemAdapter.notifyDataSetChanged(); // Refresh the RecyclerView
-                updateTotalValue();
+                dbController.loadItems(new DataLoadCallbackItem() {
+                    @Override
+                    public void onDataLoaded(List<Item> items) {
+                        itemAdapter = new ItemAdapter(items, recyclerView);
+                        recyclerView.setAdapter(itemAdapter);
+                        itemAdapter.setSumCallback(ListScreen.this);
+                    }
+                }, filterCriteria);
             }
         }
     }
@@ -459,6 +448,7 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
 //            search.setEnabled(true);
 //            search.setVisible(true);
 
+
             bulkDelete.setEnabled(false);
             bulkDelete.setVisible(false);
 
@@ -476,7 +466,7 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
             addItemButton = findViewById(R.id.addItemButton);
             addItemButton.setVisibility(View.VISIBLE);
 
-            topBar.setTitle("Items");
+            topBar.setTitle(mAuth.getCurrentUser().getDisplayName());
         }
     }
 
@@ -534,6 +524,85 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
     public void onSumChanged(double sum) {
         // Update the total value TextView
         totalValueTextView.setText(String.format(Locale.getDefault(), "%.2f", sum));
+    }
+
+    private interface DialogInterfaceCallback {
+        void onPositiveButtonClick(DialogInterface dialog);
+    }
+
+    private void showConfirmDialog(String title, String message, DialogInterfaceCallback callback) {
+        new AlertDialog.Builder(ListScreen.this, R.style.PurpleAlertDialog)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    if (callback != null) {
+                        callback.onPositiveButtonClick(dialog);
+                    }
+                })
+                .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+    }
+
+    private void handleBulkDelete(){
+        List<Item> selectedItems = itemAdapter.getSelectedItems();
+        Task<Void> deleteTask = dbController.bulkDeleteItems(selectedItems);
+
+        deleteTask.addOnSuccessListener(aVoid -> {
+            // After successful deletion from Firestore, remove items from the adapter list.
+            for (Item selectedItem : selectedItems) {
+                int index = itemAdapter.getItemList().indexOf(selectedItem);
+                if (index != -1) {
+                    itemAdapter.removeItem(index);
+                }
+            }
+            // Update the UI after items have been removed from the adapter.
+            itemAdapter.notifyDataSetChanged();
+            closeBulkSelect(); // Call this method to update UI and exit selection mode.
+            Toast.makeText(ListScreen.this, "Items deleted.", Toast.LENGTH_SHORT).show();
+        }).addOnFailureListener(e -> {
+            // Handle the failure scenario, perhaps by showing a message to the user.
+            Toast.makeText(ListScreen.this, "Error while deleting items.", Toast.LENGTH_SHORT).show();
+        });
 
     }
+
+    private void handleBulkTag() {
+        List<Tag> selectedTags = new ArrayList<>();
+        for (int i = 0; i < chipGroupTags.getChildCount(); i++) {
+            Chip chip = (Chip) chipGroupTags.getChildAt(i);
+            if (chip.isChecked()) {
+                Tag tag = (Tag) chip.getTag();
+                selectedTags.add(tag);
+            }
+        }
+
+        // Now you have the selected tags, iterate over selected items and update them
+        List<Item> selectedItems = itemAdapter.getSelectedItems();
+        for (Item selectedItem : selectedItems) {
+            for (Tag selectedTag : selectedTags) {
+                if (!selectedItem.getTags().contains(selectedTag))
+                    selectedItem.addTag(selectedTag);
+            }
+            // Update each item in the database
+            dbController.editItem(selectedItem.getItemID(), selectedItem, task -> {
+                if (!task.isSuccessful()) {
+                    Exception e = task.getException();
+                    Log.e("BulkTag", "Failed to update item tags", e);
+                    Toast.makeText(ListScreen.this, "Failed to update item tags" + (e != null ? ": " + e.getMessage() : ""), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+        itemAdapter.notifyDataSetChanged();
+
+        // Inform the user
+        Toast.makeText(ListScreen.this, "Tags applied to selected items.", Toast.LENGTH_SHORT).show();
+
+        // Update UI and hide the tag selection layout
+        itemAdapter.notifyDataSetChanged();
+        tagSelectionLayout.setVisibility(View.GONE);
+        closeBulkSelect(); // Close the bulk selection mode
+    }
 }
+
+

@@ -8,15 +8,25 @@
         android:icon="@drawable/home_24px" />
 
     <item
+        android:id="@+id/nav_sort"
+        android:title=""
+        android:icon="@drawable/filter_alt_24px"/>
+
+    <item
         android:id="@+id/fab"
         android:title=""
         android:enabled="false"
         android:checked="true"/>
 
     <item
-        android:id="@+id/nav_sort"
+        android:id="@+id/nav_chart"
         android:title=""
-        android:icon="@drawable/filter_alt_24px"/>
+        android:icon="@drawable/bar_chart_24px"/>
+
+    <item
+        android:id="@+id/nav_profile"
+        android:title=""
+        android:icon="@drawable/profile_24px"/>
 
 
 

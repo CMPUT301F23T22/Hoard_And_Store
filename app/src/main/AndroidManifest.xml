@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-feature android:name="android.hardware.camera" android:required="true"/>
@@ -18,18 +19,26 @@
         android:theme="@style/Theme.Hoard_And_Store"
         tools:targetApi="31">
         <activity
+            android:name=".ItemBreakdown"
+            android:exported="false" />
+        <activity
+            android:name=".EditProfileActivity"
+            android:exported="false" />
+        <activity
             android:name=".ListScreen"
             android:exported="false" />
-
-        <activity android:name=".DetailsActivity"
-            android:exported="false"/>
-
-        <activity android:name=".AddEditItem"
-            android:exported="false"/>
-        <activity android:name=".SortActivity"
-            android:exported="false"/>
-        <activity android:name=".TagAddEdit"
-            android:exported="false"/>
+        <activity
+            android:name=".DetailsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AddEditItem"
+            android:exported="false" />
+        <activity
+            android:name=".SortActivity"
+            android:exported="false" />
+        <activity
+            android:name=".TagAddEdit"
+            android:exported="false" />
         <activity android:name=".CameraActivity"
             android:exported="false"/>
         <activity android:name=".AddImage"
