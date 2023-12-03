@@ -33,23 +33,37 @@ import java.util.Locale;
 /**
  * An activity for adding or editing items, extending AppCompatActivity and implementing
  * CustomDatePicker.DatePickListener for handling date selections.
- *
  */
 public class AddEditItem extends AppCompatActivity implements CustomDatePicker.DatePickListener {
 
-    private EditText descriptionInput, makeInput, modelInput, serialNumberInput, valueInput, commentInput, dateInput;
     private final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-
+    // ActivityResultLauncher for adding images
+    private final ActivityResultLauncher<Intent> addImageResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            this::handleAddImageResult
+    );
+    ChipGroup chipGroupTags;
+    private final ActivityResultLauncher<Intent> addTagResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            this::handleAddTagResult);
+    private EditText descriptionInput, makeInput, modelInput, serialNumberInput, valueInput, commentInput, dateInput;
+    private String imageData;
     private TextView addEditHeader;
     private Item currentItem; // Item to edit
     private boolean isEdit; // To identify whether it's an edit operation
     private ItemDBController itemDBController;
-
-    private final ActivityResultLauncher<Intent> addTagResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleAddTagResult);
-
     private ArrayList<Tag> selectedTagList;
 
-    ChipGroup chipGroupTags;
+    // ActivityResultLauncher for the barcode scanner
+    private final ActivityResultLauncher<Intent> barcodeScannerResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                    String description = result.getData().getStringExtra("productDescription");
+                    descriptionInput.setText(description); // Set the scanned product description
+                }
+            }
+    );
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +123,11 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         dateInput.setOnClickListener(v -> showDatePicker());
         dateInputLayout.setEndIconOnClickListener(v -> showDatePicker());
 
+        // Listener for the barcode scanner
+        TextInputLayout descriptionInputLayout = findViewById(R.id.descriptionInputLayout);
+        descriptionInputLayout.setEndIconOnClickListener(v -> launchBarcodeScanner());
+
+
         // Save button listener
         Button saveButton = findViewById(R.id.submitButton);
         saveButton.setOnClickListener(v -> {
@@ -131,6 +150,20 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
             // Start the new activity.
             addTagResultLauncher.launch(tagIntent);
         });
+
+        Button addImageBtn = findViewById(R.id.AddImageButton);
+        addImageBtn.setOnClickListener(view -> {
+            // Create an intent that will start the TagAddEditActivity.
+            Intent tagIntent = new Intent(this, AddImage.class);
+            // Start the new activity.
+            addImageResultLauncher.launch(tagIntent);
+        });
+
+    }
+
+    private void launchBarcodeScanner() {
+        Intent intent = new Intent(this, BarcodeScannerActivity.class);
+        barcodeScannerResultLauncher.launch(intent);
     }
 
     /**
@@ -297,7 +330,7 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
      * @param value The value to check.
      * @return True if the value is a valid number, false otherwise.
      */
-    private  boolean isValidValue(String value) {
+    private boolean isValidValue(String value) {
         try {
             double parsedValue = Double.parseDouble(value);
             return parsedValue >= 0;
@@ -394,7 +427,6 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
                 selectedTagList.add(selectedtag);
             }
         }
-
         if (currentItem != null) {
             // If this is an edit, update the existing item's fields
             currentItem.setBriefDescription(description);
@@ -405,6 +437,7 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
             currentItem.setComment(comment);
             currentItem.setDateOfAcquisition(acquisitionDate);
             currentItem.setTags(selectedTagList);
+            currentItem.setImageData(imageData);
             return currentItem;
         }
 
@@ -416,7 +449,8 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
                 serialNumber,
                 value,
                 comment,
-                selectedTagList);
+                selectedTagList,
+                imageData);
 
     }
 
@@ -454,6 +488,14 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
                 chip.setChecked(true);
                 // Add the chip to the ChipGroup
                 chipGroupTags.addView(chip);
+            }
+        }
+    }
+
+    private void handleAddImageResult(ActivityResult result) {
+        if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+            if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                imageData = result.getData().getStringExtra("selectedImageData");
             }
         }
     }
