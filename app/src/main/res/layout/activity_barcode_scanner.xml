@@ -22,7 +22,7 @@
 
         <!-- Close Button -->
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/closeButton"
+            android:id="@+id/DiscriptionCloseButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/close_text"
@@ -42,7 +42,7 @@
             app:cardElevation="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/closeButton">
+            app:layout_constraintTop_toBottomOf="@+id/DiscriptionCloseButton">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -84,7 +84,7 @@
 
                 <!--  Description -->
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/autoGenDescription"
+                    android:id="@+id/autodescriptionblock"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="20dp"
@@ -93,11 +93,11 @@
                     app:hintAnimationEnabled="true"
                     app:boxBackgroundMode="outline"
                     app:counterEnabled="true"
-                    app:counterMaxLength="200"
+                    app:counterMaxLength="1000"
                    >
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/autodescriptionInput"
+                        android:id="@+id/autodescriptiontext"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textMultiLine"
@@ -129,7 +129,7 @@
                     app:backgroundTint="#3F51B5"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/AddTagButton"/>
+                    app:layout_constraintTop_toBottomOf="@+id/progressBar"/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
