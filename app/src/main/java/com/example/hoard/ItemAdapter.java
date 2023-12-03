@@ -127,8 +127,9 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Item currentItem = filteredItems.get(position);
         holder.bind(selectedItems.get(position, false));
-
-        holder.briefDescription.setText(currentItem.getBriefDescription());
+        holder.itemComment.setText(currentItem.getComment());
+        holder.itemMake.setText(currentItem.getMake());
+        holder.itemModel.setText(currentItem.getModel());
         // Format the date using SimpleDateFormat
         SimpleDateFormat desiredFormat = new SimpleDateFormat("yyyy-MM-dd");
         String formattedDate = desiredFormat.format(currentItem.getDateOfAcquisition());
@@ -136,7 +137,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
         // Correct the type mismatch issue by converting the double to a string
         holder.estimatedValue.setText(String.valueOf(currentItem.getEstimatedValue()));
 
-        holder.detailsArrow.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 int adapterPosition = holder.getAdapterPosition();
@@ -146,17 +147,9 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
                     Intent intent = new Intent(context, DetailsActivity.class);
                     intent.putExtra("SELECTED_ITEM", itemAtPosition);
                     context.startActivity(intent);
-                }
-            }
-        });
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int adapterPosition = holder.getAdapterPosition();
-                if (adapterPosition != RecyclerView.NO_POSITION) {
+
                     if (isSelectionMode) {
                         toggleItemSelection(adapterPosition);
-                        notifyItemChanged(adapterPosition);
                     }
                 }
             }
@@ -321,17 +314,21 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView briefDescription;
+        public TextView itemMake;
+        public TextView itemModel;
+
+        public TextView itemComment;
         public TextView dateOfAcquisition;
         public TextView estimatedValue;
         public ImageView detailsArrow;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            briefDescription = itemView.findViewById(R.id.descriptionList);
+            itemComment = itemView.findViewById(R.id.commentTextView);
+            itemMake = itemView.findViewById(R.id.makeTextView);
+            itemModel = itemView.findViewById(R.id.modelTextView);
             dateOfAcquisition = itemView.findViewById(R.id.dateOfAcquisitionList);
             estimatedValue = itemView.findViewById(R.id.estimatedValueList);
-            detailsArrow = itemView.findViewById(R.id.detailsArrow);
         }
 
         void bind(boolean isSelected) {
