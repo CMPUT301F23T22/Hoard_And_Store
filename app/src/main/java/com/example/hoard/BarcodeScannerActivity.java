@@ -31,7 +31,14 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-
+/**
+ * Activity for scanning barcodes and fetching product information.
+ * <p>
+ * This activity allows the user to scan barcodes using the device's camera.
+ * After scanning, it fetches product information from the Barcode Lookup API
+ * and displays it in the UI. It also provides options to close the activity or
+ * return the scanned barcode data to a calling activity.
+ */
 public class BarcodeScannerActivity extends AppCompatActivity {
 
     private static final String API_KEY = "pfhjpg9m2en2k2e8sv2va0x55wxmeg";
@@ -53,7 +60,13 @@ public class BarcodeScannerActivity extends AppCompatActivity {
                 }
             }
     );
-
+    /**
+     * Initializes the activity, setting up the UI and binding actions to buttons.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after
+     *                           previously being shut down then this Bundle contains
+     *                           the most recent data provided by onSaveInstanceState(Bundle).
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,7 +112,11 @@ public class BarcodeScannerActivity extends AppCompatActivity {
             finish();
         });
     }
-
+    /**
+     * Starts the barcode scanning process using ZXing's ScanOptions.
+     *
+     * This method sets up the scanning options and launches the barcode scanner.
+     */
     private void startScanning() {
         ScanOptions options = new ScanOptions();
         options.setPrompt("Scan a barcode");
@@ -108,8 +125,14 @@ public class BarcodeScannerActivity extends AppCompatActivity {
         options.setBarcodeImageEnabled(true);
         barcodeLauncher.launch(options);
     }
-
-    // Method to make an API call to the Barcode Lookup API
+    /**
+     * Fetches product information based on the scanned barcode value.
+     * <p>
+     * Makes an asynchronous network request to the Barcode Lookup API using OkHttp.
+     * On success, updates the UI with product information. On failure, displays a toast message.
+     *
+     * @param barcodeValue The barcode value for which product information is to be fetched.
+     */
     private void fetchProductInfo(String barcodeValue) {
         progressBar.setVisibility(View.VISIBLE); // Show the ProgressBar
         OkHttpClient client = new OkHttpClient();
