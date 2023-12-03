@@ -399,4 +399,6 @@ public class ListScreenActivity {
         closeSoftKeyboard();
         onView(withId(R.id.submitButton)).perform(click());
         wait(2000);
+
+    }
 }
