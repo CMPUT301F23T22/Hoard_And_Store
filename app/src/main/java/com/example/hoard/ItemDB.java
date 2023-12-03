@@ -471,34 +471,42 @@ public class ItemDB {
      *
      * @return Task to be continued and handle on success/oncomplete
      */
-    public void deleteAccount(){
+    public Task<Void> deleteAccount() {
+        final TaskCompletionSource<Void> tcs = new TaskCompletionSource<>();
+
         FirebaseUser user = mAuth.getCurrentUser();
-        String uid = user.getUid();
         user.delete()
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
                             userCollection.document(userDocumentId)
-                                .delete()
+                                    .delete()
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
                                             Log.d(TAG, "DocumentSnapshot successfully deleted!");
+                                            tcs.setResult(null);  // Resolve the Task successfully
                                         }
                                     })
                                     .addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
                                             Log.w(TAG, "Error deleting document", e);
+                                            tcs.setException(e);  // Set an exception for the Task
                                         }
                                     });
 
                             Log.d(TAG, "User account deleted.");
+                        } else {
+                            tcs.setException(task.getException());  // Set an exception for the Task
                         }
                     }
                 });
+
+        return tcs.getTask();
     }
+
 
 
     /**
