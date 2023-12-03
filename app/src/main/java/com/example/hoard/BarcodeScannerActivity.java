@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +39,10 @@ public class BarcodeScannerActivity extends AppCompatActivity {
     private Button scanButton;
     private TextView AutogenDescription;
     private Button getDescriptionBtn;
+
+    private Button CloseBtn;
+    private Button AddDescriptionBtn;
+    private ProgressBar progressBar;
     private final ActivityResultLauncher<ScanOptions> barcodeLauncher = registerForActivityResult(
             new ScanContract(),
             result -> {
@@ -52,7 +58,7 @@ public class BarcodeScannerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_barcode_scanner);
-
+        progressBar = findViewById(R.id.progressBar);
         barcodeNumberText = findViewById(R.id.scannedBarcode);
         scanButton = findViewById(R.id.BarcodeScan);
 
@@ -75,6 +81,23 @@ public class BarcodeScannerActivity extends AppCompatActivity {
                 Toast.makeText(BarcodeScannerActivity.this, "No barcode scanned", Toast.LENGTH_SHORT).show();
             }
         });
+
+        CloseBtn = findViewById(R.id.closeButton);
+        AddDescriptionBtn = findViewById(R.id.AddDescriptionBtn);
+
+        // Set up the Close button
+        CloseBtn.setOnClickListener(view -> {
+            finish(); // Close the activity
+        });
+
+        // Set up the Add Description button
+        AddDescriptionBtn.setOnClickListener(view -> {
+            String description = barcodeNumberText.getText().toString(); // Assuming you want to return the barcode number
+            Intent returnIntent = new Intent();
+            returnIntent.putExtra("barcodeDescription", description);
+            setResult(Activity.RESULT_OK, returnIntent);
+            finish();
+        });
     }
 
     private void startScanning() {
@@ -88,6 +111,7 @@ public class BarcodeScannerActivity extends AppCompatActivity {
 
     // Method to make an API call to the Barcode Lookup API
     private void fetchProductInfo(String barcodeValue) {
+        progressBar.setVisibility(View.VISIBLE); // Show the ProgressBar
         OkHttpClient client = new OkHttpClient();
 
         Request request = new Request.Builder()
@@ -98,11 +122,13 @@ public class BarcodeScannerActivity extends AppCompatActivity {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                progressBar.setVisibility(View.GONE); // Hide the ProgressBar
                 runOnUiThread(() -> Toast.makeText(BarcodeScannerActivity.this, "Failed to auto-gen description", Toast.LENGTH_SHORT).show());
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                progressBar.setVisibility(View.GONE); // Hide the ProgressBar
                 if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
                 try {
                     String responseData = response.body().string();
@@ -113,16 +139,16 @@ public class BarcodeScannerActivity extends AppCompatActivity {
                         JSONObject firstProduct = products.getJSONObject(0);
                         String description = firstProduct.optString("description", "No description available.");
 
-                        Log.d(BarcodeScannerActivity.class.getSimpleName(), "Description: " + description);
-                        // Return the description to the calling activity
-                        Intent returnIntent = new Intent();
-                        returnIntent.putExtra("productDescription", description);
-                        setResult(Activity.RESULT_OK, returnIntent);
-                        finish();
+                        runOnUiThread(() -> {
+                            AutogenDescription.setText(description); // Update the TextView with the description
+                        });
+
 
                     } else {
                         Log.d(BarcodeScannerActivity.class.getSimpleName(), "No products found");
-                        // Handle the case when no products are returned
+                        runOnUiThread(() -> {
+                            AutogenDescription.setText("No description available."); // Update UI for no products found
+                        });
                     }
                 } catch (JSONException e) {
                     Log.e(BarcodeScannerActivity.class.getSimpleName(), "Json parsing error: " + e.getMessage());
