@@ -87,6 +87,11 @@ public class SortActivity extends AppCompatActivity implements CustomDatePicker.
     private RadioButton radioButtonDescending;
     private ChipGroup chipGroupTags;
     private ArrayList<Tag> selectedTagList;
+
+    /**
+     * Creates the sort activity which allows users to sort items by various criteria
+     * @param savedInstanceState The saved instance state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -157,6 +162,10 @@ public class SortActivity extends AppCompatActivity implements CustomDatePicker.
         //addMoreFilters.setVisibility(View.INVISIBLE);
 
         tagDBController.loadTags(new DataLoadCallBackTag() {
+            /**
+             * Loads the tags from the database
+             * @param tags The list of tags
+             */
             @Override
             public void onDataLoaded(List<Tag> tags) {
                 // Iterate through the items, creating a chip for each one
@@ -177,6 +186,10 @@ public class SortActivity extends AppCompatActivity implements CustomDatePicker.
         setFilterOption();
 
         // Load items and populate the AutoCompleteTextView
+        /**
+         * Loads the items from the database and populates the AutoCompleteTextView
+         * @param items The list of items
+         */
         dbController.loadItems(new DataLoadCallbackItem() {
             @Override
             public void onDataLoaded(List<Item> items) {
@@ -207,6 +220,9 @@ public class SortActivity extends AppCompatActivity implements CustomDatePicker.
             }
         });
 
+        /**
+         * When the user clicks the add more filters button, the filter criteria is updated
+         */
         topBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -324,7 +340,9 @@ public class SortActivity extends AppCompatActivity implements CustomDatePicker.
                 }
             }
         });
-
+        /**
+         * When user clicks on reset filters button, the filter criteria is cleared
+         */
         resetFilters.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -332,7 +350,9 @@ public class SortActivity extends AppCompatActivity implements CustomDatePicker.
                 setFiltersCount(addMoreFilters, filterCriteria.getMakes());
             }
         });
-
+        /**
+         * When user clicks on reset date range button, the filter criteria is cleared
+         */
         resetDateRange.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -343,7 +363,9 @@ public class SortActivity extends AppCompatActivity implements CustomDatePicker.
                 endDateEditText.setText("");
             }
         });
-
+        /**
+         * When user clicks on reset description keywords button, the filter criteria is cleared
+         */
         resetDescriptionKeyWords.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -354,6 +376,9 @@ public class SortActivity extends AppCompatActivity implements CustomDatePicker.
         });
 
         // Handle bottom navigation item selection
+        /**
+         * When user clicks on bottom navigation item, the corresponding activity is launched
+         */
         bottomNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -384,20 +409,24 @@ public class SortActivity extends AppCompatActivity implements CustomDatePicker.
 
         // Set up date range picker
 //        Button showDatePicker = findViewById(R.id.showDateRangePicker);
+        //        MaterialDatePicker<Pair<Long, Long>> picker = createMaterialDatePicker();
         startDateEditText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showDatePicker();
             }
         });
-
         endDateEditText.setOnClickListener(new View.OnClickListener() {
+            /**
+             * When user clicks on start date edit text, the date picker is launched
+             */
             @Override
             public void onClick(View view) {
                 showDatePicker();
             }
         });
         // Handle AutoCompleteTextView text changes
+
         search.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -441,6 +470,9 @@ public class SortActivity extends AppCompatActivity implements CustomDatePicker.
         });
     }
 
+    /**
+     * This method iwill set the filter options for the user based on the previous on input
+     */
     private void setFilterOption() {
         try {
             if(filterCriteria.getSortOption() != null & filterCriteria.getSortOption() == "Ascending"){
@@ -520,14 +552,24 @@ public class SortActivity extends AppCompatActivity implements CustomDatePicker.
 
         }
     }
-
+    /**
+     * Shows the date picker.
+     */
     private void showDatePicker() {
         // Create an instance of the CustomDatePicker
         CustomDatePicker customDatePicker = new CustomDatePicker(this, this, true);
         customDatePicker.showDatePicker();
 
     }
-
+    /**
+     * When user clicks on start date edit text, the date picker is launched
+     * @param startYear The start year
+     * @param startMonth The start month
+     * @param startDay The start day
+     * @param endYear The end year
+     * @param endMonth The end month
+     * @param endDay The end day
+     */
     @Override
     public void onDateRangePicked(int startYear, int startMonth, int startDay, int endYear, int endMonth, int endDay) {
         Date selectedStartDateObject = new GregorianCalendar(startYear, startMonth, startDay+1).getTime();

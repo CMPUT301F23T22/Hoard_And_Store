@@ -100,7 +100,11 @@ public class Tag implements Serializable {
                 tagName.equals(tag.tagName) &&
                 tagColor.equals(tag.tagColor);
     }
-
+    /**
+     * Generates a hash code for the tag.
+     *
+     * @return The hash code for the tag.
+     */
     @Override
     public int hashCode() {
         return Objects.hash(tagID, tagName, tagColor);

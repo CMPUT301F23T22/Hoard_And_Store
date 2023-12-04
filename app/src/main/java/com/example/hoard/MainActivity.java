@@ -78,6 +78,10 @@ public class MainActivity extends AppCompatActivity {
     private ClickableSpan signUpClickable;
     private ClickableSpan signInClickable;
 
+    /**
+     * Creates the sign in page, initializes the database controller, and sets up the sign in button.
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -149,6 +153,10 @@ public class MainActivity extends AppCompatActivity {
 //        });
 
         signInButton.setOnClickListener(new View.OnClickListener() {
+            /**
+             * When the sign in button is clicked, the user is signed in.
+             * @param v
+             */
             @Override
             public void onClick(View v) {
                 clearErrors();
@@ -173,7 +181,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
+    /**
+     * Sets up the sign in mode.
+     * Allows the user to choose to sign in or create an account.
+     *
+     */
     private void setupSignInMode() {
         // Set up views for sign-in mode
         clickableAccountOption.setText("Don't have an account? Sign up");
@@ -209,6 +221,10 @@ public class MainActivity extends AppCompatActivity {
         clickableAccountOption.setMovementMethod(LinkMovementMethod.getInstance());
 
     }
+
+    /**
+     * Ensure the UI is updated when the user signs in or out.
+     */
     @Override
     public void onStart() {
         super.onStart();
@@ -234,11 +250,17 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Goes from login page to home page.
+     */
     private void homePage() {
         Intent intent = new Intent(MainActivity.this, ListScreen.class);
         startActivity(intent);
     }
 
+    /**
+     * Returns to the login page if the sign in fails.
+     */
     private void signInFailed() {
         Intent intent = new Intent(MainActivity.this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -249,6 +271,13 @@ public class MainActivity extends AppCompatActivity {
     private void updateUI(FirebaseUser user){
 
     }
+
+    /**
+     * Creates a new account with the given email, password, and username.
+     * @param email
+     * @param password
+     * @param userName
+     */
     private void createAccount(String email, String password, String userName){
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -282,6 +311,11 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
     }
+    /**
+     * Signs in the user with the given email and password.
+     * @param email
+     * @param password
+     */
     private void signIn(String email, String password){
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -335,6 +369,10 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * This method handles the error that occurs when the user tries to sign in.
+     * @param exception
+     */
     private void handleError(Exception exception){
         if (exception instanceof FirebaseAuthInvalidUserException) {
             // The user with the provided email does not exist
@@ -367,6 +405,10 @@ public class MainActivity extends AppCompatActivity {
         Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG).show();
     }
 
+    /**
+     * This method handles the error that occurs when the user tries to create an account.
+     * @param e
+     */
     private void handleAccountCreationError(Exception e){
         clearErrors();
         if(e instanceof FirebaseAuthUserCollisionException) {
@@ -399,6 +441,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Removes all errors from the text input layouts.
+     */
     private void clearErrors(){
         emailInputLayout.setError("");
         emailInputLayout.setErrorEnabled(false);

@@ -46,6 +46,10 @@ public class ImageCarouselAdapter extends RecyclerView.Adapter<ImageCarouselAdap
                 .into(holder.imageView);
     }
 
+    /**
+     * Returns the number of items in the list of image Uris.
+     * @return
+     */
     @Override
     public int getItemCount() {
         return imageUris.size();

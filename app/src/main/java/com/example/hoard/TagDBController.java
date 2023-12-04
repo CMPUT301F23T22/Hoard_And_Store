@@ -19,6 +19,9 @@ public class TagDBController {
     private static TagDBController instance;
     private final TagDB tagDB;
 
+    /**
+     * Constructor for the TagDBController class.
+     */
     private TagDBController() {
         tagDB = new TagDB(new ItemDBConnector());
     }
@@ -26,6 +29,12 @@ public class TagDBController {
     // chatgpt: to make a singleton we only ever want one instance here
     // prompts: Need to only have one instance of a class how can i do this in java
     // Replied with pesudo code on how to do this
+
+    /**
+     * Gets the instance of the TagDBController class.
+     *
+     * @return
+     */
     public static TagDBController getInstance() {
         if (instance == null) {
             synchronized (ItemDBController.class) {

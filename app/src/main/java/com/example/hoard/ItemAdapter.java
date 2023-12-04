@@ -110,6 +110,12 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
         return itemList;
     }
 
+    /**
+     * gets the filtered items in the item adapter
+     * @param itemList list of items
+     * @param recyclerView RecyclerView
+     * @return list of filtered items
+     */
     public ItemAdapter(List<Item> itemList, RecyclerView recyclerView) {
         this.itemList = itemList;
         this.filteredItems = new ArrayList<>(itemList);
@@ -141,14 +147,29 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
             }
         }
     }
-
+    /**
+     * Creates a new ViewHolder instance for the RecyclerView.
+     * Inflates the layout for the item view, and returns a new ViewHolder instance with the inflated view.
+     *
+     * @param parent   The parent ViewGroup into which the new View will be added after it is bound to an adapter position.
+     * @param viewType The view type of the new View.
+     * @return A new ViewHolder that holds a View of the given view type.
+     */
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_content, parent, false);
         return new ViewHolder(view);
     }
-
+    /**
+     * Binds the data at the specified position in the itemList to the ViewHolder.
+     * Sets the text of the TextViews in the ViewHolder to the corresponding data from the Item object.
+     * Sets an OnClickListener on the ViewHolder's itemView to handle click events.
+     * Sets an OnLongClickListener on the ViewHolder's itemView to handle long click events.
+     *
+     * @param holder   The ViewHolder instance to bind the data to.
+     * @param position The position of the item in the itemList.
+     */
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Item currentItem = filteredItems.get(position);
@@ -184,6 +205,12 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
         });
 
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            /**
+             * Called when a view has been clicked and held.
+             *
+             * @param view The view that was clicked and held.
+             * @return true if the callback consumed the long click, false otherwise.
+             */
             @Override
             public boolean onLongClick(View view) {
                 // we enter the mult select mode
@@ -333,6 +360,11 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
         return filteredItems.size();
     }
 
+    /**
+     * get the filter
+     *
+     * @return Filter: filter
+     */
     @Override
     public Filter getFilter() {
         return new Filter() {
@@ -361,6 +393,11 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
         };
     }
 
+    /**
+     * filter by date range
+     *
+     * @param startDate Date: start date
+     */
     public void filterByDateRange(Date startDate, Date endDate) {
         List<Item> tempFilteredList = new ArrayList<>();
         for (Item item : itemList) {
@@ -385,6 +422,11 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
 
         public ShapeableImageView itemImage;
 
+        /**
+         * ViewHolder constructor
+         *
+         * @param itemView View
+         */
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             itemComment = itemView.findViewById(R.id.commentTextView);
@@ -395,7 +437,12 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
             itemImage = itemView.findViewById(R.id.imageView);
 
         }
-
+        /**
+         * Binds the data at the specified position in the itemList to the ViewHolder.
+         * Sets the background color of the ViewHolder's itemView to the specified color.
+         *
+         * @param isSelected boolean indicating whether the item is selected or not.
+         */
         void bind(boolean isSelected) {
             itemView.setBackgroundColor(isSelected ? Color.LTGRAY : Color.TRANSPARENT);
         }
@@ -427,6 +474,11 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
         setSum();
     }
 
+    /**
+     * get the size of the item adapter
+     *
+     * @return int: size of the item adapter
+     */
     public int getsize() {
         return itemList.size();
     }
@@ -464,7 +516,11 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
         notifyDataSetChanged();
 
     }
-
+    /**
+     * get the sum of all items in adapter
+     *
+     * @return double: sum of all items
+     */
     public double getSum() {
         double sum = 0.0;
         for (Item item : itemList) {

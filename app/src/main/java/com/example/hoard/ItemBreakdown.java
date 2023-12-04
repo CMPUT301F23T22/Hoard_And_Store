@@ -104,6 +104,13 @@ public class ItemBreakdown extends AppCompatActivity {
         }
 
         bottomNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
+            /**
+             * Called when an item in the bottom navigation menu is selected.
+             * Switches to the selected activity.
+             *
+             * @param item The selected item.
+             * @return true to display the item as the selected item and false if the item should not be selected.
+             */
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
@@ -134,6 +141,13 @@ public class ItemBreakdown extends AppCompatActivity {
 
 
         tagDBController.loadTags(new DataLoadCallBackTag() {
+
+            /**
+             * Called when the tags are loaded from the database.
+             * Creates a chip for each tag and adds it to the chip group.
+             *
+             * @param tags The list of tags loaded from the database.
+             */
             @Override
             public void onDataLoaded(List<Tag> tags) {
                 // Iterate through the items, creating a chip for each one
@@ -151,6 +165,13 @@ public class ItemBreakdown extends AppCompatActivity {
         });
 
         applyButton.setOnClickListener(new View.OnClickListener() {
+
+            /**
+             * Called when the apply button is clicked.
+             * Gets the selected tags and updates the pie chart and list view.
+             *
+             * @param view The view that was clicked.
+             */
             @Override
             public void onClick(View view) {
                 // clear any previous  tags that were selected

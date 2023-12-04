@@ -43,6 +43,11 @@ public class EditProfileActivity extends AppCompatActivity {
     private MenuItem profileMenuItem;
     private MenuItem chartMenuItem;
 
+    /**
+     * This creates the activity for editing the user profile
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

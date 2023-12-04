@@ -9,7 +9,9 @@ import com.google.firebase.firestore.FirebaseFirestoreSettings;
 public class ItemDBConnector {
     private final FirebaseFirestore db;
 
-
+    /**
+     * Connects to the FireStore DB
+     */
     public ItemDBConnector() {
         // connect to the FireStore DB
         db = FirebaseFirestore.getInstance();
@@ -19,7 +21,10 @@ public class ItemDBConnector {
                 .build();
         db.setFirestoreSettings(settings);
     }
-
+    /**
+     * Gets the FireStore DB
+     * @return the FireStore DB
+     */
     public FirebaseFirestore getDatabase() {
         return db;
     }

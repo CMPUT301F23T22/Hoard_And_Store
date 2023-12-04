@@ -45,6 +45,9 @@ public class ItemDBController {
         void onInitializationComplete();
     }
 
+    /**
+     * Initializes the ItemDBController singleton instance.
+     */
     private ItemDBController() {itemDB = new ItemDB(new ItemDBConnector()); }
 
     /**
@@ -79,6 +82,10 @@ public class ItemDBController {
         });
     }
 
+    /**
+     * Gets the currently signed in user's username
+     * @return
+     */
     public Task<String> getUsername(){
         return itemDB.getUsername();
     }
@@ -196,7 +203,11 @@ public class ItemDBController {
         return new Item(dateOfAcquisition, briefDescription, make, model, serialNumber, estimatedValue, comment, itemID, (ArrayList<Tag>) tags,imageUrls);
     }
 
-
+    /**
+     * gets the total value of all items in the db
+     *
+     * @param callback callback to detect when the query finished
+     */
     public void getTotalValue(final Consumer<Double> callback) {
         // We may need to rethink how we are getting estimated value this is very messy and touches alot of code everywhere
 //        itemDB.getAllItems().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -223,7 +234,12 @@ public class ItemDBController {
     }
 
 
-
+    /**
+     * add a new item to the firebase database
+     *
+     * @param item
+     * @param onCompleteListener
+     */
     public void addItem(Item item, OnCompleteListener<DocumentReference> onCompleteListener) {
         itemDB.addItem(item, onCompleteListener);
     }
@@ -355,10 +371,18 @@ public class ItemDBController {
         });
     }
 
+    /**
+     * Gets the document ID of the currently signed in user's document.
+     * @return
+     */
     public String getUserDocID(){
         return itemDB.getUserDocumentId();
     }
 
+    /**
+     * Gets the collection reference for the currently signed in user's collection.
+     * @return
+     */
     public CollectionReference getUserCollection(){
         return itemDB.getUserCollection();
     }
