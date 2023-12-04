@@ -647,4 +647,9 @@ public class ItemDB {
         return uploadTasks;
     }
 
+    public Task<Void> deleteImageFromStorage(String imageUrl) {
+        StorageReference imageRef = storage.getReference().child(imageUrl);
+        return imageRef.delete();
+    }
+
 }

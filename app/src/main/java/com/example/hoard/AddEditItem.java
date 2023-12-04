@@ -65,7 +65,11 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
             this::handleAddImageResult
     );
     private final List<String> imageURLs = new ArrayList<>();
+
+    private List<String> previousUrlsList = new ArrayList<>();
+
     private TextView addEditHeader;
+    private Button addPhotoBtn;
     private Item currentItem; // Item to edit
     private boolean isEdit; // To identify whether it's an edit operation
     private ItemDBController itemDBController;
@@ -94,6 +98,7 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         TextInputLayout dateInputLayout = findViewById(R.id.dateInputLayout);
         addEditHeader = findViewById(R.id.addEditHeader);
         chipGroupTags = findViewById(R.id.tagChipGroup);
+        addPhotoBtn = findViewById(R.id.AddImageButton);
 
         // Check if editing
         Intent intent = getIntent();
@@ -166,9 +171,14 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         Button addImageBtn = findViewById(R.id.AddImageButton);
         addImageBtn.setOnClickListener(view -> {
             // Create an intent that will start the TagAddEditActivity.
-            Intent tagIntent = new Intent(this, AddImage.class);
+            Intent addImageIntent = new Intent(this, AddImage.class);
+            // Check if it's an edit operation
+            if (isEdit) {
+                // Assume currentItem is the item you're editing, and it's a Parcelable or Serializable object
+                addImageIntent.putExtra("CURRENT_ITEM", currentItem);
+            }
             // Start the new activity.
-            addImageResultLauncher.launch(tagIntent);
+            addImageResultLauncher.launch(addImageIntent);
         });
 
     }
@@ -205,6 +215,7 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         valueInput.setText(String.valueOf(currentItem.getEstimatedValue()));
         commentInput.setText(currentItem.getComment());
         dateInput.setText(sdf.format(currentItem.getDateOfAcquisition()));
+        addPhotoBtn.setText("Edit Photo");
     }
 
     /**
@@ -413,13 +424,21 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
             if (task.isSuccessful()) {
                 // Log success
                 Log.i("EditItem", "Item updated successfully");
-
-                Toast.makeText(this, "Item updated successfully", Toast.LENGTH_SHORT).show();
-                Intent resultIntent = new Intent();
-
-                resultIntent.putExtra("updatedItem", updatedItem);
-                setResult(Activity.RESULT_OK, resultIntent);
-                finish();
+                itemDBController.uploadImagesWithItemURl(imageURLs, imagesData, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.i("UploadImages", "Images uploaded and item updated successfully");
+                            Toast.makeText(AddEditItem.this, "Item Updated", Toast.LENGTH_SHORT).show();
+                            Intent resultIntent = new Intent();
+                            resultIntent.putExtra("updatedItem", updatedItem);
+                            setResult(Activity.RESULT_OK, resultIntent);
+                            finish();
+                        } else {
+                            Log.e("UploadImages", "Error uploading images: " + task.getException().getMessage());
+                        }
+                    }
+                });
             } else {
                 // This block handles the failure case
                 Exception e = task.getException();
@@ -463,6 +482,12 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
             currentItem.setComment(comment);
             currentItem.setDateOfAcquisition(acquisitionDate);
             currentItem.setTags(selectedTagList);
+            for (int i = 0; i < imagesData.size(); i++) {
+                String filePath = "images/" + currentItem.getItemID() + "/" + UUID.randomUUID().toString() + ".jpg";
+                imageURLs.add(filePath);
+            }
+            previousUrlsList.addAll(imageURLs);
+            currentItem.setImageUrls(previousUrlsList);
             return currentItem;
         }
 
@@ -524,6 +549,14 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
 
     private void handleAddImageResult(ActivityResult result) {
         if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+
+            if (isEdit) {
+                ArrayList<String> previousUrls = result.getData().getStringArrayListExtra("previousUrls");
+                if (previousUrls != null) {
+                    previousUrlsList = new ArrayList<>(previousUrls);
+                }
+            }
+
             // Retrieve the ArrayList of Uri objects
             ArrayList<Uri> selectedUris = result.getData().getParcelableArrayListExtra("itemImagesData");
             if (selectedUris != null) {
