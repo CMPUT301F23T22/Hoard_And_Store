@@ -73,7 +73,17 @@
                     android:id="@+id/btnSelect"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Select"/>
+                    android:text="Select"
+                    android:layout_marginEnd="8dp"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDelete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Delete"
+                    android:layout_marginEnd="8dp"
+                    android:backgroundTint="@color/color_one"/>
+
             </LinearLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>

@@ -396,23 +396,19 @@ public class ItemDBController {
     public void uploadImagesWithItemURl(List<String> imageUrls, List<Uri> imageUris, OnCompleteListener<Void> onCompleteListener) {
         List<UploadTask> uploadTasks = itemDB.uploadItemImages(imageUris, imageUrls);
         Tasks.whenAllSuccess(uploadTasks).addOnSuccessListener(tasks -> {
-            List<Task<Uri>> downloadUrlTasks = new ArrayList<>();
-            for (Object task : tasks) {
-                UploadTask.TaskSnapshot snapshot = (UploadTask.TaskSnapshot) task;
-                StorageReference ref = snapshot.getStorage();
-                downloadUrlTasks.add(ref.getDownloadUrl());
-            }
-            // Wait for all download URL tasks to complete
-            Tasks.whenAllSuccess(downloadUrlTasks).addOnSuccessListener(downloadUrls -> {
-                // Then, call the onCompleteListener
-                onCompleteListener.onComplete(Tasks.forResult(null)); // Indicate success
-            }).addOnFailureListener(e -> {
-                // Handle failure in getting download URLs
-                onCompleteListener.onComplete(Tasks.forException(e));
-            });
+            // Call the onCompleteListener to indicate success after all images are uploaded
+            onCompleteListener.onComplete(Tasks.forResult(null));
         }).addOnFailureListener(e -> {
             // Handle failure in uploading images
             onCompleteListener.onComplete(Tasks.forException(e));
         });
+
     }
+
+    public void deleteImage(String imageLocationToDelete, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
+        itemDB.deleteImageFromStorage(imageLocationToDelete)
+                .addOnSuccessListener(onSuccessListener)
+                .addOnFailureListener(onFailureListener);
+    }
+
 }

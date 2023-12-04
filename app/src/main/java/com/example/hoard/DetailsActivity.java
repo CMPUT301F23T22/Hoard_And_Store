@@ -183,6 +183,9 @@ public class DetailsActivity extends AppCompatActivity{
 
         List<String> imageUrls = selectedItem.getImageUrls();
 
+        // Clear the existing images
+        images.clear();
+
         if (imageUrls != null && !imageUrls.isEmpty()) {
             for (String currentImagePath : imageUrls) {
                 if (currentImagePath != null && !currentImagePath.isEmpty()) {
