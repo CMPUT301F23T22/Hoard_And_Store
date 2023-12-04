@@ -176,7 +176,7 @@ public class ItemBreakdown extends AppCompatActivity {
         itemDBController.getTagCounts(selectedTagList, new ItemDBController.TagCountsCallback() {
             @Override
             public void onTagCountsReady(List<Item> itemWithSelectedTags) {
-                // check if piechart is not null
+                // check if pie chart is not null
                 selectedTagMap.clear();
                 if(pieChart != null){
                     pieChart.clearChart();
@@ -200,7 +200,7 @@ public class ItemBreakdown extends AppCompatActivity {
                 for (Map.Entry<Tag, Integer> entry : selectedTagMap.entrySet()) {
                     pieChart.addPieSlice(
                             new PieModel(
-                                    entry.getKey().getTagName().toString(),
+                                    entry.getKey().getTagName(),
                                     Integer.parseInt(entry.getValue().toString()),
                                     Color.parseColor(entry.getKey().getTagColor()))
                     );
@@ -228,7 +228,7 @@ public class ItemBreakdown extends AppCompatActivity {
 
 
     /**
-     * Shows a snackbar with a certain message
+     * Shows a snack bar with a certain message
      *
      * @param  message message to display
      */

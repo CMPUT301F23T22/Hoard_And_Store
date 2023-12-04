@@ -43,13 +43,13 @@ import java.util.Map;
 public class ItemDB {
     private final FirebaseFirestore db;
 
-    private FirebaseStorage storage;
+    private final FirebaseStorage storage;
 
     private CollectionReference itemsCollection;
     private final CollectionReference userCollection;
-    private User loggedInUser = UserManager.getInstance().getLoggedInUser();
+    private final User loggedInUser = UserManager.getInstance().getLoggedInUser();
     private static final String TAG = "ItemDB";
-    private FirebaseAuth mAuth;
+    private final FirebaseAuth mAuth;
     private String userDocumentId;
 
     public CollectionReference getUserCollection() {

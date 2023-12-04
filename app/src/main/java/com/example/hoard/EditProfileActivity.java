@@ -27,7 +27,7 @@ import com.google.android.material.textfield.TextInputLayout;
 
 public class EditProfileActivity extends AppCompatActivity {
     private ItemDBController dbController;
-    private boolean passwordUpdated = false;
+    private final boolean passwordUpdated = false;
     private MenuItem sort;
     private MenuItem home;
     private BottomNavigationView bottomNav;
@@ -173,7 +173,7 @@ public class EditProfileActivity extends AppCompatActivity {
         builder.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(DialogInterface dialogInterface) {
-                Button button = ((AlertDialog) builder).getButton(AlertDialog.BUTTON_POSITIVE);
+                Button button = builder.getButton(AlertDialog.BUTTON_POSITIVE);
                 button.setOnClickListener(new View.OnClickListener() {
 
                     @Override
@@ -245,7 +245,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
             @Override
             public void onShow(DialogInterface dialogInterface) {
-                Button button = ((AlertDialog) builder).getButton(AlertDialog.BUTTON_POSITIVE);
+                Button button = builder.getButton(AlertDialog.BUTTON_POSITIVE);
                 button.setOnClickListener(new View.OnClickListener() {
 
                     @Override
@@ -300,7 +300,7 @@ public class EditProfileActivity extends AppCompatActivity {
             @Override
             public void onShow(DialogInterface dialogInterface) {
 
-                Button button = ((AlertDialog) builder).getButton(AlertDialog.BUTTON_POSITIVE);
+                Button button = builder.getButton(AlertDialog.BUTTON_POSITIVE);
                 button.setOnClickListener(new View.OnClickListener() {
 
                     @Override

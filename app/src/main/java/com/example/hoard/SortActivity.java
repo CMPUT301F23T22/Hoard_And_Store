@@ -523,7 +523,7 @@ public class SortActivity extends AppCompatActivity implements CustomDatePicker.
 
     private void showDatePicker() {
         // Create an instance of the CustomDatePicker
-        CustomDatePicker customDatePicker = new CustomDatePicker((Context) this, (CustomDatePicker.DatePickListener) this, true);
+        CustomDatePicker customDatePicker = new CustomDatePicker(this, this, true);
         customDatePicker.showDatePicker();
 
     }

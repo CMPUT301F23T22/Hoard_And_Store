@@ -31,7 +31,7 @@ public class SortAdapter extends RecyclerView.Adapter<SortAdapter.SortViewHolder
     private final Map<String, String> databaseToUserMapping = new HashMap<>();
     private FilterCriteria filterCriteria;
     private int selectedPos = RecyclerView.NO_POSITION;
-    private boolean isSelected = false;
+    private final boolean isSelected = false;
 
     private String clickedText;
 

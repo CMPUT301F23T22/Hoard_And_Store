@@ -16,8 +16,8 @@ import java.util.List;
  */
 public class ImageCarouselAdapter extends RecyclerView.Adapter<ImageCarouselAdapter.ViewHolder> {
 
-    private List<Uri> imageUris;
-    private Context context;
+    private final List<Uri> imageUris;
+    private final Context context;
 
     /**
      * Constructor for ImageCarouselAdapter.

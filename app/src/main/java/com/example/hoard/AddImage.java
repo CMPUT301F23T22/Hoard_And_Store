@@ -29,7 +29,7 @@ public class AddImage extends AppCompatActivity{
     private static final int IMAGE_CAPTURE_FAILURE_RESULT_CODE = 2;
     private ViewPager2 viewPager;
     private ImageCarouselAdapter adapter;
-    private List<Uri> images = new ArrayList<>();
+    private final List<Uri> images = new ArrayList<>();
 
     // Launchers for handling different results
     private final ActivityResultLauncher<Intent> captureImageResultLauncher =

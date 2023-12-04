@@ -48,7 +48,7 @@ public class DetailsActivity extends AppCompatActivity{
     FirebaseStorage storage = FirebaseStorage.getInstance();
     StorageReference storageRef = storage.getReference();
 
-    private List<Uri> images = new ArrayList<>();
+    private final List<Uri> images = new ArrayList<>();
 
     private final ActivityResultLauncher<Intent> editActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleEditResult);
 

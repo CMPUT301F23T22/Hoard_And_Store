@@ -38,9 +38,9 @@ import android.util.Log;
 public class ItemDBController {
     private static ItemDBController instance;
     private final ItemDB itemDB;
-    private boolean isItemDBInitialized = false;
+    private final boolean isItemDBInitialized = false;
 
-    private User loggedInUser = UserManager.getInstance().getLoggedInUser();
+    private final User loggedInUser = UserManager.getInstance().getLoggedInUser();
 
     public interface OnInitializationCompleteListener {
         void onInitializationComplete();
