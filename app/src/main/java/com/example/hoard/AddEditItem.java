@@ -388,15 +388,13 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
             if (task.isSuccessful()) {
                 // Log success
                 Log.i("AddItem", "Item added successfully");
-
-                Toast.makeText(this, "Item added successfully", Toast.LENGTH_SHORT).show();
-
                 // Call the method to upload images and update the item
                 itemDBController.uploadImagesAndUpdateItem(newItem.getItemID(), newItem.getImageUrls(), imagesData, new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
                             Log.i("UploadImages", "Images uploaded and item updated successfully");
+                            Toast.makeText(AddEditItem.this, "Item added successfully", Toast.LENGTH_SHORT).show();
                             Intent resultIntent = new Intent();
                             resultIntent.putExtra("newItem", newItem);
                             setResult(Activity.RESULT_OK, resultIntent);
