@@ -403,7 +403,6 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
                             finish();
                         } else {
                             Log.e("UploadImages", "Error uploading images: " + task.getException().getMessage());
-                            // Handle the error case
                         }
                     }
                 });
