@@ -1,5 +1,7 @@
 package com.example.hoard;
 
+import androidx.test.espresso.Espresso;
+import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.uiautomator.UiDevice;
 import androidx.test.uiautomator.UiObjectNotFoundException;
 import androidx.test.uiautomator.UiSelector;
@@ -10,6 +12,7 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.actionWithAssertions;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.longClick;
+import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
@@ -312,10 +315,49 @@ public class AppTest {
 
     @Test
     public void testEditItem() {
+        // Edit item
+        wait(2000);
+        onView(withId(R.id.recyclerView))
+                .perform(RecyclerViewActions.scrollTo(hasDescendant(withText("Test Item"))))
+                .perform(RecyclerViewActions.actionOnItem(hasDescendant(withText("Test Item")), clickOnViewChildWithId(R.id.detailsArrow)));
+        wait(2000);
+        onView(withId(R.id.editButton)).perform(click());
+        onView(withId(R.id.dateInput)).perform(replaceText("31/12/2023"));
+        onView(withId(R.id.descriptionInput)).perform(replaceText("Test Item Edited"));
+        onView(withId(R.id.makeInput)).perform(replaceText("Make Edited"));
+        onView(withId(R.id.modelInput)).perform(replaceText("Model Edited"));
+        onView(withId(R.id.serialNumberInput)).perform(replaceText("ASD123"));
+        onView(withId(R.id.valueInput)).perform(replaceText("1000"));
+        onView(withId(R.id.commentInput)).perform(replaceText("Comment Edited"));
+        onView(withId(R.id.tagChipGroup)).perform(selectChipWithTag("Test Tag 2"));
+        closeSoftKeyboard();
+        onView(withId(R.id.submitButton)).perform(click());
+
+        // Check if item is edited
+        wait(2000);
+        onView(withId(R.id.dateOfAcquisitionTextView)).check(matches(withText("Date Of Purchase: 2023-12-31")));
+        onView(withId(R.id.briefDescriptionTextView)).check(matches(withText("Description: Test Item Edited")));
+        onView(withId(R.id.makeTextView)).check(matches(withText("Make: Make Edited")));
+        onView(withId(R.id.modelTextView)).check(matches(withText("Model: Model Edited")));
+        onView(withId(R.id.serialNumberTextView)).check(matches(withText("Serial Number: ASD123")));
+        onView(withId(R.id.estimatedValueTextView)).check(matches(withText("Estimated value: 1000.00")));
+        onView(withId(R.id.commentTextView)).check(matches(withText("Comment: Comment Edited")));
+        onView(withId(R.id.chipGroup)).check(matches(hasDescendant(withText("Test Tag 1"))));
+        onView(withId(R.id.chipGroup)).check(matches(hasDescendant(withText("Test Tag 2"))));
     }
 
     @Test
     public void testDeleteItem() {
+        // Delete item
+        wait(2000);
+        Espresso.onView(ViewMatchers.withId(R.id.recyclerView))
+                .perform(RecyclerViewActions.actionOnItem(
+                        ViewMatchers.hasDescendant(ViewMatchers.withText("Test Item Edited")),
+                        ViewActions.swipeLeft()));
+
+        // Check if item is deleted
+        wait(4000);
+        onView(withText("Test Item Edited")).check(doesNotExist());
     }
 
     // #	   Date	       Description	    Make	  Model	    Serial Number	    Value	    Comment         Tags
@@ -486,6 +528,98 @@ public class AppTest {
         //sort_ascedning, sort_descending
     }
 
+
+    @Test
+    public void testFilter() {
+        // Filter by date
+        onView(withId(R.id.nav_sort)).perform(click());
+        wait(2000);
+        onView(withId(R.id.start_date_edit_text)).perform(ViewActions.typeText("29/03/2023"));
+        closeSoftKeyboard();
+        onView(withId(R.id.end_date_edit_text)).perform(ViewActions.typeText("11/04/2023"));
+        closeSoftKeyboard();
+        onView(withId(R.id.action_apply)).perform(click());
+        wait(2000);
+
+        // Check if items are filtered
+        onView(withText("Item One")).check(doesNotExist());
+        onView(withText("Sample")).check(doesNotExist());
+        onView(withText("Throwaway Item")).check(matches(isDisplayed()));
+        onView(withText("Item 2")).check(matches(isDisplayed()));
+        onView(withText("Random Sample")).check(doesNotExist());
+
+        // Reset filter
+        onView(withId(R.id.nav_sort)).perform(click());
+        wait(2000);
+        onView(withId(R.id.action_reset)).perform(click());
+        wait(2000);
+
+        // Filter by description
+        onView(withId(R.id.nav_sort)).perform(click());
+        wait(2000);
+        onView(isRoot()).perform(swipeUp());
+        wait(1000);
+        onView(withId(R.id.BriefDescriptionKeyword)).perform(ViewActions.typeText("Item"));
+        closeSoftKeyboard();
+        onView(withId(R.id.action_apply)).perform(click());
+        wait(2000);
+
+        // Check if items are filtered
+        onView(withText("Item One")).check(matches(isDisplayed()));
+        onView(withText("Sample")).check(doesNotExist());
+        onView(withText("Throwaway Item")).check(matches(isDisplayed()));
+        onView(withText("Item 2")).check(matches(isDisplayed()));
+        onView(withText("Random Sample")).check(doesNotExist());
+
+        // Reset filter
+        onView(withId(R.id.nav_sort)).perform(click());
+        wait(2000);
+        onView(withId(R.id.action_reset)).perform(click());
+        wait(2000);
+
+        // Filter by make
+        onView(withId(R.id.nav_sort)).perform(click());
+        wait(2000);
+        onView(isRoot()).perform(swipeUp());
+        wait(1000);
+        onView(withId(R.id.filter_make_search)).perform(ViewActions.typeText("Alpha"));
+        closeSoftKeyboard();
+        onView(withId(R.id.add_more_make_filter)).perform(click());
+        onView(withId(R.id.action_apply)).perform(click());
+        wait(2000);
+
+        // Check if items are filtered
+        onView(withText("Item One")).check(matches(isDisplayed()));
+        onView(withText("Sample")).check(doesNotExist());
+        onView(withText("Throwaway Item")).check(matches(isDisplayed()));
+        onView(withText("Item 2")).check(doesNotExist());
+        onView(withText("Random Sample")).check(doesNotExist());
+
+        // Reset filter
+        onView(withId(R.id.nav_sort)).perform(click());
+        wait(2000);
+        onView(withId(R.id.action_reset)).perform(click());
+        wait(2000);
+
+        // Filter by tag
+        onView(withId(R.id.nav_sort)).perform(click());
+        wait(2000);
+        onView(isRoot()).perform(swipeUp());
+        wait(1000);
+        onView(withId(R.id.tagChipGroup)).perform(selectChipWithTag("Green"));
+        onView(withId(R.id.tagChipGroup)).perform(selectChipWithTag("Yellow"));
+        onView(withId(R.id.action_apply)).perform(click());
+        wait(2000);
+
+        // Check if items are filtered
+        onView(withText("Item One")).check(doesNotExist());
+        onView(withText("Sample")).check(doesNotExist());
+        onView(withText("Throwaway Item")).check(matches(isDisplayed()));
+        onView(withText("Item 2")).check(matches(isDisplayed()));
+        onView(withText("Random Sample")).check(doesNotExist());
+
+    }
+
     @Test
     public void testBulkDelete() {
         //Perform bulk delete
@@ -494,6 +628,7 @@ public class AppTest {
             onView(withText("Item One")).perform(longClick());
         } catch (Exception e) {
             onView(isRoot()).perform(swipeUp());
+            wait(2000);
             onView(withText("Item One")).perform(longClick());
             onView(isRoot()).perform(swipeDown());
         }
@@ -502,6 +637,7 @@ public class AppTest {
             onView(withText("Sample")).perform(longClick());
         } catch (Exception e) {
             onView(isRoot()).perform(swipeUp());
+            wait(2000);
             onView(withText("Sample")).perform(longClick());
             onView(isRoot()).perform(swipeDown());
         }
@@ -510,6 +646,7 @@ public class AppTest {
             onView(withText("Throwaway Item")).perform(longClick());
         } catch (Exception e) {
             onView(isRoot()).perform(swipeUp());
+            wait(2000);
             onView(withText("Throwaway Item")).perform(longClick());
             onView(isRoot()).perform(swipeDown());
         }
@@ -518,6 +655,7 @@ public class AppTest {
             onView(withText("Item 2")).perform(longClick());
         } catch (Exception e) {
             onView(isRoot()).perform(swipeUp());
+            wait(2000);
             onView(withText("Item 2")).perform(longClick());
             onView(isRoot()).perform(swipeDown());
         }
@@ -526,6 +664,7 @@ public class AppTest {
             onView(withText("Random Sample")).perform(longClick());
         } catch (Exception e) {
             onView(isRoot()).perform(swipeUp());
+            wait(2000);
             onView(withText("Random Sample")).perform(longClick());
             onView(isRoot()).perform(swipeDown());
         }
