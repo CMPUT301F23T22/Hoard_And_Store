@@ -9,6 +9,8 @@ import static androidx.test.espresso.Espresso.closeSoftKeyboard;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.actionWithAssertions;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.longClick;
+import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
 import static androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom;
@@ -244,15 +246,6 @@ public class AppTest {
 
     @Test
     public void testAddItem() {
-        try {
-            onView(withId(R.id.emailInput)).perform(ViewActions.typeText("test@gmail.com"));
-            onView(withId(R.id.passwordInput)).perform(ViewActions.typeText("123456"));
-            closeSoftKeyboard();
-            onView(withId(R.id.signInButton)).perform(click());
-            wait(2000);
-        } catch (Exception e) {
-        }
-
         // Add item
         onView(withId(R.id.addItemButton)).perform(click());
         wait(2000);
@@ -321,10 +314,10 @@ public class AppTest {
 
     // #	   Date	       Description	    Make	  Model	    Serial Number	    Value	    Comment         Tags
     // 1	01/01/2023	Initial Test Item	Alpha	  A1-1	    ALPH123	            500	        Initial Entry   Blue, White
-    // 2	15/02/2023	Mid-Quarter Sample	Beta	  B2-1	    BETA456	            750	        Mid-Quarter     Blue
-    // 3	30/03/2023	End of Quarter Test	Alpha	  G2000	    ALPH789	            1000	    Quarter End     Green
+    // 2	15/02/2023	Sample Item     	Beta	  B2-1	    BETA456	            750	        Mid-Quarter     Blue
+    // 3	30/03/2023	Throwaway Item  	Alpha	  G2000	    ALPH789	            1000	    Quarter End     Green
     // 4	10/04/2023	Spring Check Item	Delta	  D-700	    DELT012	            300	        Spring Check    Yellow, Green
-    // 5	20/05/2023	Pre-Summer Review	Beta	  B-AD	    BETA345	            600	        Pre-Summer      White
+    // 5	20/05/2023	Random Item     	Beta	  B-AD	    BETA345	            600	        Pre-Summer      White
 
     // This part of the code test sorting, filtering and bulk delete.
     // Run createItems() before running testSort(), testFilter() and testBulkDelete().
@@ -371,7 +364,7 @@ public class AppTest {
         onView(withId(R.id.addItemButton)).perform(click());
         wait(2000);
         onView(withId(R.id.dateInput)).perform(ViewActions.typeText("15/02/2023"));
-        onView(withId(R.id.descriptionInput)).perform(ViewActions.typeText("Mid-Quarter Sample"));
+        onView(withId(R.id.descriptionInput)).perform(ViewActions.typeText("Sample Item"));
         onView(withId(R.id.makeInput)).perform(ViewActions.typeText("Beta"));
         onView(withId(R.id.modelInput)).perform(ViewActions.typeText("B2-1"));
         onView(withId(R.id.serialNumberInput)).perform(ViewActions.typeText("BETA456"));
@@ -393,7 +386,7 @@ public class AppTest {
         onView(withId(R.id.addItemButton)).perform(click());
         wait(2000);
         onView(withId(R.id.dateInput)).perform(ViewActions.typeText("30/03/2023"));
-        onView(withId(R.id.descriptionInput)).perform(ViewActions.typeText("End of Quarter Test"));
+        onView(withId(R.id.descriptionInput)).perform(ViewActions.typeText("Throwaway Item"));
         onView(withId(R.id.makeInput)).perform(ViewActions.typeText("Alpha"));
         onView(withId(R.id.modelInput)).perform(ViewActions.typeText("G2000"));
         onView(withId(R.id.serialNumberInput)).perform(ViewActions.typeText("ALPH789"));
@@ -448,7 +441,7 @@ public class AppTest {
         onView(withId(R.id.addItemButton)).perform(click());
         wait(2000);
         onView(withId(R.id.dateInput)).perform(ViewActions.typeText("20/05/2023"));
-        onView(withId(R.id.descriptionInput)).perform(ViewActions.typeText("Pre-Summer Review"));
+        onView(withId(R.id.descriptionInput)).perform(ViewActions.typeText("Random Item"));
         onView(withId(R.id.makeInput)).perform(ViewActions.typeText("Beta"));
         onView(withId(R.id.modelInput)).perform(ViewActions.typeText("B-AD"));
         onView(withId(R.id.serialNumberInput)).perform(ViewActions.typeText("BETA345"));
@@ -471,11 +464,38 @@ public class AppTest {
     public void testSort() {
         onView(withId(R.id.nav_sort)).perform(click());
         wait(2000);
+        onView(withId(R.id.sorting))
+                .perform(RecyclerViewActions.scrollTo(hasDescendant(withText("Date"))))
+                .perform(RecyclerViewActions.actionOnItem(hasDescendant(withText("Date")), click()));
+        onView(withId(R.id.sort_ascedning)).perform(click());
+        onView(withId(R.id.action_apply)).perform(click());
+        wait(2000);
 
         // Test sort by date
-        
+
 
 
         //sort_ascedning, sort_descending
+    }
+
+    @Test
+    public void testBulkDelete() {
+        //Perform bulk delete
+        wait(2000);
+        onView(withText("Initial Test Item")).perform(longClick());
+        onView(withText("Sample Item")).perform(click());
+        onView(withText("Throwaway Item")).perform(click());
+        onView(withText("Spring Check Item")).perform(click());
+        onView(withText("Random Item")).perform(click());
+        onView(withId(R.id.bulk_delete)).perform(click());
+        onView(withText("Yes")).perform(click());
+
+        // Check if items are deleted
+        wait(2000);
+        onView(withText("Initial Test Item")).check(doesNotExist());
+        onView(withText("Sample Item")).check(doesNotExist());
+        onView(withText("Throwaway Item")).check(doesNotExist());
+        onView(withText("Spring Check Item")).check(doesNotExist());
+        onView(withText("Random Item")).check(doesNotExist());
     }
 }
