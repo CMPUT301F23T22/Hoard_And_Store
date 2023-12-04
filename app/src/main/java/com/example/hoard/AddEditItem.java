@@ -47,6 +47,8 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
             new ActivityResultContracts.StartActivityForResult(),
             this::handleAddImageResult
     );
+
+
     ChipGroup chipGroupTags;
     private final ActivityResultLauncher<Intent> addTagResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -67,6 +69,16 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
                 if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                     String description = result.getData().getStringExtra("productDescription");
                     descriptionInput.setText(description); // Set the scanned product description
+                }
+            }
+    );
+
+    private final ActivityResultLauncher<Intent> serialScannerResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                    String serialNumber = result.getData().getStringExtra("serialNumber");
+                    serialNumberInput.setText(serialNumber);
                 }
             }
     );
@@ -135,6 +147,10 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         TextInputLayout descriptionInputLayout = findViewById(R.id.descriptionInputLayout);
         descriptionInputLayout.setEndIconOnClickListener(v -> launchBarcodeScanner());
 
+        // Listener for the serial scanner
+        TextInputLayout serialNumberInputLayout = findViewById(R.id.serialNumberInputLayout);
+        serialNumberInputLayout.setEndIconOnClickListener(v -> launchSerialScanner());
+
 
         // Save button listener
         Button saveButton = findViewById(R.id.submitButton);
@@ -172,6 +188,11 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
     private void launchBarcodeScanner() {
         Intent intent = new Intent(this, BarcodeScannerActivity.class);
         barcodeScannerResultLauncher.launch(intent);
+    }
+
+    private void launchSerialScanner(){
+        Intent intent = new Intent(this, SerialScannerActivity.class);
+        serialScannerResultLauncher.launch(intent);
     }
 
     /**

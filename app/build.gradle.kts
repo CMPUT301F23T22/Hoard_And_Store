@@ -46,6 +46,9 @@ dependencies {
     implementation ("com.journeyapps:zxing-android-embedded:4.3.0")
     implementation ("com.squareup.okhttp3:okhttp:4.9.0")
     implementation ("org.json:json:20210307")
+    implementation("com.google.mlkit:vision-common:16.0.0")
+    implementation("com.google.android.gms:play-services-mlkit-text-recognition-common:16.0.0")
+    implementation("com.google.mlkit:text-recognition:16.0.0")
     var cameraxversion = "1.1.0-beta01"
     implementation ("androidx.camera:camera-camera2:$cameraxversion")
     implementation ("androidx.camera:camera-lifecycle:$cameraxversion")
