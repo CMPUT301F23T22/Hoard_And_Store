@@ -259,6 +259,7 @@ public class AppTest {
         signIn();
     }
 
+    // Run this when something is wrong so that the account is reset.
     @Test
     public void accountDeleteCreate() {
         // Delete account
