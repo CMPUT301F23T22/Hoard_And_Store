@@ -1,5 +1,7 @@
 package com.example.hoard;
 
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.test.espresso.matcher.BoundedMatcher;
 import androidx.test.espresso.Espresso;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.uiautomator.UiDevice;
@@ -22,6 +24,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.isRoot;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
+import static com.google.firebase.firestore.util.Preconditions.checkNotNull;
 import static org.hamcrest.Matchers.allOf;
 
 import android.view.View;
@@ -41,6 +44,7 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
+import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Rule;
@@ -163,6 +167,25 @@ public class AppTest {
         return actionWithAssertions(new GeneralSwipeAction(Swipe.FAST, GeneralLocation.CENTER,
                 GeneralLocation.BOTTOM_CENTER, Press.FINGER));
     }
+
+
+    // StackOverFlow: https://stackoverflow.com/questions/52737309/espresso-check-recyclerview-items-are-ordered-correctly/52828004#52828004
+    // Accessed Dec 3,2023
+    public static Matcher<View> hasItemAtPosition(final Matcher<View> matcher, final int position) {
+        return new BoundedMatcher<View, RecyclerView>(RecyclerView.class) {
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("has item at position " + position + ": ");
+                matcher.describeTo(description);
+            }
+            @Override
+            protected boolean matchesSafely(RecyclerView recyclerView) {
+                RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(position);
+                return matcher.matches(viewHolder.itemView);
+            }
+        };
+    }
+
 
     public void allowPermissionIfNeeded(String permissionText) {
         UiDevice device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
@@ -512,20 +535,95 @@ public class AppTest {
 
     @Test
     public void testSort() {
+        // #	   Date	       Description	    Make	  Model	    Serial Number	    Value	    Comment         Tags
+        // 1	01/01/2023	Item One        	Alpha	  A1-1	    ALPH123	            500	        Initial Entry   Blue, White
+        // 2	15/02/2023	Sample           	Beta	  B2-1	    BETA456	            750	        Mid-Quarter     Blue
+        // 3	30/03/2023	Throwaway Item  	Alpha	  G2000	    ALPH789	            1000	    Quarter End     Green
+        // 4	10/04/2023	Item 2          	Delta	  D-700	    DELT012	            300	        Spring Check    Yellow, Green
+        // 5	20/05/2023	Random Sample     	Beta	  B-AD	    BETA345	            600	        Pre-Summer      White
         onView(withId(R.id.nav_sort)).perform(click());
         wait(2000);
         onView(withId(R.id.sorting))
                 .perform(RecyclerViewActions.scrollTo(hasDescendant(withText("Date"))))
                 .perform(RecyclerViewActions.actionOnItem(hasDescendant(withText("Date")), click()));
+        onView(withId(R.id.sort_descending)).perform(click());
+        onView(withId(R.id.action_apply)).perform(click());
+        wait(2000);
+
+
+        onView(hasItemAtPosition(hasDescendant(withText("Random Sample")), 0)).check(matches(isDisplayed()));
+        onView(hasItemAtPosition(hasDescendant(withText("Item 2")), 1)).check(matches(isDisplayed()));
+        onView(hasItemAtPosition(hasDescendant(withText("Throwaway Item")), 2)).check(matches(isDisplayed()));
+        onView(hasItemAtPosition(hasDescendant(withText("Sample")), 3)).check(matches(isDisplayed()));
+        onView(hasItemAtPosition(hasDescendant(withText("Item One")), 4)).check(matches(isDisplayed()));
+
+
+        // Description
+        onView(withId(R.id.nav_sort)).perform(click());
+        wait(2000);
+        onView(withId(R.id.sorting))
+                .perform(RecyclerViewActions.scrollTo(hasDescendant(withText("Description"))))
+                .perform(RecyclerViewActions.actionOnItem(hasDescendant(withText("Description")), click()));
         onView(withId(R.id.sort_ascedning)).perform(click());
         onView(withId(R.id.action_apply)).perform(click());
         wait(2000);
 
-        // Test sort by date
+        onView(hasItemAtPosition(hasDescendant(withText("Item 2")), 0)).check(matches(isDisplayed()));
+        onView(hasItemAtPosition(hasDescendant(withText("Item One")), 1)).check(matches(isDisplayed()));
+        onView(hasItemAtPosition(hasDescendant(withText("Random Sample")), 2)).check(matches(isDisplayed()));
+        onView(hasItemAtPosition(hasDescendant(withText("Sample")), 3)).check(matches(isDisplayed()));
+        onView(hasItemAtPosition(hasDescendant(withText("Throwaway Item")), 4)).check(matches(isDisplayed()));
+
+       // Tags
+        onView(withId(R.id.nav_sort)).perform(click());
+        wait(2000);
+        onView(withId(R.id.sorting))
+                .perform(RecyclerViewActions.scrollTo(hasDescendant(withText("Tags"))))
+                .perform(RecyclerViewActions.actionOnItem(hasDescendant(withText("Tags")), click()));
+        onView(withId(R.id.sort_descending)).perform(click());
+        onView(withId(R.id.action_apply)).perform(click());
+        wait(2000);
+
+        onView(hasItemAtPosition(hasDescendant(withText("Random Sample")), 0)).check(matches(isDisplayed()));
+        onView(hasItemAtPosition(hasDescendant(withText("Throwaway Item")), 1)).check(matches(isDisplayed()));
+        onView(hasItemAtPosition(hasDescendant(withText("Item 2")), 2)).check(matches(isDisplayed()));
+        onView(hasItemAtPosition(hasDescendant(withText("Sample")), 3)).check(matches(isDisplayed()));
+        onView(hasItemAtPosition(hasDescendant(withText("Item One")), 4)).check(matches(isDisplayed()));
 
 
+        // Estimated Value
+        onView(withId(R.id.nav_sort)).perform(click());
+        wait(2000);
+        onView(withId(R.id.sorting))
+                .perform(RecyclerViewActions.scrollTo(hasDescendant(withText("Estimated Value"))))
+                .perform(RecyclerViewActions.actionOnItem(hasDescendant(withText("Estimated Value")), click()));
+        onView(withId(R.id.sort_ascedning)).perform(click());
+        onView(withId(R.id.action_apply)).perform(click());
+        wait(2000);
 
-        //sort_ascedning, sort_descending
+        onView(hasItemAtPosition(hasDescendant(withText("Item 2")), 0)).check(matches(isDisplayed()));
+        onView(hasItemAtPosition(hasDescendant(withText("Item One")), 1)).check(matches(isDisplayed()));
+        onView(hasItemAtPosition(hasDescendant(withText("Random Sample")), 2)).check(matches(isDisplayed()));
+        onView(hasItemAtPosition(hasDescendant(withText("Sample")), 3)).check(matches(isDisplayed()));
+        onView(hasItemAtPosition(hasDescendant(withText("Throwaway Item")), 4)).check(matches(isDisplayed()));
+
+
+        // Estimated Value
+        onView(withId(R.id.nav_sort)).perform(click());
+        wait(2000);
+        onView(withId(R.id.sorting))
+                .perform(RecyclerViewActions.scrollTo(hasDescendant(withText("Description"))))
+                .perform(RecyclerViewActions.actionOnItem(hasDescendant(withText("Description")), click()));
+        onView(withId(R.id.sort_descending)).perform(click());
+        onView(withId(R.id.action_apply)).perform(click());
+        wait(2000);
+
+        onView(hasItemAtPosition(hasDescendant(withText("Item 2")), 4)).check(matches(isDisplayed()));
+        onView(hasItemAtPosition(hasDescendant(withText("Item One")), 3)).check(matches(isDisplayed()));
+        onView(hasItemAtPosition(hasDescendant(withText("Random Sample")), 2)).check(matches(isDisplayed()));
+        onView(hasItemAtPosition(hasDescendant(withText("Sample")), 1)).check(matches(isDisplayed()));
+        onView(hasItemAtPosition(hasDescendant(withText("Throwaway Item")), 0)).check(matches(isDisplayed()));
+
     }
 
 
