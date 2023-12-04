@@ -1,7 +1,6 @@
 package com.example.hoard;
 
 import android.content.Context;
-import android.util.Pair;
 
 import androidx.fragment.app.FragmentActivity;
 
@@ -11,7 +10,7 @@ import java.util.Calendar;
 
 /**
  * A custom date picker class for selecting dates within the application.
- *
+ * This class can be used to show either a single date picker or a date range picker based on the provided parameters.
  */
 public class CustomDatePicker {
     private final Context context;
@@ -19,7 +18,8 @@ public class CustomDatePicker {
     private final boolean isDateRangePicker;
 
     /**
-     * Interface for the date picker
+     * Interface for the date picker listener.
+     * Provides callbacks for single date or date range selection.
      */
     public interface DatePickListener {
         default void onSingleDatePicked(int year, int month, int day){
@@ -33,11 +33,11 @@ public class CustomDatePicker {
     }
 
     /**
-     * Constructor for the custom date picker
+     * Constructor for the custom date picker.
      *
-     * @param context           The context of the activity
-     * @param listener          The listener for the date picker
-     * @param isDateRangePicker True if a date range picker should be shown, false for a normal date picker
+     * @param context           The context of the activity where the date picker is used.
+     * @param listener          The listener for date selection events.
+     * @param isDateRangePicker True if the date picker is for selecting a date range, false for a single date.
      */
     public CustomDatePicker(Context context, DatePickListener listener, boolean isDateRangePicker) {
         this.context = context;
@@ -46,7 +46,7 @@ public class CustomDatePicker {
     }
 
     /**
-     * Shows the custom date picker
+     * Shows the custom date picker based on the type specified (single date or date range).
      */
     public void showDatePicker() {
         if (isDateRangePicker) {
@@ -56,6 +56,10 @@ public class CustomDatePicker {
         }
     }
 
+    /**
+     * Displays a single date picker using MaterialDatePicker.
+     * On date selection, the listener's onSingleDatePicked method is called.
+     */
     private void showSingleDatePicker() {
         MaterialDatePicker.Builder<Long> builder = MaterialDatePicker.Builder.datePicker();
         MaterialDatePicker<Long> materialDatePicker = builder.build();
@@ -74,6 +78,10 @@ public class CustomDatePicker {
         });
     }
 
+    /**
+     * Displays a date range picker using MaterialDatePicker.
+     * On date range selection, the listener's onDateRangePicked method is called.
+     */
     private void showDateRangePicker() {
         MaterialDatePicker.Builder<androidx.core.util.Pair<Long, Long>> builder = MaterialDatePicker.Builder.dateRangePicker();
         MaterialDatePicker<androidx.core.util.Pair<Long, Long>> materialDateRangePicker = builder.build();

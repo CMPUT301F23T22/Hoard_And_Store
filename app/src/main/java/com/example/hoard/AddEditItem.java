@@ -36,8 +36,9 @@ import java.util.Locale;
 import java.util.UUID;
 
 /**
- * An activity for adding or editing items, extending AppCompatActivity and implementing
- * CustomDatePicker.DatePickListener for handling date selections.
+ * Activity class for adding or editing items in the inventory.
+ * It provides UI to input item details like description, make, model, serial number, value, etc.
+ * This class also handles barcode scanning, image adding, and date picking functionalities.
  */
 public class AddEditItem extends AppCompatActivity implements CustomDatePicker.DatePickListener {
 
@@ -71,6 +72,12 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
     private ItemDBController itemDBController;
     private ArrayList<Tag> selectedTagList;
 
+    /**
+     * Initializes the activity, sets up UI components and listeners.
+     * It also checks if the activity is opened for editing an existing item or adding a new item.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after previously being shut down, this contains the data it most recently supplied in onSaveInstanceState(Bundle).
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -172,12 +179,17 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         });
 
     }
-
+    /**
+     * Launches the barcode scanner activity.
+     */
     private void launchBarcodeScanner() {
         Intent intent = new Intent(this, BarcodeScannerActivity.class);
         barcodeScannerResultLauncher.launch(intent);
     }
 
+    /**
+     * Launches the serial number scanner activity.
+     */
     private void launchSerialScanner() {
         Intent intent = new Intent(this, SerialScannerActivity.class);
         serialScannerResultLauncher.launch(intent);
@@ -246,7 +258,7 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         TextInputLayout commentInputLayout = findViewById(R.id.commentInputLayout);
         TextInputEditText commentInput = findViewById(R.id.commentInput);
 
-
+        // Validate fields before saving
         if (isFieldEmpty(dateInput) || !isValidDate(dateInput.getText().toString())) {
             dateInputLayout.setError("Invalid date format. Use dd/mm/yyyy");
             dateInputLayout.setErrorEnabled(true);
@@ -522,6 +534,12 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         }
     }
 
+    /**
+     * Handles the result from the image adding activity. If the result is OK, it retrieves the selected image URIs
+     * and adds them to the imagesData list.
+     *
+     * @param result The result data from the image adding activity, containing the URIs of the selected images.
+     */
     private void handleAddImageResult(ActivityResult result) {
         if (result.getResultCode() == RESULT_OK && result.getData() != null) {
             // Retrieve the ArrayList of Uri objects
@@ -533,6 +551,12 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         }
     }
 
+    /**
+     * Handles the result from the serial number scanner activity. If the result is OK, it sets the scanned serial number
+     * to the serialNumberInput field.
+     *
+     * @param result The result data from the serial scanner activity, containing the scanned serial number.
+     */
     private void handleSerialScannerResult(ActivityResult result) {
         if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
             String serialNumber = result.getData().getStringExtra("serialNumber");
@@ -540,6 +564,12 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         }
     }
 
+    /**
+     * Handles the result from the barcode scanner activity. If the result is OK, it sets the scanned product's
+     * description to the descriptionInput field.
+     *
+     * @param result The result data from the barcode scanner activity, containing the product description.
+     */
     private void handleBarcodeScannerResult(ActivityResult result) {
         if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
             String description = result.getData().getStringExtra("productDescription");

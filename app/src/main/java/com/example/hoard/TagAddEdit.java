@@ -39,7 +39,11 @@ public class TagAddEdit extends AppCompatActivity {
     private ChipGroup chipGroup;
 
     private TagDBController dbController;
-
+    /**
+     * Initializes the activity and sets up the UI for adding or editing a tag.
+     *
+     * @param savedInstanceState The saved instance state.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

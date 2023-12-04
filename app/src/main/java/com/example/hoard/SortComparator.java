@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 
+/**
+ * This class is used to compare objects for sorting
+ */
+
 public class SortComparator implements Comparator<Object> {
     /**
      * Compares 2 objects and their valies

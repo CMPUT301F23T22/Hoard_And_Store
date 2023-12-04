@@ -11,20 +11,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Adapter for displaying item breakdown information in a ListView.
+ * This adapter takes a list of Map entries where each entry consists of a Tag and its associated count.
+ */
 public class ItemBreakDownAdapter extends BaseAdapter {
 
     private final Context context;
     private final List<Map.Entry<Tag, Integer>> itemTagChartInfo;
 
+    /**
+     * Constructor for ItemBreakDownAdapter.
+     *
+     * @param context The current context.
+     * @param itemTagChartInfo A list of Map entries representing tag data and their counts.
+     */
     public ItemBreakDownAdapter(Context context, List<Map.Entry<Tag, Integer>> itemTagChartInfo) {
         this.context = context;
         this.itemTagChartInfo = itemTagChartInfo;
     }
 
     /**
-     * Returns the number of elements for chart info
+     * Returns the count of items in the adapter.
      *
-     * @return int
+     * @return The number of items.
      */
     @Override
     public int getCount() {
@@ -33,10 +43,10 @@ public class ItemBreakDownAdapter extends BaseAdapter {
 
 
     /**
-     * Returns the item at position i
+     * Returns the item at the specified position.
      *
-     * @param i an integer for position in adapter
-     * @return Object
+     * @param i The position of the item in the data set.
+     * @return The item at the specified position.
      */
     @Override
     public Object getItem(int i) {
@@ -44,10 +54,11 @@ public class ItemBreakDownAdapter extends BaseAdapter {
     }
 
     /**
-     * Returns the itemID at position i
+     * Returns the row ID associated with the specified position in the list.
+     * In this case, the position itself is used as the row ID.
      *
-     * @param i an integer for position in adapter
-     * @return long
+     * @param i The position of the item within the adapter's data set.
+     * @return The ID of the item at the specified position.
      */
     @Override
     public long getItemId(int i) {
@@ -56,12 +67,13 @@ public class ItemBreakDownAdapter extends BaseAdapter {
 
 
     /**
-     * sets the custom view for out chart info
+     * Provides a view for an AdapterView (ListView, GridView, etc.).
+     * The method creates a new View for each item referenced by the adapter.
      *
-     * @param position an integer for position in adapter
-     * @param convertView view
-     * @param parent parent views group
-     * @return Object
+     * @param position The position of the item within the adapter's data set of the item whose view we want.
+     * @param convertView The old view to reuse, if possible.
+     * @param parent The parent that this view will eventually be attached to.
+     * @return A View corresponding to the data at the specified position.
      */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {

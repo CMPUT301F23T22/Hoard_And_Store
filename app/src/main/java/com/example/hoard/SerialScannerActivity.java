@@ -53,7 +53,10 @@ public class SerialScannerActivity extends AppCompatActivity {
                 }
             }
     );
-
+    /**
+     * Creates the serial scanner activity which allows users to scan serial numbers by using OCR text recognition
+     * @param savedInstanceState The saved instance state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 

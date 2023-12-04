@@ -28,6 +28,10 @@ import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 
+/**
+ * An activity class for editing user profile details like username, email, and password.
+ * Also provides options to sign out or delete the account.
+ */
 public class EditProfileActivity extends AppCompatActivity {
     private ItemDBController dbController;
     private final boolean passwordUpdated = false;
@@ -39,6 +43,11 @@ public class EditProfileActivity extends AppCompatActivity {
     private MenuItem profileMenuItem;
     private MenuItem chartMenuItem;
 
+    /**
+     * This creates the activity for editing the user profile
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
