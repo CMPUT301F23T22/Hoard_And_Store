@@ -24,7 +24,7 @@ import java.util.List;
  * Activity class for adding images to a item.
  * This activity allows users to capture new images or select existing ones from their device.
  */
-public class AddImage extends AppCompatActivity implements ImageCarouselAdapter.OnImageDeleteListener{
+public class AddImage extends AppCompatActivity{
 
     private static final int IMAGE_CAPTURE_FAILURE_RESULT_CODE = 2;
     private ViewPager2 viewPager;
@@ -49,7 +49,7 @@ public class AddImage extends AppCompatActivity implements ImageCarouselAdapter.
 
         // Initialize the ViewPager2 and the ImageCarouselAdapter
         viewPager = findViewById(R.id.viewPagerImageCarousel);
-        adapter = new ImageCarouselAdapter(images, this,this);
+        adapter = new ImageCarouselAdapter(images, this);
         viewPager.setAdapter(adapter);
 
         // Initialize UI elements and set up event listeners
@@ -87,14 +87,6 @@ public class AddImage extends AppCompatActivity implements ImageCarouselAdapter.
      */
     private boolean checkPermission(String permission) {
         return ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED;
-    }
-
-    @Override
-    public void onImageDelete(Uri uri) {
-        if (images.contains(uri)) {
-            images.remove(uri);
-            adapter.notifyDataSetChanged();
-        }
     }
 
     /**

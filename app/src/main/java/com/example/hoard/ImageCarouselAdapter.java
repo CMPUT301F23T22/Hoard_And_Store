@@ -19,18 +19,15 @@ public class ImageCarouselAdapter extends RecyclerView.Adapter<ImageCarouselAdap
     private List<Uri> imageUris;
     private Context context;
 
-    private final OnImageDeleteListener deleteListener;
-
     /**
      * Constructor for ImageCarouselAdapter.
      *
      * @param imageUris List of Uri objects representing the images.
      * @param context  Context of the application.
      */
-    public ImageCarouselAdapter(List<Uri> imageUris, Context context, OnImageDeleteListener deleteListener) {
+    public ImageCarouselAdapter(List<Uri> imageUris, Context context) {
         this.imageUris = imageUris;
         this.context = context;
-        this.deleteListener = deleteListener;
     }
 
     @NonNull
@@ -46,10 +43,6 @@ public class ImageCarouselAdapter extends RecyclerView.Adapter<ImageCarouselAdap
         Glide.with(context)
                 .load(uri)
                 .into(holder.imageView);
-
-        holder.deleteButton.setOnClickListener(view -> {
-            deleteListener.onImageDelete(uri);
-        });
     }
 
     @Override
@@ -67,11 +60,6 @@ public class ImageCarouselAdapter extends RecyclerView.Adapter<ImageCarouselAdap
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.imageView);
-            deleteButton = itemView.findViewById(R.id.deleteButton);
         }
-    }
-
-    public interface OnImageDeleteListener {
-        void onImageDelete(Uri uri);
     }
 }

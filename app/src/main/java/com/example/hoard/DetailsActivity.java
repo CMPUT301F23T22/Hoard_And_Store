@@ -36,7 +36,7 @@ import java.util.Locale;
  * An activity class for displaying details of item in the application.
  *
  */
-public class DetailsActivity extends AppCompatActivity implements ImageCarouselAdapter.OnImageDeleteListener{
+public class DetailsActivity extends AppCompatActivity{
     private TextView dateOfAcquisitionTextView, makeTextView, modelTextView, serialNumberTextView, estimatedValueTextView, commentTextView, briefDescriptionTextView;
     private Item selectedItem;
     private ChipGroup chipGroup;
@@ -81,7 +81,7 @@ public class DetailsActivity extends AppCompatActivity implements ImageCarouselA
 
         // Initialize the ViewPager2 and the ImageCarouselAdapter
         viewPager = findViewById(R.id.viewPagerImageCarousel);
-        adapter = new ImageCarouselAdapter(images, this,this);
+        adapter = new ImageCarouselAdapter(images, this);
         viewPager.setAdapter(adapter);
 
         Button editButton = findViewById(R.id.editButton);
@@ -200,10 +200,5 @@ public class DetailsActivity extends AppCompatActivity implements ImageCarouselA
                 }
             }
         }
-    }
-
-    @Override
-    public void onImageDelete(Uri uri) {
-        //
     }
 }
