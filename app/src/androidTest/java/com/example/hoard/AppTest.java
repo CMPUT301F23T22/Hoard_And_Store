@@ -532,7 +532,7 @@ public class AppTest {
         onView(withId(R.id.bulk_delete)).perform(click());
         onView(withText("Yes")).perform(click());
 
-        Check if items are deleted
+        // Check if items are deleted
         wait(2000);
         onView(withText("Item One")).check(doesNotExist());
         onView(withText("Sample")).check(doesNotExist());

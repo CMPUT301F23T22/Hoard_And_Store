@@ -33,8 +33,10 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.textview.MaterialTextView;
+import com.google.firebase.auth.FirebaseUser;
 
 import org.hamcrest.Matcher;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -89,7 +91,7 @@ public class ListScreenActivity {
         };
     }
 
-    public static ViewAction clickOnViewChildWithId(final int viewId) {
+    public static ViewAction clickOnItemBox() {
         /**
          * This method clicks on a child view with the specified ID.
          * @param viewId The ID of the view to click on.
@@ -121,9 +123,8 @@ public class ListScreenActivity {
                  * @param uiController The UiController instance.
                  * @param view The view to perform the action on.
                  */
-                View childView = view.findViewById(viewId);
-                if (childView != null && childView.isShown()) {
-                    childView.performClick();
+                if (view != null && view.isShown()) {
+                    view.performClick();
                 }
             }
         };
@@ -226,7 +227,7 @@ public class ListScreenActivity {
         wait(2000);
         onView(withId(R.id.recyclerView))
                 .perform(RecyclerViewActions.scrollTo(hasDescendant(withText("Test Item"))))
-                .perform(RecyclerViewActions.actionOnItem(hasDescendant(withText("Test Item")), clickOnViewChildWithId(R.id.detailsArrow)));
+                .perform(RecyclerViewActions.actionOnItem(hasDescendant(withText("Test Item")), clickOnItemBox()));
         onView(withId(R.id.dateOfAcquisitionTextView)).check(matches(withText("Date Of Purchase: 2023-01-01")));
         onView(withId(R.id.briefDescriptionTextView)).check(matches(withText("Description: Test Item")));
         onView(withId(R.id.makeTextView)).check(matches(withText("Make: Make")));
@@ -243,7 +244,7 @@ public class ListScreenActivity {
         wait(2000);
         onView(withId(R.id.recyclerView))
                 .perform(RecyclerViewActions.scrollTo(hasDescendant(withText("Test Item"))))
-                .perform(RecyclerViewActions.actionOnItem(hasDescendant(withText("Test Item")), clickOnViewChildWithId(R.id.detailsArrow)));
+                .perform(RecyclerViewActions.actionOnItem(hasDescendant(withText("Test Item")), clickOnItemBox()));
         wait(2000);
         onView(withId(R.id.editButton)).perform(click());
         onView(withId(R.id.dateInput)).perform(replaceText("31/12/2023"));
@@ -325,12 +326,12 @@ public class ListScreenActivity {
     }
 
     // Sorting and Filtering tests
-    // #	Date	Description	Make	Model	Serial Number	Value	Comment
-    //1	01/01/2023	Initial Test Item	AlphaMake	AlphaModel	ALPH123	500	Initial Entry
-    //2	15/02/2023	Mid-Quarter Sample	BetaMake	BetaModel	BETA456	750	Mid-Quarter
-    //3	30/03/2023	End of Quarter Test	GammaMake	GammaModel	GAMM789	1000	Quarter End
-    //4	10/04/2023	Spring Check Item	DeltaMake	DeltaModel	DELT012	300	Spring Check
-    //5	20/05/2023	Pre-Summer Review	EpsilonMake	EpsModel	EPSI345	600	Pre-Summer
+    // #	   Date	       Description	    Make	  Model	    Serial Number	    Value	    Comment
+    // 1	01/01/2023	Initial Test Item	Alpha	  A1-1	    ALPH123	            500	        Initial Entry
+    // 2	15/02/2023	Mid-Quarter Sample	Beta	  B2-1	    BETA456	            750	        Mid-Quarter
+    // 3	30/03/2023	End of Quarter Test	Alpha	  G2000	    ALPH789	            1000	    Quarter End
+    // 4	10/04/2023	Spring Check Item	Delta	  D-700	    DELT012	            300	        Spring Check
+    // 5	20/05/2023	Pre-Summer Review	Beta	  B-AD	    BETA345	            600	        Pre-Summer
 
     //Create items to tests sorting and filtering
     @Test
@@ -339,8 +340,8 @@ public class ListScreenActivity {
         onView(withId(R.id.addItemButton)).perform(click());
         onView(withId(R.id.dateInput)).perform(ViewActions.typeText("01/01/2023"));
         onView(withId(R.id.descriptionInput)).perform(ViewActions.typeText("Initial Test Item"));
-        onView(withId(R.id.makeInput)).perform(ViewActions.typeText("AlphaMake"));
-        onView(withId(R.id.modelInput)).perform(ViewActions.typeText("AlphaModel"));
+        onView(withId(R.id.makeInput)).perform(ViewActions.typeText("Alpha"));
+        onView(withId(R.id.modelInput)).perform(ViewActions.typeText("A1-1"));
         onView(withId(R.id.serialNumberInput)).perform(ViewActions.typeText("ALPH123"));
         onView(withId(R.id.valueInput)).perform(ViewActions.typeText("500"));
         onView(withId(R.id.commentInput)).perform(ViewActions.typeText("Initial Entry"));
@@ -352,7 +353,7 @@ public class ListScreenActivity {
         onView(withId(R.id.addItemButton)).perform(click());
         onView(withId(R.id.dateInput)).perform(ViewActions.typeText("15/02/2023"));
         onView(withId(R.id.descriptionInput)).perform(ViewActions.typeText("Mid-Quarter Sample"));
-        onView(withId(R.id.makeInput)).perform(ViewActions.typeText("BetaMake"));
+        onView(withId(R.id.makeInput)).perform(ViewActions.typeText("Beta"));
         onView(withId(R.id.modelInput)).perform(ViewActions.typeText("BetaModel"));
         onView(withId(R.id.serialNumberInput)).perform(ViewActions.typeText("BETA456"));
         onView(withId(R.id.valueInput)).perform(ViewActions.typeText("750"));
@@ -365,7 +366,7 @@ public class ListScreenActivity {
         onView(withId(R.id.addItemButton)).perform(click());
         onView(withId(R.id.dateInput)).perform(ViewActions.typeText("30/03/2023"));
         onView(withId(R.id.descriptionInput)).perform(ViewActions.typeText("End of Quarter Test"));
-        onView(withId(R.id.makeInput)).perform(ViewActions.typeText("GammaMake"));
+        onView(withId(R.id.makeInput)).perform(ViewActions.typeText("Alpha"));
         onView(withId(R.id.modelInput)).perform(ViewActions.typeText("GammaModel"));
         onView(withId(R.id.serialNumberInput)).perform(ViewActions.typeText("GAMM789"));
         onView(withId(R.id.valueInput)).perform(ViewActions.typeText("1000"));
@@ -378,7 +379,7 @@ public class ListScreenActivity {
         onView(withId(R.id.addItemButton)).perform(click());
         onView(withId(R.id.dateInput)).perform(ViewActions.typeText("10/04/2023"));
         onView(withId(R.id.descriptionInput)).perform(ViewActions.typeText("Spring Check Item"));
-        onView(withId(R.id.makeInput)).perform(ViewActions.typeText("DeltaMake"));
+        onView(withId(R.id.makeInput)).perform(ViewActions.typeText("Delta"));
         onView(withId(R.id.modelInput)).perform(ViewActions.typeText("DeltaModel"));
         onView(withId(R.id.serialNumberInput)).perform(ViewActions.typeText("DELT012"));
         onView(withId(R.id.valueInput)).perform(ViewActions.typeText("300"));
@@ -391,7 +392,7 @@ public class ListScreenActivity {
         onView(withId(R.id.addItemButton)).perform(click());
         onView(withId(R.id.dateInput)).perform(ViewActions.typeText("20/05/2023"));
         onView(withId(R.id.descriptionInput)).perform(ViewActions.typeText("Pre-Summer Review"));
-        onView(withId(R.id.makeInput)).perform(ViewActions.typeText("EpsilonMake"));
+        onView(withId(R.id.makeInput)).perform(ViewActions.typeText("Beta"));
         onView(withId(R.id.modelInput)).perform(ViewActions.typeText("EpsModel"));
         onView(withId(R.id.serialNumberInput)).perform(ViewActions.typeText("EPSI345"));
         onView(withId(R.id.valueInput)).perform(ViewActions.typeText("600"));
@@ -399,6 +400,5 @@ public class ListScreenActivity {
         closeSoftKeyboard();
         onView(withId(R.id.submitButton)).perform(click());
         wait(2000);
-
     }
 }
