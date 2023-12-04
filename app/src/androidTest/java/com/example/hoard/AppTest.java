@@ -155,6 +155,11 @@ public class AppTest {
                 GeneralLocation.TOP_CENTER, Press.FINGER));
     }
 
+    public static ViewAction swipeDown() {
+        return actionWithAssertions(new GeneralSwipeAction(Swipe.FAST, GeneralLocation.CENTER,
+                GeneralLocation.BOTTOM_CENTER, Press.FINGER));
+    }
+
     public void allowPermissionIfNeeded(String permissionText) {
         UiDevice device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
 
@@ -313,11 +318,11 @@ public class AppTest {
     }
 
     // #	   Date	       Description	    Make	  Model	    Serial Number	    Value	    Comment         Tags
-    // 1	01/01/2023	Initial Test Item	Alpha	  A1-1	    ALPH123	            500	        Initial Entry   Blue, White
-    // 2	15/02/2023	Sample Item     	Beta	  B2-1	    BETA456	            750	        Mid-Quarter     Blue
+    // 1	01/01/2023	Item One        	Alpha	  A1-1	    ALPH123	            500	        Initial Entry   Blue, White
+    // 2	15/02/2023	Sample           	Beta	  B2-1	    BETA456	            750	        Mid-Quarter     Blue
     // 3	30/03/2023	Throwaway Item  	Alpha	  G2000	    ALPH789	            1000	    Quarter End     Green
-    // 4	10/04/2023	Spring Check Item	Delta	  D-700	    DELT012	            300	        Spring Check    Yellow, Green
-    // 5	20/05/2023	Random Item     	Beta	  B-AD	    BETA345	            600	        Pre-Summer      White
+    // 4	10/04/2023	Item 2          	Delta	  D-700	    DELT012	            300	        Spring Check    Yellow, Green
+    // 5	20/05/2023	Random Sample     	Beta	  B-AD	    BETA345	            600	        Pre-Summer      White
 
     // This part of the code test sorting, filtering and bulk delete.
     // Run createItems() before running testSort(), testFilter() and testBulkDelete().
@@ -327,7 +332,7 @@ public class AppTest {
         onView(withId(R.id.addItemButton)).perform(click());
         wait(2000);
         onView(withId(R.id.dateInput)).perform(ViewActions.typeText("01/01/2023"));
-        onView(withId(R.id.descriptionInput)).perform(ViewActions.typeText("Initial Test Item"));
+        onView(withId(R.id.descriptionInput)).perform(ViewActions.typeText("Item One"));
         onView(withId(R.id.makeInput)).perform(ViewActions.typeText("Alpha"));
         onView(withId(R.id.modelInput)).perform(ViewActions.typeText("A1-1"));
         onView(withId(R.id.serialNumberInput)).perform(ViewActions.typeText("ALPH123"));
@@ -335,6 +340,7 @@ public class AppTest {
         closeSoftKeyboard();
         onView(withId(R.id.commentInput)).perform(ViewActions.typeText("Initial Entry"));
         closeSoftKeyboard();
+        wait(2000);
 
         // Add tag
         onView(withId(R.id.AddTagButton)).perform(click());
@@ -343,16 +349,15 @@ public class AppTest {
         onView(withId(R.id.tagColorInput)).perform(ViewActions.typeText("#0000FF"));
         closeSoftKeyboard();
         onView(withId(R.id.submitButton)).perform(click());
+        wait(2000);
 
-        onView(isRoot()).perform(swipeUp());
-
-        // Add tag
         onView(withId(R.id.AddTagButton)).perform(click());
         wait(1000);
         onView(withId(R.id.tagNameInput)).perform(ViewActions.typeText("White"));
         onView(withId(R.id.tagColorInput)).perform(ViewActions.typeText("#FFFFFF"));
         closeSoftKeyboard();
         onView(withId(R.id.submitButton)).perform(click());
+        wait(2000);
 
         onView(isRoot()).perform(swipeUp());
 
@@ -364,7 +369,7 @@ public class AppTest {
         onView(withId(R.id.addItemButton)).perform(click());
         wait(2000);
         onView(withId(R.id.dateInput)).perform(ViewActions.typeText("15/02/2023"));
-        onView(withId(R.id.descriptionInput)).perform(ViewActions.typeText("Sample Item"));
+        onView(withId(R.id.descriptionInput)).perform(ViewActions.typeText("Sample"));
         onView(withId(R.id.makeInput)).perform(ViewActions.typeText("Beta"));
         onView(withId(R.id.modelInput)).perform(ViewActions.typeText("B2-1"));
         onView(withId(R.id.serialNumberInput)).perform(ViewActions.typeText("BETA456"));
@@ -402,6 +407,7 @@ public class AppTest {
         onView(withId(R.id.tagColorInput)).perform(ViewActions.typeText("#00FF00"));
         closeSoftKeyboard();
         onView(withId(R.id.submitButton)).perform(click());
+        wait(2000);
 
         onView(isRoot()).perform(swipeUp());
 
@@ -413,7 +419,7 @@ public class AppTest {
         onView(withId(R.id.addItemButton)).perform(click());
         wait(2000);
         onView(withId(R.id.dateInput)).perform(ViewActions.typeText("10/04/2023"));
-        onView(withId(R.id.descriptionInput)).perform(ViewActions.typeText("Spring Check Item"));
+        onView(withId(R.id.descriptionInput)).perform(ViewActions.typeText("Item 2"));
         onView(withId(R.id.makeInput)).perform(ViewActions.typeText("Delta"));
         onView(withId(R.id.modelInput)).perform(ViewActions.typeText("D-700"));
         onView(withId(R.id.serialNumberInput)).perform(ViewActions.typeText("DELT012"));
@@ -429,6 +435,7 @@ public class AppTest {
         onView(withId(R.id.tagColorInput)).perform(ViewActions.typeText("#FFFF00"));
         closeSoftKeyboard();
         onView(withId(R.id.submitButton)).perform(click());
+        wait(2000);
         onView(withId(R.id.tagChipGroup)).perform(selectChipWithTag("Green"));
 
         onView(isRoot()).perform(swipeUp());
@@ -441,7 +448,7 @@ public class AppTest {
         onView(withId(R.id.addItemButton)).perform(click());
         wait(2000);
         onView(withId(R.id.dateInput)).perform(ViewActions.typeText("20/05/2023"));
-        onView(withId(R.id.descriptionInput)).perform(ViewActions.typeText("Random Item"));
+        onView(withId(R.id.descriptionInput)).perform(ViewActions.typeText("Random Sample"));
         onView(withId(R.id.makeInput)).perform(ViewActions.typeText("Beta"));
         onView(withId(R.id.modelInput)).perform(ViewActions.typeText("B-AD"));
         onView(withId(R.id.serialNumberInput)).perform(ViewActions.typeText("BETA345"));
@@ -482,20 +489,55 @@ public class AppTest {
     public void testBulkDelete() {
         //Perform bulk delete
         wait(2000);
-        onView(withText("Initial Test Item")).perform(longClick());
-        onView(withText("Sample Item")).perform(click());
-        onView(withText("Throwaway Item")).perform(click());
-        onView(withText("Spring Check Item")).perform(click());
-        onView(withText("Random Item")).perform(click());
+        try {
+            onView(withText("Item One")).perform(longClick());
+        } catch (Exception e) {
+            onView(isRoot()).perform(swipeUp());
+            onView(withText("Item One")).perform(longClick());
+            onView(isRoot()).perform(swipeDown());
+        }
+
+        try {
+            onView(withText("Sample")).perform(longClick());
+        } catch (Exception e) {
+            onView(isRoot()).perform(swipeUp());
+            onView(withText("Sample")).perform(longClick());
+            onView(isRoot()).perform(swipeDown());
+        }
+
+        try {
+            onView(withText("Throwaway Item")).perform(longClick());
+        } catch (Exception e) {
+            onView(isRoot()).perform(swipeUp());
+            onView(withText("Throwaway Item")).perform(longClick());
+            onView(isRoot()).perform(swipeDown());
+        }
+
+        try {
+            onView(withText("Item 2")).perform(longClick());
+        } catch (Exception e) {
+            onView(isRoot()).perform(swipeUp());
+            onView(withText("Item 2")).perform(longClick());
+            onView(isRoot()).perform(swipeDown());
+        }
+
+        try {
+            onView(withText("Random Sample")).perform(longClick());
+        } catch (Exception e) {
+            onView(isRoot()).perform(swipeUp());
+            onView(withText("Random Sample")).perform(longClick());
+            onView(isRoot()).perform(swipeDown());
+        }
+
         onView(withId(R.id.bulk_delete)).perform(click());
         onView(withText("Yes")).perform(click());
 
-        // Check if items are deleted
+        Check if items are deleted
         wait(2000);
-        onView(withText("Initial Test Item")).check(doesNotExist());
-        onView(withText("Sample Item")).check(doesNotExist());
+        onView(withText("Item One")).check(doesNotExist());
+        onView(withText("Sample")).check(doesNotExist());
         onView(withText("Throwaway Item")).check(doesNotExist());
-        onView(withText("Spring Check Item")).check(doesNotExist());
-        onView(withText("Random Item")).check(doesNotExist());
+        onView(withText("Item 2")).check(doesNotExist());
+        onView(withText("Random Sample")).check(doesNotExist());
     }
 }
