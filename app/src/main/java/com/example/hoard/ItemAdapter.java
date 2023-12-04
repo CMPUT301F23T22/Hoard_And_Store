@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -166,8 +167,14 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
         SimpleDateFormat desiredFormat = new SimpleDateFormat("yyyy-MM-dd");
         String formattedDate = desiredFormat.format(currentItem.getDateOfAcquisition());
         holder.dateOfAcquisition.setText(formattedDate);
-        // Correct the type mismatch issue by converting the double to a string
-        holder.estimatedValue.setText(String.valueOf(currentItem.getEstimatedValue()));
+        double estimatedValue = currentItem.getEstimatedValue();
+
+        // Format the double value to two decimal places
+        DecimalFormat decimalFormat = new DecimalFormat("#.##");
+        String formattedValue = decimalFormat.format(estimatedValue);
+
+        // Set the formatted value to the TextView or wherever you want to display it
+        holder.estimatedValue.setText(formattedValue);
 
         loadImage(currentItem,holder);
 
