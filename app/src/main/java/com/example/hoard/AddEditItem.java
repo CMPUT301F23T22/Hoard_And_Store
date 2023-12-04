@@ -482,9 +482,13 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
             currentItem.setComment(comment);
             currentItem.setDateOfAcquisition(acquisitionDate);
             currentItem.setTags(selectedTagList);
+
             for (int i = 0; i < imagesData.size(); i++) {
                 String filePath = "images/" + currentItem.getItemID() + "/" + UUID.randomUUID().toString() + ".jpg";
                 imageURLs.add(filePath);
+            }
+            if (previousUrlsList.isEmpty()){
+                previousUrlsList = currentItem.getImageUrls();
             }
             previousUrlsList.addAll(imageURLs);
             currentItem.setImageUrls(previousUrlsList);
