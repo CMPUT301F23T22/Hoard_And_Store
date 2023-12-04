@@ -38,8 +38,6 @@ public class Item implements Serializable {
     private double estimatedValue;
     private final String itemID;
     private ArrayList<Tag> tags;
-    private String imageData;
-    private DecimalFormat decimalFormat = new DecimalFormat("#.##");
     private List<String> imageUrls;
     @PropertyName("briefDescriptionList")
     private final Map<String, Boolean> briefDescriptionList;
@@ -86,7 +84,7 @@ public class Item implements Serializable {
         this.make = make;
         this.model = model;
         this.serialNumber = serialNumber;
-        this.estimatedValue = Double.parseDouble(decimalFormat.format(estimatedValue));
+        this.estimatedValue = estimatedValue;
         this.comment = comment;
         this.briefDescriptionList = splitBriefDescription(this.briefDescription);
         this.itemID = UUID.randomUUID().toString();
@@ -321,7 +319,7 @@ public class Item implements Serializable {
      * @param estimatedValue The estimated value to be set.
      */
     public void setEstimatedValue(double estimatedValue) {
-        this.estimatedValue = Double.parseDouble(decimalFormat.format(estimatedValue));
+        this.estimatedValue = estimatedValue;
     }
 
     /**
