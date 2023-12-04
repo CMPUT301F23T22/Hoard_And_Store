@@ -28,7 +28,7 @@ public class TestFilterCriteria {
 
     @Test
     public void testGetMakes() {
-        assertNull(filterCriteria.getMakes());
+        assertEquals(null, filterCriteria.getMakes());
         makes = new ArrayList<>();
         filterCriteria.setMakes(makes);
         assertEquals(makes, filterCriteria.getMakes());
@@ -44,7 +44,7 @@ public class TestFilterCriteria {
 
     @Test
     public void testGetDescriptionKeyWords() {
-        assertNull(filterCriteria.getDescriptionKeyWords());
+        assertEquals(null, filterCriteria.getDescriptionKeyWords());
         descriptionKeyWords = new ArrayList<>();
         filterCriteria.setDescriptionKeyWords(descriptionKeyWords);
         assertEquals(descriptionKeyWords, filterCriteria.getDescriptionKeyWords());
@@ -54,7 +54,7 @@ public class TestFilterCriteria {
     @Test
     public void testSetDescriptionKeyWords() {
         filterCriteria.setDescriptionKeyWords(null);
-        assertNull(filterCriteria.getDescriptionKeyWords());
+        assertEquals(null, filterCriteria.getDescriptionKeyWords());
         descriptionKeyWords = new ArrayList<>();
         filterCriteria.setDescriptionKeyWords(descriptionKeyWords);
         assertEquals(descriptionKeyWords, filterCriteria.getDescriptionKeyWords());
@@ -62,7 +62,7 @@ public class TestFilterCriteria {
 
     @Test
     public void testGetTags() {
-        assertNull(filterCriteria.getTags());
+        assertEquals(null, filterCriteria.getTags());
         tags = new ArrayList<>();
         filterCriteria.setTags(tags);
         assertEquals(tags, filterCriteria.getTags());
@@ -79,7 +79,7 @@ public class TestFilterCriteria {
 
     @Test
     public void testGetStartDate() {
-        assertNull(filterCriteria.getStartDate());
+        assertEquals(null, filterCriteria.getStartDate());
         Startdate = new Date();
         filterCriteria.setStartDate(Startdate);
         assertEquals(Startdate, filterCriteria.getStartDate());
@@ -95,7 +95,7 @@ public class TestFilterCriteria {
 
     @Test
     public void testGetEndDate() {
-        assertNull(filterCriteria.getEndDate());
+        assertEquals(null, filterCriteria.getEndDate());
         endDate = new Date();
         filterCriteria.setEndDate(endDate);
         assertEquals(endDate, filterCriteria.getEndDate());
@@ -114,7 +114,7 @@ public class TestFilterCriteria {
         filterCriteria.setStartDate(Startdate);
         assertEquals(Startdate, filterCriteria.getStartDate());
         filterCriteria.clearStartDate();
-        assertNull(filterCriteria.getStartDate());
+        assertEquals(null, filterCriteria.getStartDate());
     }
 
     @Test
@@ -123,7 +123,7 @@ public class TestFilterCriteria {
         filterCriteria.setEndDate(endDate);
         assertEquals(endDate, filterCriteria.getEndDate());
         filterCriteria.clearEndDate();
-        assertNull(filterCriteria.getEndDate());
+        assertEquals(null, filterCriteria.getEndDate());
     }
 
     @Test
@@ -133,6 +133,13 @@ public class TestFilterCriteria {
         filterCriteria.clearMakes();
         assertTrue(filterCriteria.getMakes().isEmpty());
     }
+    @Test
+    public void testClearDescriptionKeyWords() {
+        filterCriteria.setDescriptionKeyWords(new ArrayList<>());
+        assertNotNull(filterCriteria.getDescriptionKeyWords());
+        filterCriteria.clearDescriptionKeyWords();
+        assertNull(filterCriteria.getDescriptionKeyWords());
+    }
 
     @Test
     public void apply() {
@@ -141,9 +148,9 @@ public class TestFilterCriteria {
         updatedCriteria.setStartDate(null);
         updatedCriteria.setEndDate(null);
         filterCriteria.apply(updatedCriteria);
-        assertNull(filterCriteria.getDescriptionKeyWords());
-        assertNull(filterCriteria.getStartDate());
-        assertNull(filterCriteria.getEndDate());
+        assertEquals(null, filterCriteria.getDescriptionKeyWords());
+        assertEquals(null, filterCriteria.getStartDate());
+        assertEquals(null, filterCriteria.getEndDate());
     }
 
 }
