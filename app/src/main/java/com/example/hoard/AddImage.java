@@ -246,13 +246,22 @@ public class AddImage extends AppCompatActivity{
      */
     private void handleImageSelection(List<Uri> uris) {
         for (Uri uri : uris) {
-            // Add URI to your list
-            images.add(uri);
-            if (isEdit){
-                newImages.add(uri);
+            try {
+                // Take persistable URI permission to access the URI across different components
+                getContentResolver().takePersistableUriPermission(
+                        uri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION
+                );
+
+                // Add URI to your list
+                images.add(uri);
+                if (isEdit) {
+                    newImages.add(uri);
+                }
+            } catch (SecurityException e) {
+                Log.e("ImagePicker", "Error taking persistable URI permission", e);
             }
         }
-        // Notify your adapter
         adapter.notifyDataSetChanged();
     }
 
