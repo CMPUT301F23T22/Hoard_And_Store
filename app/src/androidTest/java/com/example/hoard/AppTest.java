@@ -49,7 +49,7 @@ public class AppTest {
             onView(withId(R.id.passwordInput)).perform(ViewActions.typeText("123456"));
             closeSoftKeyboard();
             onView(withId(R.id.signInButton)).perform(click());
-            wait(2000);
+            wait(3000);
         } catch (Exception e) {
         }
     }
@@ -472,6 +472,10 @@ public class AppTest {
         onView(withId(R.id.nav_sort)).perform(click());
         wait(2000);
 
-        // Te
+        // Test sort by date
+        
+
+
+        //sort_ascedning, sort_descending
     }
 }
