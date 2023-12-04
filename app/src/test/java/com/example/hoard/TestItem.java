@@ -474,6 +474,39 @@ public class TestItem {
     	item.removeTag(new Tag("Test Tag", "Test Color"));
     	assertEquals(tags, item.getTags());
     }
+    @Test
+    public void testsetImageData() {
+        	date = new Date();
+        	description = "This is a test description";
+        	make = "Test Make";
+        	model = "Test Model";
+        	serialNumber = "Test Serial Number";
+        	estimatedValue = 100.00;
+        	comment = "This is a test comment";
+        	itemID = "Test Item ID";
+        	tags = new ArrayList<>();
+            imageData = "Test Image Data";
+            Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags, "Test Image Data");
+        	item.setImageData(imageData);
+        	assertEquals(imageData, item.getImageData());
+    }
+
+    @Test
+    public void testgetImageData() {
+    	date = new Date();
+    	description = "This is a test description";
+    	make = "Test Make";
+    	model = "Test Model";
+    	serialNumber = "Test Serial Number";
+    	estimatedValue = 100.00;
+    	comment = "This is a test comment";
+    	itemID = "Test Item ID";
+    	tags = new ArrayList<>();
+        imageData = "Test Image Data";
+        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags, imageData);
+
+    	assertEquals(imageData, item.getImageData());
+    }
 
     @Test
     public void testgetTags() {

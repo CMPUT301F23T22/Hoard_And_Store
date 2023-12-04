@@ -17,6 +17,5 @@ public class TestImageCarouselAdapter {
 
         ImageCarouselAdapter imageCarouselAdapter = new ImageCarouselAdapter(emptyImageList);
         assertEquals(0, imageCarouselAdapter.getItemCount());
-
     }
 }

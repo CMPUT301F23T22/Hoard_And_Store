@@ -3,6 +3,7 @@ package com.example.hoard;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -66,5 +67,34 @@ public class TestTag {
         tag.setTagColor("test2");
         String tagColor2 = tag.getTagColor();
         assertEquals("test2", tagColor2);
+    }
+    @Test
+    public void testEquals() {
+        String tagName = "ExampleTag";
+        String tagColor = "#FF0000";
+        String tagID = "12345";
+
+        Tag tag1 = new Tag(tagName, tagColor, tagID);
+        Tag tag2 = new Tag(tagName, tagColor, tagID);
+
+        boolean result = tag1.equals(tag2);
+
+        Assert.assertTrue(result);
+    }
+
+    @Test
+    public void testHashCode() {
+        String tagName = "ExampleTag";
+        String tagColor = "#FF0000";
+        String tagID = "12345";
+
+        Tag tag1 = new Tag(tagName, tagColor, tagID);
+        Tag tag2 = new Tag(tagName, tagColor, tagID);
+
+        // Check that the hash codes of tag1 and tag2 are equal
+        int hashCode1 = tag1.hashCode();
+        int hashCode2 = tag2.hashCode();
+
+        Assert.assertEquals(hashCode1, hashCode2);
     }
 }
