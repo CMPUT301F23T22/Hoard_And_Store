@@ -192,7 +192,8 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
     }
 
     private void loadImage(Item currentItem, ViewHolder holder) {
-        String imagePath = currentItem.getImageUrls().get(0);
+        List<String> imageUrls = currentItem.getImageUrls();
+        String imagePath = (imageUrls != null && !imageUrls.isEmpty()) ? imageUrls.get(0) : null;
 
         if (imagePath == null || imagePath.isEmpty()) {
             holder.itemImage.setImageResource(R.drawable.defultimage); // Default image
@@ -366,7 +367,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
             itemModel = itemView.findViewById(R.id.modelTextView);
             dateOfAcquisition = itemView.findViewById(R.id.dateOfAcquisitionList);
             estimatedValue = itemView.findViewById(R.id.estimatedValueList);
-            itemImage = itemView.findViewById(R.id.itemImage);
+            itemImage = itemView.findViewById(R.id.imageView);
 
         }
 
