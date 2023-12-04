@@ -47,6 +47,7 @@ public class AppTest {
 
     private void signIn() {
         try {
+            wait(3000);
             onView(withId(R.id.emailInput)).perform(ViewActions.typeText("test@gmail.com"));
             onView(withId(R.id.passwordInput)).perform(ViewActions.typeText("123456"));
             closeSoftKeyboard();
