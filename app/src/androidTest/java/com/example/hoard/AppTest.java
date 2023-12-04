@@ -52,6 +52,7 @@ import org.junit.Test;
 
 public class AppTest {
 
+    // Please Run the test in the following order: testAddTag(), testAddItem(), testEditItem(), testDeleteItem(), createItems(), testSort(), testFilter(), testBulkDelete()
     private void signIn() {
         try {
             wait(3000);
