@@ -148,17 +148,10 @@ public class AddImage extends AppCompatActivity{
      */
     private void handleImageSelection(List<Uri> uris) {
         for (Uri uri : uris) {
-            try {
-                // Take persistable URI permission to access the URI across different components
-                getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-                // Add URI to your list
-                images.add(uri);
-            } catch (SecurityException e) {
-                Log.e("ImagePicker", "Error taking persistable URI permission", e);
-            }
+            // Add URI to your list
+            images.add(uri);
         }
-
+        // Notify your adapter
         adapter.notifyDataSetChanged();
     }
 
