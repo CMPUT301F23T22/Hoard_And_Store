@@ -409,6 +409,7 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
                     public void onDataLoaded(List<Item> items) {
                         itemAdapter = new ItemAdapter(items, recyclerView);
                         recyclerView.setAdapter(itemAdapter);
+                        itemAdapter.setSelectionModeCallback(ListScreen.this);
                         itemAdapter.setSumCallback(ListScreen.this);
                     }
                 }, filterCriteria);

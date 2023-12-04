@@ -24,84 +24,50 @@
             app:shapeAppearanceOverlay="@style/CircularShapeAppearance"
             />
 
-
         <!-- Vertical LinearLayout for text components -->
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:orientation="vertical">
-
+            <!-- Description -->
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/commentTextView"
+                android:id="@+id/descriptionList"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:drawableLeft="@drawable/comment"
-                android:text="@string/comment_placeholder"
+                android:text="@string/description_placeholder"
+                android:drawableLeft="@drawable/info"
                 android:textSize="18sp"
                 android:drawablePadding="8dp"
                 android:fontFamily="sans-serif-medium"/>
-
-
-
-            <!-- Horizontal LinearLayout for Make and Model -->
-            <LinearLayout
-                android:layout_width="match_parent"
+            <!-- Value -->
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/estimatedValueList"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:drawableLeft="@drawable/value"
+                android:gravity="center_vertical"
+                android:drawablePadding="8dp"
+                android:text="@string/estimated_value_placeholder"
+                android:textSize="14sp"/>
 
-                <!-- Make TextView -->
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/makeTextView"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/make_placeholder"
-                    android:drawableLeft="@drawable/make"
-                    android:textSize="18sp"
-                    android:drawablePadding="8dp"
-                    android:fontFamily="sans-serif-medium"/>
-
-                <!-- Model TextView -->
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/modelTextView"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/model_placeholder"
-                    android:drawableLeft="@drawable/model"
-                    android:textSize="18sp"
-                    android:drawablePadding="8dp"
-                    android:fontFamily="sans-serif-medium"/>
-            </LinearLayout>
-
-            <!-- Horizontal LinearLayout for Date and Price -->
-            <LinearLayout
-                android:layout_width="match_parent"
+            <!-- Date -->
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/dateOfAcquisitionList"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <!-- Date TextView -->
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/dateOfAcquisitionList"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:drawableLeft="@drawable/calendar_month"
-                    android:text="@string/date_of_purchase_placeholder"
-                    android:drawablePadding="8dp"
-                    android:gravity="center_vertical"/>
-
-                <!-- Price TextView (Placeholder, replace with actual price TextView) -->
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/estimatedValueList"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:drawableLeft="@drawable/value"
-                    android:text="@string/estimated_value_placeholder"
-                    android:drawablePadding="8dp"
-                    android:gravity="center_vertical"/>
-            </LinearLayout>
+                android:drawableLeft="@drawable/calendar_month"
+                android:text="@string/date_of_purchase_placeholder"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"/>
         </LinearLayout>
+
+        <!-- Arrow indicating a clickable item-->
+        <ImageView
+            android:id="@+id/detailsArrow"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/arrow_forward"
+            android:contentDescription="@string/arrow_description"/>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
