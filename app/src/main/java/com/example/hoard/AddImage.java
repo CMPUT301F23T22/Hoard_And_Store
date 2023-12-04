@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Activity class for adding images to a item.
- * This activity allows users to capture new images or select existing ones from their device.
+ * Activity for adding images to an item. This class handles capturing new images using the camera,
+ * selecting images from the device's storage, and returning the selected images.
  */
 public class AddImage extends AppCompatActivity{
 
@@ -41,7 +41,11 @@ public class AddImage extends AppCompatActivity{
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(),
                     this::handlePermissionResult);
-
+    /**
+     * Initializes the activity, sets up the ViewPager for image carousel, and configures button listeners.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after previously being shut down, this contains the data it most recently supplied in onSaveInstanceState(Bundle).
+     */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,6 +97,7 @@ public class AddImage extends AppCompatActivity{
      * Initiates the process to capture an image.
      */
     private void captureImage() {
+        // Create an intent to open the camera activity
         Intent takePictureIntent = new Intent(this, CameraActivity.class);
         captureImageResultLauncher.launch(takePictureIntent);
     }
@@ -105,7 +110,7 @@ public class AddImage extends AppCompatActivity{
     }
 
     /**
-     * Confirms the selection of images and returns them to the previous activity.
+     * Confirms the image selection and returns the selected images to the calling activity.
      */
     private void confirmSelection() {
         if (!images.isEmpty()) {
@@ -118,9 +123,10 @@ public class AddImage extends AppCompatActivity{
     }
 
     /**
-     * Handles the result from capturing an image.
+     * Handles the result from the image capture activity.
+     * Adds the captured image URI to the list of images and updates the adapter.
      *
-     * @param result The result of the image capture.
+     * @param result The result data from the image capture activity.
      */
     private void handleCaptureResult(ActivityResult result) {
 
@@ -142,7 +148,8 @@ public class AddImage extends AppCompatActivity{
     }
 
     /**
-     * Handles the result from selecting images.
+     * Handles the result from selecting images from the device storage.
+     * Adds all selected image URIs to the list and updates the adapter.
      *
      * @param uris The URIs of the selected images.
      */
@@ -156,9 +163,9 @@ public class AddImage extends AppCompatActivity{
     }
 
     /**
-     * Handles the result of permission requests.
+     * Handles the result of the permission request, displaying a toast message based on the result.
      *
-     * @param isGranted True if the permission was granted, false otherwise.
+     * @param isGranted Indicates whether the permission was granted.
      */
     private void handlePermissionResult(boolean isGranted) {
         if (isGranted) {

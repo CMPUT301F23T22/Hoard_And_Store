@@ -13,6 +13,7 @@ import java.util.List;
 
 /**
  * Adapter for a RecyclerView that displays a carousel of images.
+ * This adapter manages a list of image Uris and binds them to the views in a RecyclerView.
  */
 public class ImageCarouselAdapter extends RecyclerView.Adapter<ImageCarouselAdapter.ViewHolder> {
 
@@ -52,6 +53,7 @@ public class ImageCarouselAdapter extends RecyclerView.Adapter<ImageCarouselAdap
 
     /**
      * ViewHolder class for the RecyclerView items.
+     * Provides a reference to the type of views used in the RecyclerView.
      */
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;

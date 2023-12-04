@@ -28,6 +28,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Activity for displaying an item breakdown, including a pie chart and a list view of tags.
+ * This screen allows users to apply tags and view the breakdown of items by these tags.
+ */
 public class ItemBreakdown extends AppCompatActivity {
     PieChart pieChart;
     private ItemDBController itemDBController;
@@ -44,6 +48,13 @@ public class ItemBreakdown extends AppCompatActivity {
     private MenuItem chartMenuItem;
     private ItemBreakDownAdapter adapter;
 
+    /**
+     * Called when the activity is first created.
+     * Initializes the UI elements and sets up the bottom navigation and tag selection functionality.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after previously being shut down,
+     *                           this Bundle contains the data it most recently supplied in onSaveInstanceState(Bundle).
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -228,18 +239,19 @@ public class ItemBreakdown extends AppCompatActivity {
 
 
     /**
-     * Shows a snack bar with a certain message
+     * Displays a Snack bar with a provided message.
      *
-     * @param  message message to display
+     * @param message The message to be displayed in the Snack bar.
      */
     private void showSnackbar(String message) {
         Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG).show();
     }
 
     /**
-     * updates our placeholder textView and sets/unsets them to be visible to the user
+     * Updates the UI placeholders with the tag counts.
+     * This method sets or unsets visibility of placeholders based on tag counts.
      *
-     * @param  tagCounts a map indicating the Tag and the number of occurences in a users item collection
+     * @param tagCounts A map indicating the Tag and the number of occurrences in a user's item collection.
      */
     private void setUpUI(Map<Tag, Integer> tagCounts){
         int maxElementsToShow = 5;

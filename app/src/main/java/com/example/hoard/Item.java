@@ -28,7 +28,8 @@ import java.util.regex.Pattern;
  * - estimatedValue (double): The estimated monetary value of the item.
  * - itemID (String): A unique identifier for the item.
  * - tags (ArrayList<Tag>): A list of tags associated with the item.
- * - briefDescriptionList (List<String>): An additional list of brief descriptions, marked for special property name handling in serialization.
+ * - imageUrls (List<String>): A list of URLs for images associated with the item.
+ * - briefDescriptionList (Map<String, Boolean>): An additional list of brief descriptions, marked for special property name handling in serialization.
  * - isSelected (boolean): A flag indicating if the item is currently selected in the UI.
  */
 public class Item implements Serializable {
@@ -53,6 +54,8 @@ public class Item implements Serializable {
      * @param serialNumber      The serial number of the item.
      * @param estimatedValue    The estimated value of the item.
      * @param comment           The comment associated with the item.
+     * @param tagsList          The list of tags associated with the item.
+     * @param imageUrls         The list of image URLs associated with the item.
      */
     public Item(Date dateOfAcquisition, String briefDescription, String make, String model, String serialNumber, double estimatedValue, String comment, ArrayList<Tag> tagsList, List<String> imageUrls) {
 
@@ -91,6 +94,20 @@ public class Item implements Serializable {
         this.imageUrls = imageUrls;
     }
 
+    /**
+     * Constructor for the Item class with an existing item ID.
+     *
+     * @param dateOfAcquisition The date of acquisition for the item.
+     * @param briefDescription  The brief description of the item.
+     * @param make              The make of the item.
+     * @param model             The model of the item.
+     * @param serialNumber      The serial number of the item.
+     * @param estimatedValue    The estimated value of the item.
+     * @param comment           The comment associated with the item.
+     * @param itemID            The unique identifier of the item. This should be used when an item already has an ID, such as when loading from a database.
+     * @param tagsList          The list of tags associated with the item.
+     * @param imageUrls         The list of image URLs associated with the item.
+     */
     public Item(Date dateOfAcquisition, String briefDescription, String make, String model, String serialNumber, double estimatedValue, String comment, String itemID, ArrayList<Tag> tagsList,List<String> imageUrls) {
         this.dateOfAcquisition = dateOfAcquisition;
         this.briefDescription = briefDescription;
@@ -361,24 +378,49 @@ public class Item implements Serializable {
         this.tags = tags;
     }
 
+    /**
+     * remove tag
+     *
+     * @param tag ArrayList<Tag>
+     */
     public void removeTag(Tag tag) {
         if (tags != null) {
             tags.remove(tag);
         }
     }
 
+    /**
+     * Gets the list of image URLs for the item.
+     *
+     * @return The list of image URLs.
+     */
     public List<String> getImageUrls() {
         return imageUrls;
     }
 
+    /**
+     * Sets the list of image URLs for the item.
+     *
+     * @return The list of image URLs.
+     */
     public void setImageUrls(List<String> imageUrls) {
         this.imageUrls = imageUrls;
     }
 
+    /**
+     * Gets the map of keywords from the brief description.
+     *
+     * @return The map of keywords.
+     */
     public Map<String, Boolean> getBriefDescriptionList() {
         return briefDescriptionList;
     }
 
+    /**
+     * Gets the list of tags associated with the item.
+     *
+     * @return The list of tags.
+     */
     public ArrayList<Tag> getTags() {
         return this.tags;
     }

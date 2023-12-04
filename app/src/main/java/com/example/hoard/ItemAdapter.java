@@ -43,6 +43,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
 
     private List<Item> itemList;
 
+    // Firebase storage for image handling
     FirebaseStorage storage = FirebaseStorage.getInstance();
     StorageReference storageRef = storage.getReference();
 
@@ -73,6 +74,12 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
         notifyDataSetChanged();
     }
 
+    /**
+     * Updates the total estimated value of all items in the adapter.
+     * Iterates through the itemList, summing up the estimated values of each item.
+     * The calculated sum is then passed to the registered itemAdapterListener.
+     * Finally, it calls notifyAndRecalculate to update the UI.
+     */
     public void updateEstimatedValue() {
         for (Item item : itemList) {
             currentSum = currentSum + item.getEstimatedValue();
@@ -120,6 +127,11 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
         sumCallBack.onSumChanged(currentSum);
     }
 
+    /**
+     * Resets the background colors of all item views in the RecyclerView to their default state.
+     * Iterates through the items in the adapter and sets the background color of each corresponding view to white.
+     * This method is typically used to clear the selection visual state when exiting selection mode.
+     */
     private void resetBackgroundColors() {
         // reset the background colours to the unselected colour
         for (int i = 0; i < itemList.size(); i++) {
@@ -191,6 +203,12 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
         });
     }
 
+    /**
+     * Loads an image into the provided ViewHolder's ImageView.
+     *
+     * @param currentItem The current Item whose image is to be loaded.
+     * @param holder      The ViewHolder where the image will be set.
+     */
     private void loadImage(Item currentItem, ViewHolder holder) {
         List<String> imageUrls = currentItem.getImageUrls();
         String imagePath = (imageUrls != null && !imageUrls.isEmpty()) ? imageUrls.get(0) : null;
@@ -211,6 +229,13 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
         });
     }
 
+    /**
+     * Toggles the selection state of an item at a given position in the RecyclerView.
+     * If the item is currently selected, it gets deselected, and vice versa.
+     * After toggling the selection, this method also triggers a callback to notify that the selection mode may have changed.
+     *
+     * @param position The position of the item in the RecyclerView whose selection state is to be toggled.
+     */
     private void toggleItemSelection(int position) {
         if (selectedItems.get(position, false)) {
             selectedItems.delete(position);
@@ -448,7 +473,9 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
         return sum;
     }
 
-    // Notify data set changes, and recalculate sum
+    /**
+     * Notify data set changes, and recalculate sum
+     */
     public void notifyAndRecalculate() {
         notifyDataSetChanged();
         // Calculate the sum after the change
@@ -456,6 +483,9 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
         // You can use this sum for any purpose, like displaying it in your UI.
     }
 
+    /**
+     * Interface for listener to handle adapter related events.
+     */
     public interface ItemAdapterListener {
         void onEstimatedValueChanged(double sum);
     }
