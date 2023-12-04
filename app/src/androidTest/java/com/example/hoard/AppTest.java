@@ -149,7 +149,7 @@ public class AppTest {
     }
 
     public static ViewAction swipeUp() {
-        return actionWithAssertions(new GeneralSwipeAction(Swipe.FAST, GeneralLocation.BOTTOM_CENTER,
+        return actionWithAssertions(new GeneralSwipeAction(Swipe.FAST, GeneralLocation.CENTER,
                 GeneralLocation.TOP_CENTER, Press.FINGER));
     }
 
@@ -471,5 +471,7 @@ public class AppTest {
     public void testSort() {
         onView(withId(R.id.nav_sort)).perform(click());
         wait(2000);
+
+        // Te
     }
 }
