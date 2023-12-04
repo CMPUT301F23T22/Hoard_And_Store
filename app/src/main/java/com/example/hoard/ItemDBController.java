@@ -4,7 +4,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -12,15 +11,18 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
+import android.net.Uri;
 import android.util.Log;
 
 /**
@@ -34,9 +36,9 @@ import android.util.Log;
 public class ItemDBController {
     private static ItemDBController instance;
     private final ItemDB itemDB;
-    private boolean isItemDBInitialized = false;
+    private final boolean isItemDBInitialized = false;
 
-    private User loggedInUser = UserManager.getInstance().getLoggedInUser();
+    private final User loggedInUser = UserManager.getInstance().getLoggedInUser();
 
     public interface OnInitializationCompleteListener {
         void onInitializationComplete();
@@ -95,9 +97,11 @@ public class ItemDBController {
 
     /**
      * deletes the currently signed in users account
+     *
+     * @return
      */
-    public void deleteAccount(){
-        itemDB.deleteAccount();
+    public Task<Void> deleteAccount(){
+        return itemDB.deleteAccount();
     }
 
     /**
@@ -176,8 +180,19 @@ public class ItemDBController {
                 }
             }
         }
-        return new Item(dateOfAcquisition, briefDescription, make, model, serialNumber, estimatedValue, comment, itemID, (ArrayList<Tag>) tags);
 
+        List<String> imageUrls = new ArrayList<>();
+        Object urlsObject = data.get("imageUrls");
+        if (urlsObject instanceof List<?>) {
+            List<?> urlsList = (List<?>) urlsObject;
+            for (Object obj : urlsList) {
+                if (obj instanceof String) {
+                    imageUrls.add((String) obj);
+                }
+            }
+        }
+
+        return new Item(dateOfAcquisition, briefDescription, make, model, serialNumber, estimatedValue, comment, itemID, (ArrayList<Tag>) tags,imageUrls);
     }
 
 
@@ -345,5 +360,34 @@ public class ItemDBController {
 
     public CollectionReference getUserCollection(){
         return itemDB.getUserCollection();
+    }
+    /**
+     * Uploads images for an item to firebase storage.
+     *
+     * @param itemId             The ID of the item.
+     * @param imageUris          The URIs of the images to be uploaded.
+     * @param onCompleteListener Listener to be called when the operation is complete.
+     */
+    public void uploadImagesAndUpdateItem(String itemId, List<String> imageUrls, List<Uri> imageUris, OnCompleteListener<Void> onCompleteListener) {
+        List<UploadTask> uploadTasks = itemDB.uploadItemImages(imageUris, imageUrls);
+        Tasks.whenAllSuccess(uploadTasks).addOnSuccessListener(tasks -> {
+            List<Task<Uri>> downloadUrlTasks = new ArrayList<>();
+            for (Object task : tasks) {
+                UploadTask.TaskSnapshot snapshot = (UploadTask.TaskSnapshot) task;
+                StorageReference ref = snapshot.getStorage();
+                downloadUrlTasks.add(ref.getDownloadUrl());
+            }
+            // Wait for all download URL tasks to complete
+            Tasks.whenAllSuccess(downloadUrlTasks).addOnSuccessListener(downloadUrls -> {
+                // Then, call the onCompleteListener
+                onCompleteListener.onComplete(Tasks.forResult(null)); // Indicate success
+            }).addOnFailureListener(e -> {
+                // Handle failure in getting download URLs
+                onCompleteListener.onComplete(Tasks.forException(e));
+            });
+        }).addOnFailureListener(e -> {
+            // Handle failure in uploading images
+            onCompleteListener.onComplete(Tasks.forException(e));
+        });
     }
 }

@@ -40,6 +40,7 @@ public class Item implements Serializable {
     private ArrayList<Tag> tags;
     private String imageData;
     private DecimalFormat decimalFormat = new DecimalFormat("#.##");
+    private List<String> imageUrls;
     @PropertyName("briefDescriptionList")
     private final Map<String, Boolean> briefDescriptionList;
 
@@ -56,7 +57,7 @@ public class Item implements Serializable {
      * @param estimatedValue    The estimated value of the item.
      * @param comment           The comment associated with the item.
      */
-    public Item(Date dateOfAcquisition, String briefDescription, String make, String model, String serialNumber, double estimatedValue, String comment, ArrayList<Tag> tagsList, String imageData) {
+    public Item(Date dateOfAcquisition, String briefDescription, String make, String model, String serialNumber, double estimatedValue, String comment, ArrayList<Tag> tagsList, List<String> imageUrls) {
 
         if (!isValidDate(dateOfAcquisition)) {
             throw new IllegalArgumentException("Invalid date format.");
@@ -90,10 +91,10 @@ public class Item implements Serializable {
         this.briefDescriptionList = splitBriefDescription(this.briefDescription);
         this.itemID = UUID.randomUUID().toString();
         this.tags = tagsList;
-        this.imageData = imageData;
+        this.imageUrls = imageUrls;
     }
 
-    public Item(Date dateOfAcquisition, String briefDescription, String make, String model, String serialNumber, double estimatedValue, String comment, String itemID, ArrayList<Tag> tagsList) {
+    public Item(Date dateOfAcquisition, String briefDescription, String make, String model, String serialNumber, double estimatedValue, String comment, String itemID, ArrayList<Tag> tagsList,List<String> imageUrls) {
         this.dateOfAcquisition = dateOfAcquisition;
         this.briefDescription = briefDescription;
         this.make = make;
@@ -104,10 +105,9 @@ public class Item implements Serializable {
         this.itemID = itemID;
         this.tags = tagsList;
         this.briefDescriptionList = splitBriefDescription(this.briefDescription);
-
+        this.imageUrls = imageUrls;
         this.isSelected = false;
         this.tags = tags;
-
     }
 
     /**
@@ -370,12 +370,12 @@ public class Item implements Serializable {
         }
     }
 
-    public void setImageData(String imageData) {
-        this.imageData = imageData;
+    public List<String> getImageUrls() {
+        return imageUrls;
     }
 
-    public String getImageData() {
-        return imageData;
+    public void setImageUrls(List<String> imageUrls) {
+        this.imageUrls = imageUrls;
     }
 
     public Map<String, Boolean> getBriefDescriptionList() {

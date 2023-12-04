@@ -13,8 +13,8 @@ import java.util.Set;
 
 public class ItemBreakDownAdapter extends BaseAdapter {
 
-    private Context context;
-    private List<Map.Entry<Tag, Integer>> itemTagChartInfo;
+    private final Context context;
+    private final List<Map.Entry<Tag, Integer>> itemTagChartInfo;
 
     public ItemBreakDownAdapter(Context context, List<Map.Entry<Tag, Integer>> itemTagChartInfo) {
         this.context = context;
@@ -77,8 +77,8 @@ public class ItemBreakDownAdapter extends BaseAdapter {
         TextView languageTagNameTextView = convertView.findViewById(R.id.tag_chart_info);
         TextView languageTagCountTextView = convertView.findViewById(R.id.tag_count_chart_info);
 
-        languageTagNameTextView.setText(chartEntry.getKey().getTagName().toString());
-        languageTagCountTextView.setText(String.valueOf(chartEntry.getValue()).toString());
+        languageTagNameTextView.setText(chartEntry.getKey().getTagName());
+        languageTagCountTextView.setText(String.valueOf(chartEntry.getValue()));
 
         return convertView;
     }

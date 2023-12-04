@@ -39,6 +39,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -149,6 +151,7 @@ public class MainActivity extends AppCompatActivity {
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                clearErrors();
                 if (isSignInMode) {
                     String password = passwordInputLayout.getEditText().getText().toString();
                     String email = emailInputLayout.getEditText().getText().toString();
@@ -158,13 +161,12 @@ public class MainActivity extends AppCompatActivity {
                     String email = emailInputLayout.getEditText().getText().toString();
                     String username = usernameInputLayout.getEditText().getText().toString();
 
-                    if(username.length() > 15){
+                    if(username.length() > 15 | username.length() == 0){
                         usernameInputLayout.setError(getString(R.string.username_length_error));
                         usernameInputLayout.setErrorEnabled(true);
                         usernameInputLayout.setBoxStrokeColor(Color.RED);
                     } else {
                         createAccount(email,password,username);
-                        setupSignInMode();
                     }
 
                 }
@@ -191,6 +193,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupSignUpMode() {
         // Set up views for sign-up mode
+        clearErrors();
         clickableAccountOption.setText("Already have an account? Sign in");
         SpannableString singupSpannableString = new SpannableString(clickableAccountOption.getText());
 
@@ -258,17 +261,18 @@ public class MainActivity extends AppCompatActivity {
                             dbController = ItemDBController.getInstance();
                             dbController.addUser(user,email, userName);
                             showSnackbar("Account created, please sign in!");
-                            updateUI(null);
+                            setupSignInMode();
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            emailInputLayout.setError("Email may not be formatted correctly");
-                            emailInputLayout.setErrorEnabled(true);
-                            emailInputLayout.setBoxStrokeColor(Color.RED);
-
-                            passwordInputLayout.setError("Password may be too short, must be greater then 6 characters");
-                            passwordInputLayout.setErrorEnabled(true);
-                            passwordInputLayout.setBoxStrokeColor(Color.RED);
+                            handleAccountCreationError(task.getException());
+//                            emailInputLayout.setError("Email may not be formatted correctly");
+//                            emailInputLayout.setErrorEnabled(true);
+//                            emailInputLayout.setBoxStrokeColor(Color.RED);
+//
+//                            passwordInputLayout.setError("Password may be too short, must be greater then 6 characters");
+//                            passwordInputLayout.setErrorEnabled(true);
+//                            passwordInputLayout.setBoxStrokeColor(Color.RED);
 
 
 
@@ -361,6 +365,52 @@ public class MainActivity extends AppCompatActivity {
 
     private void showSnackbar(String message) {
         Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG).show();
+    }
+
+    private void handleAccountCreationError(Exception e){
+        clearErrors();
+        if(e instanceof FirebaseAuthUserCollisionException) {
+            // The email address is already in use by another account.
+            // Display a specific error message or handle the situation accordingly.
+            emailInputLayout.setError("Email address is already in use");
+            emailInputLayout.setErrorEnabled(true);
+            emailInputLayout.setBoxStrokeColor(Color.RED);
+        } else if (e instanceof FirebaseAuthWeakPasswordException){
+            // Handle other authentication failures or display a generic error message
+            passwordInputLayout.setError("Password is too weak");
+            passwordInputLayout.setErrorEnabled(true);
+            passwordInputLayout.setBoxStrokeColor(Color.RED);
+        } else if (e instanceof FirebaseAuthInvalidCredentialsException) {
+            emailInputLayout.setError("Email address Badly Formatted");
+            emailInputLayout.setErrorEnabled(true);
+            emailInputLayout.setBoxStrokeColor(Color.RED);
+            
+        } else {
+        // Handle other authentication failures or display a generic error message
+
+            emailInputLayout.setError("Account creation failed. Please try again.");
+            emailInputLayout.setErrorEnabled(true);
+            emailInputLayout.setBoxStrokeColor(Color.RED);
+
+            passwordInputLayout.setError("Account creation failed. Please try again.");
+            passwordInputLayout.setErrorEnabled(true);
+            passwordInputLayout.setBoxStrokeColor(Color.RED);
+        }
+
+    }
+
+    private void clearErrors(){
+        emailInputLayout.setError("");
+        emailInputLayout.setErrorEnabled(false);
+        emailInputLayout.setBoxStrokeColor(Color.GRAY);
+
+        passwordInputLayout.setError("");
+        passwordInputLayout.setErrorEnabled(false);
+        passwordInputLayout.setBoxStrokeColor(Color.GRAY);
+
+        usernameInputLayout.setError("");
+        usernameInputLayout.setErrorEnabled(false);
+        usernameInputLayout.setBoxStrokeColor(Color.GRAY);
     }
 
 }

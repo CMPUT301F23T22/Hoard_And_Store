@@ -1,9 +1,12 @@
 package com.example.hoard;
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,7 +30,7 @@ import com.google.android.material.textfield.TextInputLayout;
 
 public class EditProfileActivity extends AppCompatActivity {
     private ItemDBController dbController;
-    private boolean passwordUpdated = false;
+    private final boolean passwordUpdated = false;
     private MenuItem sort;
     private MenuItem home;
     private BottomNavigationView bottomNav;
@@ -173,7 +176,7 @@ public class EditProfileActivity extends AppCompatActivity {
         builder.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(DialogInterface dialogInterface) {
-                Button button = ((AlertDialog) builder).getButton(AlertDialog.BUTTON_POSITIVE);
+                Button button = builder.getButton(AlertDialog.BUTTON_POSITIVE);
                 button.setOnClickListener(new View.OnClickListener() {
 
                     @Override
@@ -245,7 +248,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
             @Override
             public void onShow(DialogInterface dialogInterface) {
-                Button button = ((AlertDialog) builder).getButton(AlertDialog.BUTTON_POSITIVE);
+                Button button = builder.getButton(AlertDialog.BUTTON_POSITIVE);
                 button.setOnClickListener(new View.OnClickListener() {
 
                     @Override
@@ -300,7 +303,7 @@ public class EditProfileActivity extends AppCompatActivity {
             @Override
             public void onShow(DialogInterface dialogInterface) {
 
-                Button button = ((AlertDialog) builder).getButton(AlertDialog.BUTTON_POSITIVE);
+                Button button = builder.getButton(AlertDialog.BUTTON_POSITIVE);
                 button.setOnClickListener(new View.OnClickListener() {
 
                     @Override
@@ -374,10 +377,24 @@ public class EditProfileActivity extends AppCompatActivity {
      * Handles the delete account process for the user account.
      */
     private void handleAccountDeletion(){
-        dbController.deleteAccount();
-        Intent accountDeletionIntent = new Intent(getApplicationContext(), MainActivity.class);
-        accountDeletionIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(accountDeletionIntent);
+        dbController.deleteAccount().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    Intent accountDeletionIntent = new Intent(getApplicationContext(), MainActivity.class);
+                    accountDeletionIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(accountDeletionIntent);
+                } else {
+                    // Handle the failure
+                    Exception exception = task.getException();
+                    if (exception != null) {
+                        showSnackbar("Account deletion Failed. Signing you out!");
+                        handleAccountSignOut();
+                    }
+                }
+            }
+        });
+
     }
 
     /**

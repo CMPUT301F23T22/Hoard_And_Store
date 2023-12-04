@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -14,9 +15,12 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.textfield.TextInputEditText;
@@ -29,6 +33,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 /**
  * An activity for adding or editing items, extending AppCompatActivity and implementing
@@ -37,33 +42,34 @@ import java.util.Locale;
 public class AddEditItem extends AppCompatActivity implements CustomDatePicker.DatePickListener {
 
     private final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+    ChipGroup chipGroupTags;
+    private final ActivityResultLauncher<Intent> addTagResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            this::handleAddTagResult);
+    private final ActivityResultLauncher<Intent> serialScannerResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            this::handleSerialScannerResult
+    );
+    private EditText descriptionInput, makeInput, modelInput, serialNumberInput, valueInput, commentInput, dateInput;
+
+    // ActivityResultLauncher for the barcode scanner
+    private final ActivityResultLauncher<Intent> barcodeScannerResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            this::handleBarcodeScannerResult
+    );
+
+    private ArrayList<Uri> imagesData;
     // ActivityResultLauncher for adding images
     private final ActivityResultLauncher<Intent> addImageResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             this::handleAddImageResult
     );
-    ChipGroup chipGroupTags;
-    private final ActivityResultLauncher<Intent> addTagResultLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            this::handleAddTagResult);
-    private EditText descriptionInput, makeInput, modelInput, serialNumberInput, valueInput, commentInput, dateInput;
-    private String imageData;
+    private final List<String> imageURLs = new ArrayList<>();
     private TextView addEditHeader;
     private Item currentItem; // Item to edit
     private boolean isEdit; // To identify whether it's an edit operation
     private ItemDBController itemDBController;
     private ArrayList<Tag> selectedTagList;
-
-    // ActivityResultLauncher for the barcode scanner
-    private final ActivityResultLauncher<Intent> barcodeScannerResultLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                    String description = result.getData().getStringExtra("productDescription");
-                    descriptionInput.setText(description); // Set the scanned product description
-                }
-            }
-    );
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +77,8 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         setContentView(R.layout.item_add_edit);
 
         selectedTagList = new ArrayList<Tag>();
+
+        imagesData = new ArrayList<Uri>();
 
         itemDBController = ItemDBController.getInstance();
         TagDBController tagDBController = TagDBController.getInstance();
@@ -127,6 +135,10 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         TextInputLayout descriptionInputLayout = findViewById(R.id.descriptionInputLayout);
         descriptionInputLayout.setEndIconOnClickListener(v -> launchBarcodeScanner());
 
+        // Listener for the serial scanner
+        TextInputLayout serialNumberInputLayout = findViewById(R.id.serialNumberInputLayout);
+        serialNumberInputLayout.setEndIconOnClickListener(v -> launchSerialScanner());
+
 
         // Save button listener
         Button saveButton = findViewById(R.id.submitButton);
@@ -164,6 +176,11 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
     private void launchBarcodeScanner() {
         Intent intent = new Intent(this, BarcodeScannerActivity.class);
         barcodeScannerResultLauncher.launch(intent);
+    }
+
+    private void launchSerialScanner() {
+        Intent intent = new Intent(this, SerialScannerActivity.class);
+        serialScannerResultLauncher.launch(intent);
     }
 
     /**
@@ -359,13 +376,22 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
             if (task.isSuccessful()) {
                 // Log success
                 Log.i("AddItem", "Item added successfully");
-
-                Toast.makeText(this, "Item added successfully", Toast.LENGTH_SHORT).show();
-                Intent resultIntent = new Intent();
-
-                resultIntent.putExtra("newItem", newItem);
-                setResult(Activity.RESULT_OK, resultIntent);
-                finish();
+                // Call the method to upload images and update the item
+                itemDBController.uploadImagesAndUpdateItem(newItem.getItemID(), newItem.getImageUrls(), imagesData, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.i("UploadImages", "Images uploaded and item updated successfully");
+                            Toast.makeText(AddEditItem.this, "Item added successfully", Toast.LENGTH_SHORT).show();
+                            Intent resultIntent = new Intent();
+                            resultIntent.putExtra("newItem", newItem);
+                            setResult(Activity.RESULT_OK, resultIntent);
+                            finish();
+                        } else {
+                            Log.e("UploadImages", "Error uploading images: " + task.getException().getMessage());
+                        }
+                    }
+                });
             } else {
                 // This block handles the failure case
                 Exception e = task.getException();
@@ -437,11 +463,10 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
             currentItem.setComment(comment);
             currentItem.setDateOfAcquisition(acquisitionDate);
             currentItem.setTags(selectedTagList);
-            currentItem.setImageData(imageData);
             return currentItem;
         }
 
-        return new Item(
+        Item item = new Item(
                 acquisitionDate,
                 description,
                 make,
@@ -450,8 +475,13 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
                 value,
                 comment,
                 selectedTagList,
-                imageData);
-
+                imageURLs);
+        for (int i = 0; i < imagesData.size(); i++) {
+            String filePath = "images/" + item.getItemID() + "/" + UUID.randomUUID().toString() + ".jpg";
+            imageURLs.add(filePath);
+        }
+        item.setImageUrls(imageURLs);
+        return item;
     }
 
     /**
@@ -494,9 +524,27 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
 
     private void handleAddImageResult(ActivityResult result) {
         if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-            if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                imageData = result.getData().getStringExtra("selectedImageData");
+            // Retrieve the ArrayList of Uri objects
+            ArrayList<Uri> selectedUris = result.getData().getParcelableArrayListExtra("itemImagesData");
+            if (selectedUris != null) {
+                // Add all the Uri objects to your imagesData list
+                imagesData.addAll(selectedUris);
             }
         }
     }
+
+    private void handleSerialScannerResult(ActivityResult result) {
+        if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+            String serialNumber = result.getData().getStringExtra("serialNumber");
+            serialNumberInput.setText(serialNumber);
+        }
+    }
+
+    private void handleBarcodeScannerResult(ActivityResult result) {
+        if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+            String description = result.getData().getStringExtra("productDescription");
+            descriptionInput.setText(description); // Set the scanned product description
+        }
+    }
+
 }

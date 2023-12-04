@@ -4,38 +4,52 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.util.Base64;
+import androidx.annotation.NonNull;
+
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager2.widget.ViewPager2;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 /**
  * An activity class for displaying details of item in the application.
  *
  */
-public class DetailsActivity extends AppCompatActivity {
+public class DetailsActivity extends AppCompatActivity{
     private TextView dateOfAcquisitionTextView, makeTextView, modelTextView, serialNumberTextView, estimatedValueTextView, commentTextView, briefDescriptionTextView;
     private Item selectedItem;
-    ChipGroup chipGroup;
+    private ChipGroup chipGroup;
+
+    private ViewPager2 viewPager;
+
+    private ImageCarouselAdapter adapter;
+
+    FirebaseStorage storage = FirebaseStorage.getInstance();
+    StorageReference storageRef = storage.getReference();
+
+    private final List<Uri> images = new ArrayList<>();
+
     private final ActivityResultLauncher<Intent> editActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleEditResult);
 
     /**
@@ -64,6 +78,11 @@ public class DetailsActivity extends AppCompatActivity {
             finish();
             return;
         }
+
+        // Initialize the ViewPager2 and the ImageCarouselAdapter
+        viewPager = findViewById(R.id.viewPagerImageCarousel);
+        adapter = new ImageCarouselAdapter(images, this);
+        viewPager.setAdapter(adapter);
 
         Button editButton = findViewById(R.id.editButton);
         Button closeButton = findViewById(R.id.closeButton);
@@ -152,12 +171,6 @@ public class DetailsActivity extends AppCompatActivity {
         // create a chips from tags
         chipGroup.removeAllViews();
 
-
-        ImageView itemImageView = findViewById(R.id.itemImage);
-        // showing nothing rn
-        Log.d("DetailsActivity", "Image data: " + selectedItem.getImageData());
-
-
         // iterate over the tags and add to chip group
         for (Tag tag : tags) {
             Chip chip = new Chip(DetailsActivity.this);
@@ -166,10 +179,26 @@ public class DetailsActivity extends AppCompatActivity {
             // Add the chip to the ChipGroup
             chipGroup.addView(chip);
         }
-    }
 
-    private Bitmap convertBase64ToBitmap(String base64Str) {
-        byte[] decodedBytes = Base64.decode(base64Str, Base64.DEFAULT);
-        return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+        List<String> imageUrls = selectedItem.getImageUrls();
+
+        if (imageUrls != null && !imageUrls.isEmpty()) {
+            for (String currentImagePath : imageUrls) {
+                if (currentImagePath != null && !currentImagePath.isEmpty()) {
+                    StorageReference imageRef = storageRef.child(currentImagePath);
+                    imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri downloadUri) {
+                            images.add(downloadUri);
+                            adapter.notifyDataSetChanged(); // Notify adapter here after adding each URI
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        public void onFailure(@NonNull Exception exception) {
+                            Toast.makeText(DetailsActivity.this, "Failed to load image: " + exception.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+            }
+        }
     }
 }

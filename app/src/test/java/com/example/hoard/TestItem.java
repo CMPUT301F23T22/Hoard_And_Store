@@ -56,7 +56,7 @@ public class TestItem {
         itemID = "Test Item ID";
         tags = new ArrayList<>();
         Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags);
-        assertEquals(true, item.isValidDate(date));
+        assertTrue(Item.isValidDate(date));
     }
 
     @Test
@@ -71,7 +71,7 @@ public class TestItem {
         itemID = "Test Item ID";
         tags = new ArrayList<>();
         Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags);
-        assertEquals(true, item.isValidDescription(description));
+        assertTrue(Item.isValidDescription(description));
     }
 
     @Test
@@ -86,7 +86,7 @@ public class TestItem {
         itemID = "Test Item ID";
         tags = new ArrayList<>();
         Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags);
-        assertEquals(true, item.isValidMake(make));
+        assertTrue(Item.isValidMake(make));
     }
 
     @Test
@@ -101,7 +101,7 @@ public class TestItem {
         itemID = "Test Item ID";
         tags = new ArrayList<>();
         Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags);
-        assertEquals(true, item.isValidModel(model));
+        assertTrue(Item.isValidModel(model));
     }
 
     @Test
@@ -116,7 +116,7 @@ public class TestItem {
         itemID = "Test Item ID";
         tags = new ArrayList<>();
         Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags);
-        assertEquals(true, item.isValidSerialNumber(serialNumber));
+        assertTrue(Item.isValidSerialNumber(serialNumber));
     }
 
     @Test
@@ -131,7 +131,7 @@ public class TestItem {
         itemID = "Test Item ID";
         tags = new ArrayList<>();
         Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags);
-        assertEquals(true, item.isValidValue(estimatedValue));
+        assertTrue(Item.isValidValue(estimatedValue));
     }
 
     @Test
@@ -146,7 +146,7 @@ public class TestItem {
         itemID = "Test Item ID";
         tags = new ArrayList<>();
         Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags);
-        assertEquals(true, item.isValidComment(comment));
+        assertTrue(Item.isValidComment(comment));
     }
 
     @Test

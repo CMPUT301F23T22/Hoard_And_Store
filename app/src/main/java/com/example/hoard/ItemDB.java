@@ -1,5 +1,6 @@
 package com.example.hoard;
 
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -25,6 +26,9 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,11 +42,14 @@ import java.util.Map;
  */
 public class ItemDB {
     private final FirebaseFirestore db;
+
+    private final FirebaseStorage storage;
+
     private CollectionReference itemsCollection;
     private final CollectionReference userCollection;
-    private User loggedInUser = UserManager.getInstance().getLoggedInUser();
+    private final User loggedInUser = UserManager.getInstance().getLoggedInUser();
     private static final String TAG = "ItemDB";
-    private FirebaseAuth mAuth;
+    private final FirebaseAuth mAuth;
     private String userDocumentId;
 
     public CollectionReference getUserCollection() {
@@ -100,6 +107,7 @@ public class ItemDB {
         db = dbConnector.getDatabase();
         userCollection = db.collection("user");
         mAuth = FirebaseAuth.getInstance();
+        storage = FirebaseStorage.getInstance();
     }
 
     /**
@@ -471,34 +479,42 @@ public class ItemDB {
      *
      * @return Task to be continued and handle on success/oncomplete
      */
-    public void deleteAccount(){
+    public Task<Void> deleteAccount() {
+        final TaskCompletionSource<Void> tcs = new TaskCompletionSource<>();
+
         FirebaseUser user = mAuth.getCurrentUser();
-        String uid = user.getUid();
         user.delete()
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
                             userCollection.document(userDocumentId)
-                                .delete()
+                                    .delete()
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
                                             Log.d(TAG, "DocumentSnapshot successfully deleted!");
+                                            tcs.setResult(null);  // Resolve the Task successfully
                                         }
                                     })
                                     .addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
                                             Log.w(TAG, "Error deleting document", e);
+                                            tcs.setException(e);  // Set an exception for the Task
                                         }
                                     });
 
                             Log.d(TAG, "User account deleted.");
+                        } else {
+                            tcs.setException(task.getException());  // Set an exception for the Task
                         }
                     }
                 });
+
+        return tcs.getTask();
     }
+
 
 
     /**
@@ -615,6 +631,20 @@ public class ItemDB {
 
     public Task<QuerySnapshot> getItemTags() {
         return itemsCollection.get();
+    }
+
+    public List<UploadTask> uploadItemImages(List<Uri> imageUris, List<String> imageUrls) {
+        List<UploadTask> uploadTasks = new ArrayList<>();
+
+        for (int i = 0; i < imageUris.size(); i++) {
+            Log.d("Firestore", "imageUri: " + imageUris.get(i));
+            Uri uri = imageUris.get(i);
+            String filePath = imageUrls.get(i);
+            StorageReference imageRef = storage.getReference().child(filePath);
+            UploadTask uploadTask = imageRef.putFile(uri);
+            uploadTasks.add(uploadTask);
+        }
+        return uploadTasks;
     }
 
 }

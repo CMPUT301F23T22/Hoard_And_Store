@@ -193,12 +193,4 @@ public class BarcodeScannerActivity extends AppCompatActivity {
             }
         });
     }
-
-
-
-
-
-
-
-
 }
