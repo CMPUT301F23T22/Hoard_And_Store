@@ -142,31 +142,35 @@ public class AddImage extends AppCompatActivity{
     }
 
     private void deleteImageLocally(int position) {
-        images.remove(position);
-        imageUrls.remove(position);
-        adapter.notifyDataSetChanged();
+        if(position < images.size() && position < imageUrls.size()) {
+            images.remove(position);
+            imageUrls.remove(position);
+            adapter.notifyDataSetChanged();
+        }
     }
 
     private void loadImages(List<String> imageUrls) {
         if (imageUrls != null && !imageUrls.isEmpty()) {
-            for (String currentImagePath : imageUrls) {
+            // Initialize placeholders for each image URL
+            for (int i = 0; i < imageUrls.size(); i++) {
+                images.add(Uri.EMPTY); // Placeholder for each image
+            }
+            for (int i = 0; i < imageUrls.size(); i++) {
+                String currentImagePath = imageUrls.get(i);
                 if (currentImagePath != null && !currentImagePath.isEmpty()) {
+                    final int index = i; // Final index for use inside the listener
                     StorageReference imageRef = storageRef.child(currentImagePath);
-                    imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(Uri downloadUri) {
-                            images.add(downloadUri);
-                            adapter.notifyDataSetChanged(); // Notify adapter here after adding each URI
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        public void onFailure(@NonNull Exception exception) {
-                            Toast.makeText(AddImage.this, "Failed to load image: " + exception.getMessage(), Toast.LENGTH_LONG).show();
-                        }
-                    });
+                    imageRef.getDownloadUrl().addOnSuccessListener(downloadUri -> {
+                        images.set(index, downloadUri); // Replace placeholder with actual URI
+                        adapter.notifyDataSetChanged();
+                    }).addOnFailureListener(exception ->
+                            Toast.makeText(AddImage.this, "Failed to load image: " + exception.getMessage(), Toast.LENGTH_LONG).show()
+                    );
                 }
             }
         }
     }
+
 
     /**
      * Checks if a specific permission is granted.
