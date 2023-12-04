@@ -377,7 +377,7 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
                 // Log success
                 Log.i("AddItem", "Item added successfully");
                 // Call the method to upload images and update the item
-                itemDBController.uploadImagesAndUpdateItem(newItem.getItemID(), newItem.getImageUrls(), imagesData, new OnCompleteListener<Void>() {
+                itemDBController.uploadImagesWithItemURl(newItem.getImageUrls(), imagesData, new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {

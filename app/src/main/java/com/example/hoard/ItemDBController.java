@@ -365,11 +365,11 @@ public class ItemDBController {
     /**
      * Uploads images for an item to firebase storage.
      *
-     * @param itemId             The ID of the item.
      * @param imageUris          The URIs of the images to be uploaded.
+     * @param imageUrls          The URls to use
      * @param onCompleteListener Listener to be called when the operation is complete.
      */
-    public void uploadImagesAndUpdateItem(String itemId, List<String> imageUrls, List<Uri> imageUris, OnCompleteListener<Void> onCompleteListener) {
+    public void uploadImagesWithItemURl(List<String> imageUrls, List<Uri> imageUris, OnCompleteListener<Void> onCompleteListener) {
         List<UploadTask> uploadTasks = itemDB.uploadItemImages(imageUris, imageUrls);
         Tasks.whenAllSuccess(uploadTasks).addOnSuccessListener(tasks -> {
             List<Task<Uri>> downloadUrlTasks = new ArrayList<>();
