@@ -361,9 +361,8 @@ public class ItemDBController {
     public CollectionReference getUserCollection(){
         return itemDB.getUserCollection();
     }
-
     /**
-     * Uploads images for an item and updates the item document with the image URLs.
+     * Uploads images for an item to firebase storage.
      *
      * @param itemId             The ID of the item.
      * @param imageUris          The URIs of the images to be uploaded.
@@ -371,25 +370,21 @@ public class ItemDBController {
      */
     public void uploadImagesAndUpdateItem(String itemId, List<String> imageUrls, List<Uri> imageUris, OnCompleteListener<Void> onCompleteListener) {
         List<UploadTask> uploadTasks = itemDB.uploadItemImages(imageUris, imageUrls);
-
         Tasks.whenAllSuccess(uploadTasks).addOnSuccessListener(tasks -> {
-            // After successful upload, get the URLs and update the item document
-            List<String> image = new ArrayList<>();
+            List<Task<Uri>> downloadUrlTasks = new ArrayList<>();
             for (Object task : tasks) {
                 UploadTask.TaskSnapshot snapshot = (UploadTask.TaskSnapshot) task;
                 StorageReference ref = snapshot.getStorage();
-                ref.getDownloadUrl().addOnSuccessListener(uri -> {
-                    image.add(uri.toString());
-
-                    if (image.size() == imageUris.size()) {
-                        // All images have been uploaded and URLs retrieved
-                        itemDB.updateItemWithImageUrls(itemId, image, onCompleteListener);
-                    }
-                }).addOnFailureListener(e -> {
-                    // Handle failure in getting download URL
-                    onCompleteListener.onComplete(Tasks.forException(e));
-                });
+                downloadUrlTasks.add(ref.getDownloadUrl());
             }
+            // Wait for all download URL tasks to complete
+            Tasks.whenAllSuccess(downloadUrlTasks).addOnSuccessListener(downloadUrls -> {
+                // Then, call the onCompleteListener
+                onCompleteListener.onComplete(Tasks.forResult(null)); // Indicate success
+            }).addOnFailureListener(e -> {
+                // Handle failure in getting download URLs
+                onCompleteListener.onComplete(Tasks.forException(e));
+            });
         }).addOnFailureListener(e -> {
             // Handle failure in uploading images
             onCompleteListener.onComplete(Tasks.forException(e));

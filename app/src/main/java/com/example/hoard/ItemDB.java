@@ -639,31 +639,4 @@ public class ItemDB {
         return uploadTasks;
     }
 
-    /**
-     * Updates an item document with a list of image URLs.
-     *
-     * @param itemId              The ID of the item to update.
-     * @param imageUrls           The list of image URLs to add to the item.
-     * @param onCompleteListener  The listener to be called when the operation is complete.
-     */
-    public void updateItemWithImageUrls(String itemId, List<String> imageUrls, OnCompleteListener<Void> onCompleteListener) {
-        // Query the collection to find the document with the matching itemId
-        itemsCollection.whereEqualTo("itemId", itemId)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        // Assuming itemId is unique and there's only one document matching
-                        String docId = queryDocumentSnapshots.getDocuments().get(0).getId();
-                        itemsCollection.document(docId).update("imageUrls", imageUrls)
-                                .addOnCompleteListener(onCompleteListener);
-                    } else {
-                        // Handle the case where no document is found
-                        onCompleteListener.onComplete(Tasks.forException(new Exception("No matching document found")));
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    onCompleteListener.onComplete(Tasks.forException(e));
-                });
-    }
-
 }
