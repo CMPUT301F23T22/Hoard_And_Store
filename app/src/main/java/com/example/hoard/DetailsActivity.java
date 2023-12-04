@@ -33,10 +33,11 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * An activity class for displaying details of item in the application.
- *
+ * An activity class for displaying details of an item in the application.
+ * It shows detailed information about the selected item including images, description, and tags.
  */
 public class DetailsActivity extends AppCompatActivity{
+    // UI components to display item details
     private TextView dateOfAcquisitionTextView, makeTextView, modelTextView, serialNumberTextView, estimatedValueTextView, commentTextView, briefDescriptionTextView;
     private Item selectedItem;
     private ChipGroup chipGroup;
@@ -181,6 +182,9 @@ public class DetailsActivity extends AppCompatActivity{
         }
 
         List<String> imageUrls = selectedItem.getImageUrls();
+
+        // Clear the existing images
+        images.clear();
 
         if (imageUrls != null && !imageUrls.isEmpty()) {
             for (String currentImagePath : imageUrls) {

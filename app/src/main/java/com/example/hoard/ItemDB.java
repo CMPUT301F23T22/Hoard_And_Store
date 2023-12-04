@@ -52,10 +52,19 @@ public class ItemDB {
     private final FirebaseAuth mAuth;
     private String userDocumentId;
 
+    /**
+     * returns the items collection
+     *
+     * @return items collection
+     */
     public CollectionReference getUserCollection() {
         return userCollection;
     }
 
+    /**
+     * gets the user document id
+     * @return user document id
+     */
     public String getUserDocumentId() {
         return userDocumentId;
     }
@@ -63,7 +72,11 @@ public class ItemDB {
     public void setUserDocumentId(String userDocumentId) {
         this.userDocumentId = userDocumentId;
     }
-
+    /**
+     * gets the usename of the signed in user
+     *
+     * @return
+     */
     public Task<String> getUsername() {
         if (userCollection != null) {
             return userCollection.document(userDocumentId).get().continueWith(new Continuation<DocumentSnapshot, String>() {
@@ -102,7 +115,11 @@ public class ItemDB {
     }
 
 
-
+    /**
+     * constructor for the item db
+     *
+     * @param dbConnector the db connector
+     */
     public ItemDB(ItemDBConnector dbConnector) {
         db = dbConnector.getDatabase();
         userCollection = db.collection("user");
@@ -449,6 +466,13 @@ public class ItemDB {
         return filteredAndSortedResults;
     }
 
+    /**
+     * This method adds a new user to the 'user' collection in Firestore.
+     * @param firebaseUser
+     * @param email
+     * @param userName
+     * @return
+     */
     public Task<String> addUser(FirebaseUser firebaseUser, String email, String userName) {
         // Extract uid from the FirebaseUser
         String uid = firebaseUser.getUid();
@@ -629,10 +653,19 @@ public class ItemDB {
         return Tasks.whenAll(updateProfileTask, updateUsernameTask);
     }
 
+    /**
+     * Gets the tags from the database
+     * @return
+     */
     public Task<QuerySnapshot> getItemTags() {
         return itemsCollection.get();
     }
-
+    /**
+     * Uploads the images to the database
+     * @param imageUris
+     * @param imageUrls
+     * @return List of upload tasks
+     */
     public List<UploadTask> uploadItemImages(List<Uri> imageUris, List<String> imageUrls) {
         List<UploadTask> uploadTasks = new ArrayList<>();
 
@@ -645,6 +678,11 @@ public class ItemDB {
             uploadTasks.add(uploadTask);
         }
         return uploadTasks;
+    }
+
+    public Task<Void> deleteImageFromStorage(String imageUrl) {
+        StorageReference imageRef = storage.getReference().child(imageUrl);
+        return imageRef.delete();
     }
 
 }

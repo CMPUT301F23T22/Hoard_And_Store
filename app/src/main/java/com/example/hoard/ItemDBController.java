@@ -45,6 +45,9 @@ public class ItemDBController {
         void onInitializationComplete();
     }
 
+    /**
+     * Initializes the ItemDBController singleton instance.
+     */
     private ItemDBController() {itemDB = new ItemDB(new ItemDBConnector()); }
 
     /**
@@ -79,6 +82,10 @@ public class ItemDBController {
         });
     }
 
+    /**
+     * Gets the currently signed in user's username
+     * @return
+     */
     public Task<String> getUsername(){
         return itemDB.getUsername();
     }
@@ -196,7 +203,11 @@ public class ItemDBController {
         return new Item(dateOfAcquisition, briefDescription, make, model, serialNumber, estimatedValue, comment, itemID, (ArrayList<Tag>) tags,imageUrls);
     }
 
-
+    /**
+     * gets the total value of all items in the db
+     *
+     * @param callback callback to detect when the query finished
+     */
     public void getTotalValue(final Consumer<Double> callback) {
         // We may need to rethink how we are getting estimated value this is very messy and touches alot of code everywhere
 //        itemDB.getAllItems().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -223,7 +234,12 @@ public class ItemDBController {
     }
 
 
-
+    /**
+     * add a new item to the firebase database
+     *
+     * @param item
+     * @param onCompleteListener
+     */
     public void addItem(Item item, OnCompleteListener<DocumentReference> onCompleteListener) {
         itemDB.addItem(item, onCompleteListener);
     }
@@ -355,40 +371,44 @@ public class ItemDBController {
         });
     }
 
+    /**
+     * Gets the document ID of the currently signed in user's document.
+     * @return
+     */
     public String getUserDocID(){
         return itemDB.getUserDocumentId();
     }
 
+    /**
+     * Gets the collection reference for the currently signed in user's collection.
+     * @return
+     */
     public CollectionReference getUserCollection(){
         return itemDB.getUserCollection();
     }
     /**
      * Uploads images for an item to firebase storage.
      *
-     * @param itemId             The ID of the item.
      * @param imageUris          The URIs of the images to be uploaded.
+     * @param imageUrls          The URls to use
      * @param onCompleteListener Listener to be called when the operation is complete.
      */
-    public void uploadImagesAndUpdateItem(String itemId, List<String> imageUrls, List<Uri> imageUris, OnCompleteListener<Void> onCompleteListener) {
+    public void uploadImagesWithItemURl(List<String> imageUrls, List<Uri> imageUris, OnCompleteListener<Void> onCompleteListener) {
         List<UploadTask> uploadTasks = itemDB.uploadItemImages(imageUris, imageUrls);
         Tasks.whenAllSuccess(uploadTasks).addOnSuccessListener(tasks -> {
-            List<Task<Uri>> downloadUrlTasks = new ArrayList<>();
-            for (Object task : tasks) {
-                UploadTask.TaskSnapshot snapshot = (UploadTask.TaskSnapshot) task;
-                StorageReference ref = snapshot.getStorage();
-                downloadUrlTasks.add(ref.getDownloadUrl());
-            }
-            // Wait for all download URL tasks to complete
-            Tasks.whenAllSuccess(downloadUrlTasks).addOnSuccessListener(downloadUrls -> {
-                // Then, call the onCompleteListener
-                onCompleteListener.onComplete(Tasks.forResult(null)); // Indicate success
-            }).addOnFailureListener(e -> {
-                // Handle failure in getting download URLs
-                onCompleteListener.onComplete(Tasks.forException(e));
-            });
+            // Call the onCompleteListener to indicate success after all images are uploaded
+            onCompleteListener.onComplete(Tasks.forResult(null));
         }).addOnFailureListener(e -> {
             // Handle failure in uploading images
             onCompleteListener.onComplete(Tasks.forException(e));
         });
+
     }
+
+    public void deleteImage(String imageLocationToDelete, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
+        itemDB.deleteImageFromStorage(imageLocationToDelete)
+                .addOnSuccessListener(onSuccessListener)
+                .addOnFailureListener(onFailureListener);
+    }
+
 }

@@ -32,12 +32,9 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 /**
- * Activity for scanning barcodes and fetching product information.
- * <p>
- * This activity allows the user to scan barcodes using the device's camera.
- * After scanning, it fetches product information from the Barcode Lookup API
- * and displays it in the UI. It also provides options to close the activity or
- * return the scanned barcode data to a calling activity.
+ * Activity class for scanning barcodes and retrieving product information.
+ * This class uses the device's camera to scan barcodes and then fetches product information
+ * from an external API. It also provides the functionality to return the scanned data to the calling activity.
  */
 public class BarcodeScannerActivity extends AppCompatActivity {
 
@@ -61,11 +58,10 @@ public class BarcodeScannerActivity extends AppCompatActivity {
             }
     );
     /**
-     * Initializes the activity, setting up the UI and binding actions to buttons.
+     * Initializes the activity, setting up the user interface and binding actions to buttons.
+     * It configures the barcode scanning and network request functionalities.
      *
-     * @param savedInstanceState If the activity is being re-initialized after
-     *                           previously being shut down then this Bundle contains
-     *                           the most recent data provided by onSaveInstanceState(Bundle).
+     * @param savedInstanceState Contains the data most recently provided in onSaveInstanceState(Bundle) if the activity is being re-initialized.
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {

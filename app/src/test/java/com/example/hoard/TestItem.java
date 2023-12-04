@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 public class TestItem {
@@ -21,6 +22,7 @@ public class TestItem {
     private String comment;
     private String itemID;
     private ArrayList<Tag> tags;
+    private List<String> imageUrls;
 
     @Test
     public void testItem() {
@@ -33,7 +35,8 @@ public class TestItem {
         comment = "This is a test comment";
         itemID = "Test Item ID";
         tags = new ArrayList<>();
-        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags);
+        imageUrls = new ArrayList<>();
+        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags, imageUrls);
         assertEquals(date, item.getDateOfAcquisition());
         assertEquals(description, item.getBriefDescription());
         assertEquals(make, item.getMake());
@@ -55,8 +58,9 @@ public class TestItem {
         comment = "This is a test comment";
         itemID = "Test Item ID";
         tags = new ArrayList<>();
-        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags);
-        assertTrue(Item.isValidDate(date));
+        imageUrls = new ArrayList<>();
+        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags, imageUrls);
+        assertEquals(true, item.isValidDate(date));
     }
 
     @Test
@@ -70,8 +74,9 @@ public class TestItem {
         comment = "This is a test comment";
         itemID = "Test Item ID";
         tags = new ArrayList<>();
-        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags);
-        assertTrue(Item.isValidDescription(description));
+        imageUrls = new ArrayList<>();
+        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags, imageUrls);
+        assertEquals(true, item.isValidDescription(description));
     }
 
     @Test
@@ -85,8 +90,9 @@ public class TestItem {
         comment = "This is a test comment";
         itemID = "Test Item ID";
         tags = new ArrayList<>();
-        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags);
-        assertTrue(Item.isValidMake(make));
+        imageUrls = new ArrayList<>();
+        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags, imageUrls);
+        assertEquals(true, item.isValidMake(make));
     }
 
     @Test
@@ -100,8 +106,9 @@ public class TestItem {
         comment = "This is a test comment";
         itemID = "Test Item ID";
         tags = new ArrayList<>();
-        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags);
-        assertTrue(Item.isValidModel(model));
+        imageUrls = new ArrayList<>();
+        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags, imageUrls);
+        assertEquals(true, item.isValidModel(model));
     }
 
     @Test
@@ -115,8 +122,9 @@ public class TestItem {
         comment = "This is a test comment";
         itemID = "Test Item ID";
         tags = new ArrayList<>();
-        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags);
-        assertTrue(Item.isValidSerialNumber(serialNumber));
+        imageUrls = new ArrayList<>();
+        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags, imageUrls);
+        assertEquals(true, item.isValidSerialNumber(serialNumber));
     }
 
     @Test
@@ -130,8 +138,9 @@ public class TestItem {
         comment = "This is a test comment";
         itemID = "Test Item ID";
         tags = new ArrayList<>();
-        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags);
-        assertTrue(Item.isValidValue(estimatedValue));
+        imageUrls = new ArrayList<>();
+        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags, imageUrls);
+        assertEquals(true, item.isValidValue(estimatedValue));
     }
 
     @Test
@@ -145,8 +154,9 @@ public class TestItem {
         comment = "This is a test comment";
         itemID = "Test Item ID";
         tags = new ArrayList<>();
-        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags);
-        assertTrue(Item.isValidComment(comment));
+        imageUrls = new ArrayList<>();
+        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags, imageUrls);
+        assertEquals(true, item.isValidComment(comment));
     }
 
     @Test
@@ -160,7 +170,8 @@ public class TestItem {
         comment = "This is a test comment";
         itemID = "Test Item ID";
         tags = new ArrayList<>();
-        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags);
+        imageUrls = new ArrayList<>();
+        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags, imageUrls);
         Date date2 = item.getDateOfAcquisition();
         assertEquals(date, date2);
     }
@@ -176,7 +187,8 @@ public class TestItem {
         comment = "This is a test comment";
         itemID = "Test Item ID";
         tags = new ArrayList<>();
-        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags);
+        imageUrls = new ArrayList<>();
+        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags, imageUrls);
         item.setDateOfAcquisition(date);
         assertEquals(date, item.getDateOfAcquisition());
     }
@@ -192,7 +204,8 @@ public class TestItem {
         comment = "This is a test comment";
         itemID = "Test Item ID";
         tags = new ArrayList<>();
-        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags);
+        imageUrls = new ArrayList<>();
+        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags, imageUrls);
         String description2 = item.getBriefDescription();
         assertEquals(description, description2);
     }
@@ -208,7 +221,8 @@ public class TestItem {
         comment = "This is a test comment";
         itemID = "Test Item ID";
         tags = new ArrayList<>();
-        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags);
+        imageUrls = new ArrayList<>();
+        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags, imageUrls);
         item.setBriefDescription(description);
         assertEquals(description, item.getBriefDescription());
     }
@@ -224,9 +238,9 @@ public class TestItem {
         estimatedValue = 100.00;
         comment = "This is a test comment";
         tags = new ArrayList<>();
-
+        imageUrls = new ArrayList<>();
         // Create an Item object
-        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags);
+        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags, imageUrls);
 
         // Get itemID from the Item object
         String itemID = item.getItemID();
@@ -251,7 +265,8 @@ public class TestItem {
         comment = "This is a test comment";
         itemID = "Test Item ID";
         tags = new ArrayList<>();
-        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags);
+        imageUrls = new ArrayList<>();
+        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags, imageUrls);
         String make2 = item.getMake();
         assertEquals(make, make2);
     }
@@ -267,7 +282,8 @@ public class TestItem {
         comment = "This is a test comment";
         itemID = "Test Item ID";
         tags = new ArrayList<>();
-        Item item = new Item(date, description, make, model, serialNumber, estimatedValue,comment, tags);
+        imageUrls = new ArrayList<>();
+        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags, imageUrls);
         item.setMake(make);
         assertEquals(make, item.getMake());
     }
@@ -283,7 +299,8 @@ public class TestItem {
         comment = "This is a test comment";
         itemID = "Test Item ID";
         tags = new ArrayList<>();
-        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags);
+        imageUrls = new ArrayList<>();
+        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags, imageUrls);
         String model2 = item.getModel();
         assertEquals(model, model2);
     }
@@ -299,7 +316,8 @@ public class TestItem {
         comment = "This is a test comment";
         itemID = "Test Item ID";
         tags = new ArrayList<>();
-        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags);
+        imageUrls = new ArrayList<>();
+        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags, imageUrls);
         item.setModel(model);
         assertEquals(model, item.getModel());
     }
@@ -315,7 +333,8 @@ public class TestItem {
         comment = "This is a test comment";
         itemID = "Test Item ID";
         tags = new ArrayList<>();
-        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags);
+        imageUrls = new ArrayList<>();
+        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags, imageUrls);
         String serialNumber2 = item.getSerialNumber();
         assertEquals(serialNumber, serialNumber2);
     }
@@ -331,7 +350,8 @@ public class TestItem {
         comment = "This is a test comment";
         itemID = "Test Item ID";
         tags = new ArrayList<>();
-        Item item = new Item(date, description, make, model, serialNumber,estimatedValue, comment, tags);
+        imageUrls = new ArrayList<>();
+        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags, imageUrls);
         item.setSerialNumber(serialNumber);
         assertEquals(serialNumber, item.getSerialNumber());
     }
@@ -347,7 +367,8 @@ public class TestItem {
         comment = "This is a test comment";
         itemID = "Test Item ID";
         tags = new ArrayList<>();
-        Item item = new Item(date, description, make, model, serialNumber,estimatedValue, comment, tags);
+        imageUrls = new ArrayList<>();
+        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags, imageUrls);
         double estimatedValue2 = item.getEstimatedValue();
         assertEquals(estimatedValue, estimatedValue2, 0.0);
     }
@@ -363,90 +384,129 @@ public class TestItem {
         comment = "This is a test comment";
         itemID = "Test Item ID";
         tags = new ArrayList<>();
-        Item item = new Item(date, description, make, model, serialNumber,estimatedValue, comment, tags);
+        imageUrls = new ArrayList<>();
+        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags, imageUrls);
         item.setEstimatedValue(estimatedValue);
         assertEquals(estimatedValue, item.getEstimatedValue(), 0.0);
     }
 
     @Test
     public void testgetComment() {
-    	date = new Date();
-    	description = "This is a test description";
-    	make = "Test Make";
-    	model = "Test Model";
-    	serialNumber = "Test Serial Number";
-    	estimatedValue = 100.00;
-    	comment = "This is a test comment";
-    	itemID = "Test Item ID";
-    	tags = new ArrayList<>();
-    	Item item = new Item(date, description, make, model, serialNumber,estimatedValue, comment, tags);
-    	String comment2 = item.getComment();
-    	assertEquals(comment, comment2);
+        date = new Date();
+        description = "This is a test description";
+        make = "Test Make";
+        model = "Test Model";
+        serialNumber = "Test Serial Number";
+        estimatedValue = 100.00;
+        comment = "This is a test comment";
+        itemID = "Test Item ID";
+        tags = new ArrayList<>();
+        imageUrls = new ArrayList<>();
+        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags, imageUrls);
+        String comment2 = item.getComment();
+        assertEquals(comment, comment2);
     }
 
     @Test
     public void testsetComment() {
-    	date = new Date();
-    	description = "This is a test description";
-    	make = "Test Make";
-    	model = "Test Model";
-    	serialNumber = "Test Serial Number";
-    	estimatedValue = 100.00;
-    	comment = "This is a test comment";
-    	itemID = "Test Item ID";
-    	tags = new ArrayList<>();
-    	Item item = new Item(date, description, make, model, serialNumber,estimatedValue, comment, tags);
-    	item.setComment(comment);
-    	assertEquals(comment, item.getComment());
+        date = new Date();
+        description = "This is a test description";
+        make = "Test Make";
+        model = "Test Model";
+        serialNumber = "Test Serial Number";
+        estimatedValue = 100.00;
+        comment = "This is a test comment";
+        itemID = "Test Item ID";
+        tags = new ArrayList<>();
+        imageUrls = new ArrayList<>();
+        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags, imageUrls);
+        item.setComment(comment);
+        assertEquals(comment, item.getComment());
     }
 
     @Test
     public void addTag() {
-        	date = new Date();
-        	description = "This is a test description";
-        	make = "Test Make";
-        	model = "Test Model";
-        	serialNumber = "Test Serial Number";
-        	estimatedValue = 100.00;
-        	comment = "This is a test comment";
-        	itemID = "Test Item ID";
-        	tags = new ArrayList<>();
-        	Item item = new Item(date, description, make, model, serialNumber,estimatedValue, comment, tags);
-            tags.add(new Tag("Test Tag", "Test Color"));
-            item.addTag(new Tag("Test Tag", "Test Color"));
-            assertEquals(tags, item.getTags());
+        date = new Date();
+        description = "This is a test description";
+        make = "Test Make";
+        model = "Test Model";
+        serialNumber = "Test Serial Number";
+        estimatedValue = 100.00;
+        comment = "This is a test comment";
+        itemID = "Test Item ID";
+        tags = new ArrayList<>();
+        imageUrls = new ArrayList<>();
+        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags, imageUrls);
+        tags.add(new Tag("Test Tag", "Test Color"));
+        item.addTag(new Tag("Test Tag", "Test Color"));
+        assertEquals(tags, item.getTags());
     }
 
     @Test
     public void testsetTags() {
-    	date = new Date();
-    	description = "This is a test description";
-    	make = "Test Make";
-    	model = "Test Model";
-    	serialNumber = "Test Serial Number";
-    	estimatedValue = 100.00;
-    	comment = "This is a test comment";
-    	itemID = "Test Item ID";
-    	tags = new ArrayList<>();
-    	Item item = new Item(date, description, make, model, serialNumber,estimatedValue, comment, tags);
-    	item.setTags(tags);
-    	assertEquals(tags, item.getTags());
+        date = new Date();
+        description = "This is a test description";
+        make = "Test Make";
+        model = "Test Model";
+        serialNumber = "Test Serial Number";
+        estimatedValue = 100.00;
+        comment = "This is a test comment";
+        itemID = "Test Item ID";
+        tags = new ArrayList<>();
+        imageUrls = new ArrayList<>();
+        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags, imageUrls);
+        item.setTags(tags);
+        assertEquals(tags, item.getTags());
     }
 
     @Test
     public void testremoveTag() {
-    	date = new Date();
-    	description = "This is a test description";
-    	make = "Test Make";
-    	model = "Test Model";
-    	serialNumber = "Test Serial Number";
-    	estimatedValue = 100.00;
-    	comment = "This is a test comment";
-    	itemID = "Test Item ID";
-    	tags = new ArrayList<>();
-    	Item item = new Item(date, description, make, model, serialNumber,estimatedValue, comment, tags);
-    	item.removeTag(new Tag("Test Tag", "Test Color"));
-    	assertEquals(tags, item.getTags());
+        date = new Date();
+        description = "This is a test description";
+        make = "Test Make";
+        model = "Test Model";
+        serialNumber = "Test Serial Number";
+        estimatedValue = 100.00;
+        comment = "This is a test comment";
+        itemID = "Test Item ID";
+        tags = new ArrayList<>();
+        imageUrls = new ArrayList<>();
+        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags, imageUrls);
+        item.removeTag(new Tag("Test Tag", "Test Color"));
+        assertEquals(tags, item.getTags());
+    }
+    @Test
+    public void testsetImageUrls() {
+        date = new Date();
+        description = "This is a test description";
+        make = "Test Make";
+        model = "Test Model";
+        serialNumber = "Test Serial Number";
+        estimatedValue = 100.00;
+        comment = "This is a test comment";
+        itemID = "Test Item ID";
+        tags = new ArrayList<>();
+        imageUrls = new ArrayList<>();
+        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags, imageUrls);
+        item.setImageUrls(imageUrls);
+        assertEquals(imageUrls, item.getImageUrls());
+    }
+
+    @Test
+    public void testgetImageUrls() {
+        date = new Date();
+        description = "This is a test description";
+        make = "Test Make";
+        model = "Test Model";
+        serialNumber = "Test Serial Number";
+        estimatedValue = 100.00;
+        comment = "This is a test comment";
+        itemID = "Test Item ID";
+        tags = new ArrayList<>();
+        imageUrls = new ArrayList<>();
+        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags, imageUrls);
+
+        assertEquals(imageUrls, item.getImageUrls());
     }
 
     @Test
@@ -460,7 +520,8 @@ public class TestItem {
         comment = "This is a test comment";
         itemID = "Test Item ID";
         tags = new ArrayList<>();
-        Item item = new Item(date, description, make, model, serialNumber,estimatedValue, comment, tags);
+        imageUrls = new ArrayList<>();
+        Item item = new Item(date, description, make, model, serialNumber, estimatedValue, comment, tags, imageUrls);
         assertEquals(tags, item.getTags());
     }
 

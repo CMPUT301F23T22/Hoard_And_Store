@@ -194,7 +194,10 @@ public class SortAdapter extends RecyclerView.Adapter<SortAdapter.SortViewHolder
         // we only need a way to return the enabled options
         return sortOptionsEnabled;
     }
-
+    /**
+     * Gets the sort criteria selected by the user.
+     * @return the sort criteria selected by the user
+     */
     public String getSortBy(){
         if(filterCriteria.getSortBy()!= null){
             return filterCriteria.getSortBy();
@@ -202,6 +205,10 @@ public class SortAdapter extends RecyclerView.Adapter<SortAdapter.SortViewHolder
         return userToDatabaseMapping.get(clickedText);
     }
 
+    /**
+     * Gets the size of the list of sorting options.
+     * @return
+     */
     @Override
     public int getItemCount() {
         return sortOptions.size();

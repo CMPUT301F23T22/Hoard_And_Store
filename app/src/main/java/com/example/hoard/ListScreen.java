@@ -91,6 +91,10 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
     ChipGroup chipGroupTags;
     FrameLayout tagSelectionLayout;
 
+    /**
+     * Creates the activity and sets up the UI.
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -133,6 +137,10 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
         dbController = ItemDBController.getInstance();
 
         dbController.loadItems(new DataLoadCallbackItem() {
+            /**
+             * Loads the items from the database and updates the UI.
+             * @param items
+             */
             @Override
             public void onDataLoaded(List<Item> items) {
 
@@ -147,6 +155,11 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
 
 
         topBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            /**
+             * Handles the menu items in the top bar.
+             * @param item
+             * @return
+             */
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 int id = item.getItemId();
@@ -236,6 +249,11 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
 
 
         bottomNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
+            /**
+             * Handles the menu items in the bottom bar.
+             * @param item
+             * @return
+             */
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
@@ -264,6 +282,10 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
         });
 
         addItemButton.setOnClickListener(new View.OnClickListener() {
+            /**
+             * Handles the add item button.
+             * @param v
+             */
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ListScreen.this, AddEditItem.class);
@@ -275,11 +297,22 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
 
 
     ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+        /**
+         * Handles the swipe to delete functionality.
+         * @param recyclerView
+         * @param viewHolder
+         * @param target
+         * @return
+         */
         @Override
         public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
             return false;
         }
-
+        /**
+         * Handles the swipe to delete functionality.
+         * @param viewHolder
+         * @param direction
+         */
         @Override
         public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
             // Save the item before it's deleted
@@ -344,12 +377,17 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
         }
     };
 
-        protected void onResume() {
+    protected void onResume() {
         super.onResume();
 
-       home.setChecked(true);
+        home.setChecked(true);
 
     }
+
+    /**
+     * When save instance state is called, the selection mode is saved.
+     * @param outState
+     */
     @Override
     public void onSavedInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -361,7 +399,10 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
         }
         outState.putStringArrayList("itemIDs", itemIDs);
     }
-
+    /**
+     * When restore instance state is called, the selection mode is restored.
+     * @param savedInstanceState
+     */
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         home.setChecked(true);
@@ -387,6 +428,9 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
         }
     }
 
+    /**
+     * Updates the total value of the items.
+     */
     private void updateTotalValue() {
         dbController.getTotalValue(new Consumer<Double>() {
             @Override
@@ -398,6 +442,10 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
         });
     }
 
+    /**
+     * Handles the add item result.
+     * @param result
+     */
     private void handleAddResult(ActivityResult result) {
         if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
             Item returnedItem = (Item) result.getData().getSerializableExtra("newItem");
@@ -531,6 +579,13 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
         void onPositiveButtonClick(DialogInterface dialog);
     }
 
+    /**
+     * Shows a confirmation dialog.
+     *
+     * @param title    The title of the dialog.
+     * @param message  The message of the dialog.
+     * @param callback The callback to be called when the user clicks the positive button.
+     */
     private void showConfirmDialog(String title, String message, DialogInterfaceCallback callback) {
         new AlertDialog.Builder(ListScreen.this, R.style.PurpleAlertDialog)
                 .setTitle(title)
@@ -544,7 +599,10 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
     }
-
+    /**
+     * Handles the bulk delete functionality.
+     * Calls the database controller to delete the items.
+     */
     private void handleBulkDelete(){
         List<Item> selectedItems = itemAdapter.getSelectedItems();
         Task<Void> deleteTask = dbController.bulkDeleteItems(selectedItems);
@@ -567,7 +625,10 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
         });
 
     }
-
+    /**
+     * Handles the bulk tag functionality.
+     * Calls the database controller to add the tags to the items.
+     */
     private void handleBulkTag() {
         List<Tag> selectedTags = new ArrayList<>();
         for (int i = 0; i < chipGroupTags.getChildCount(); i++) {

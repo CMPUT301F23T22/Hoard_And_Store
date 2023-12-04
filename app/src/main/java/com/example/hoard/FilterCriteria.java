@@ -71,7 +71,7 @@ public class FilterCriteria implements Serializable {
     }
 
     /**
-     * Sets the desciption key words to FilterCriteria for filtering.
+     * Sets the description key words to FilterCriteria for filtering.
      *
      * @param descriptionKeyWords The list of description key words to be set.
      */
@@ -245,6 +245,11 @@ public class FilterCriteria implements Serializable {
         return result.toString();
     }
 
+    /**
+     * Clears all the filtering and sorting options.
+     * This method sets all the filtering and sorting related fields to null,
+     * effectively removing any existing filters or sort criteria.
+     */
     public void removeAllOptions(){
         makes = null;
         descriptionKeyWords = null;
@@ -256,19 +261,39 @@ public class FilterCriteria implements Serializable {
         sortBy = null;
     }
 
+    /**
+     * Sets the criteria by which the list will be sorted.
+     *
+     * @param sortBy The sorting criteria to be applied (e.g., name, date).
+     */
     public void setSortBy(String sortBy){
         this.sortBy = sortBy;
     }
 
+    /**
+     * Sets the sorting option (ascending or descending).
+     *
+     * @param sortOption The sort option, typically 'ascending' or 'descending'.
+     */
     public void setSortOption(String sortOption){
         this.sortOption = sortOption;
 
     }
 
+    /**
+     * Gets the current sorting criteria.
+     *
+     * @return The current sorting criteria (e.g., name, date).
+     */
     public String getSortBy(){
         return sortBy;
     }
 
+    /**
+     * Gets the current sorting option (ascending or descending).
+     *
+     * @return The current sort option.
+     */
     public String getSortOption(){
        return sortOption;
     }

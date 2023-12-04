@@ -36,8 +36,9 @@ import java.util.Locale;
 import java.util.UUID;
 
 /**
- * An activity for adding or editing items, extending AppCompatActivity and implementing
- * CustomDatePicker.DatePickListener for handling date selections.
+ * Activity class for adding or editing items in the inventory.
+ * It provides UI to input item details like description, make, model, serial number, value, etc.
+ * This class also handles barcode scanning, image adding, and date picking functionalities.
  */
 public class AddEditItem extends AppCompatActivity implements CustomDatePicker.DatePickListener {
 
@@ -65,12 +66,22 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
             this::handleAddImageResult
     );
     private final List<String> imageURLs = new ArrayList<>();
+
+    private List<String> previousUrlsList = new ArrayList<>();
+
     private TextView addEditHeader;
+    private Button addPhotoBtn;
     private Item currentItem; // Item to edit
     private boolean isEdit; // To identify whether it's an edit operation
     private ItemDBController itemDBController;
     private ArrayList<Tag> selectedTagList;
 
+    /**
+     * Initializes the activity, sets up UI components and listeners.
+     * It also checks if the activity is opened for editing an existing item or adding a new item.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after previously being shut down, this contains the data it most recently supplied in onSaveInstanceState(Bundle).
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,6 +105,7 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         TextInputLayout dateInputLayout = findViewById(R.id.dateInputLayout);
         addEditHeader = findViewById(R.id.addEditHeader);
         chipGroupTags = findViewById(R.id.tagChipGroup);
+        addPhotoBtn = findViewById(R.id.AddImageButton);
 
         // Check if editing
         Intent intent = getIntent();
@@ -166,18 +178,28 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         Button addImageBtn = findViewById(R.id.AddImageButton);
         addImageBtn.setOnClickListener(view -> {
             // Create an intent that will start the TagAddEditActivity.
-            Intent tagIntent = new Intent(this, AddImage.class);
+            Intent addImageIntent = new Intent(this, AddImage.class);
+            // Check if it's an edit operation
+            if (isEdit) {
+                // Assume currentItem is the item you're editing, and it's a Parcelable or Serializable object
+                addImageIntent.putExtra("CURRENT_ITEM", currentItem);
+            }
             // Start the new activity.
-            addImageResultLauncher.launch(tagIntent);
+            addImageResultLauncher.launch(addImageIntent);
         });
 
     }
-
+    /**
+     * Launches the barcode scanner activity.
+     */
     private void launchBarcodeScanner() {
         Intent intent = new Intent(this, BarcodeScannerActivity.class);
         barcodeScannerResultLauncher.launch(intent);
     }
 
+    /**
+     * Launches the serial number scanner activity.
+     */
     private void launchSerialScanner() {
         Intent intent = new Intent(this, SerialScannerActivity.class);
         serialScannerResultLauncher.launch(intent);
@@ -205,6 +227,7 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         valueInput.setText(String.valueOf(currentItem.getEstimatedValue()));
         commentInput.setText(currentItem.getComment());
         dateInput.setText(sdf.format(currentItem.getDateOfAcquisition()));
+        addPhotoBtn.setText("Edit Photo");
     }
 
     /**
@@ -246,7 +269,7 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         TextInputLayout commentInputLayout = findViewById(R.id.commentInputLayout);
         TextInputEditText commentInput = findViewById(R.id.commentInput);
 
-
+        // Validate fields before saving
         if (isFieldEmpty(dateInput) || !isValidDate(dateInput.getText().toString())) {
             dateInputLayout.setError("Invalid date format. Use dd/mm/yyyy");
             dateInputLayout.setErrorEnabled(true);
@@ -377,7 +400,7 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
                 // Log success
                 Log.i("AddItem", "Item added successfully");
                 // Call the method to upload images and update the item
-                itemDBController.uploadImagesAndUpdateItem(newItem.getItemID(), newItem.getImageUrls(), imagesData, new OnCompleteListener<Void>() {
+                itemDBController.uploadImagesWithItemURl(newItem.getImageUrls(), imagesData, new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
@@ -413,13 +436,21 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
             if (task.isSuccessful()) {
                 // Log success
                 Log.i("EditItem", "Item updated successfully");
-
-                Toast.makeText(this, "Item updated successfully", Toast.LENGTH_SHORT).show();
-                Intent resultIntent = new Intent();
-
-                resultIntent.putExtra("updatedItem", updatedItem);
-                setResult(Activity.RESULT_OK, resultIntent);
-                finish();
+                itemDBController.uploadImagesWithItemURl(imageURLs, imagesData, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.i("UploadImages", "Images uploaded and item updated successfully");
+                            Toast.makeText(AddEditItem.this, "Item Updated", Toast.LENGTH_SHORT).show();
+                            Intent resultIntent = new Intent();
+                            resultIntent.putExtra("updatedItem", updatedItem);
+                            setResult(Activity.RESULT_OK, resultIntent);
+                            finish();
+                        } else {
+                            Log.e("UploadImages", "Error uploading images: " + task.getException().getMessage());
+                        }
+                    }
+                });
             } else {
                 // This block handles the failure case
                 Exception e = task.getException();
@@ -463,6 +494,16 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
             currentItem.setComment(comment);
             currentItem.setDateOfAcquisition(acquisitionDate);
             currentItem.setTags(selectedTagList);
+
+            for (int i = 0; i < imagesData.size(); i++) {
+                String filePath = "images/" + currentItem.getItemID() + "/" + UUID.randomUUID().toString() + ".jpg";
+                imageURLs.add(filePath);
+            }
+            if (previousUrlsList.isEmpty()){
+                previousUrlsList = currentItem.getImageUrls();
+            }
+            previousUrlsList.addAll(imageURLs);
+            currentItem.setImageUrls(previousUrlsList);
             return currentItem;
         }
 
@@ -522,8 +563,22 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         }
     }
 
+    /**
+     * Handles the result from the image adding activity. If the result is OK, it retrieves the selected image URIs
+     * and adds them to the imagesData list.
+     *
+     * @param result The result data from the image adding activity, containing the URIs of the selected images.
+     */
     private void handleAddImageResult(ActivityResult result) {
         if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+
+            if (isEdit) {
+                ArrayList<String> previousUrls = result.getData().getStringArrayListExtra("previousUrls");
+                if (previousUrls != null) {
+                    previousUrlsList = new ArrayList<>(previousUrls);
+                }
+            }
+
             // Retrieve the ArrayList of Uri objects
             ArrayList<Uri> selectedUris = result.getData().getParcelableArrayListExtra("itemImagesData");
             if (selectedUris != null) {
@@ -533,6 +588,12 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         }
     }
 
+    /**
+     * Handles the result from the serial number scanner activity. If the result is OK, it sets the scanned serial number
+     * to the serialNumberInput field.
+     *
+     * @param result The result data from the serial scanner activity, containing the scanned serial number.
+     */
     private void handleSerialScannerResult(ActivityResult result) {
         if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
             String serialNumber = result.getData().getStringExtra("serialNumber");
@@ -540,6 +601,12 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         }
     }
 
+    /**
+     * Handles the result from the barcode scanner activity. If the result is OK, it sets the scanned product's
+     * description to the descriptionInput field.
+     *
+     * @param result The result data from the barcode scanner activity, containing the product description.
+     */
     private void handleBarcodeScannerResult(ActivityResult result) {
         if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
             String description = result.getData().getStringExtra("productDescription");

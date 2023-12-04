@@ -37,6 +37,12 @@ public class CameraActivity extends AppCompatActivity {
 
     private static final int IMAGE_CAPTURE_FAILURE_RESULT_CODE = 2;
 
+    /**
+     * Initializes the activity, sets up the camera preview, and configures button listeners.
+     *
+     * @param savedInstanceState
+     */
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
