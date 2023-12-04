@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -16,7 +17,10 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.annotation.NonNull;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.textfield.TextInputEditText;
@@ -29,6 +33,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 /**
  * An activity for adding or editing items, extending AppCompatActivity and implementing
@@ -47,7 +52,8 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
             new ActivityResultContracts.StartActivityForResult(),
             this::handleAddTagResult);
     private EditText descriptionInput, makeInput, modelInput, serialNumberInput, valueInput, commentInput, dateInput;
-    private String imageData;
+    private ArrayList<Uri> imagesData;
+    private List<String> imageURLs = new ArrayList<>();
     private TextView addEditHeader;
     private Item currentItem; // Item to edit
     private boolean isEdit; // To identify whether it's an edit operation
@@ -71,6 +77,8 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
         setContentView(R.layout.item_add_edit);
 
         selectedTagList = new ArrayList<Tag>();
+
+        imagesData = new ArrayList<Uri>();
 
         itemDBController = ItemDBController.getInstance();
         TagDBController tagDBController = TagDBController.getInstance();
@@ -361,8 +369,22 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
                 Log.i("AddItem", "Item added successfully");
 
                 Toast.makeText(this, "Item added successfully", Toast.LENGTH_SHORT).show();
-                Intent resultIntent = new Intent();
 
+                // Call the method to upload images and update the item
+                itemDBController.uploadImagesAndUpdateItem(newItem.getItemID(), newItem.getImageUrls(), imagesData, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.i("UploadImages", "Images uploaded and item updated successfully");
+                            // Additional code if needed after successful image upload
+                        } else {
+                            Log.e("UploadImages", "Error uploading images: " + task.getException().getMessage());
+                            // Handle the error case
+                        }
+                    }
+                });
+
+                Intent resultIntent = new Intent();
                 resultIntent.putExtra("newItem", newItem);
                 setResult(Activity.RESULT_OK, resultIntent);
                 finish();
@@ -437,11 +459,10 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
             currentItem.setComment(comment);
             currentItem.setDateOfAcquisition(acquisitionDate);
             currentItem.setTags(selectedTagList);
-            currentItem.setImageData(imageData);
             return currentItem;
         }
 
-        return new Item(
+        Item item = new Item(
                 acquisitionDate,
                 description,
                 make,
@@ -450,8 +471,13 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
                 value,
                 comment,
                 selectedTagList,
-                imageData);
-
+                imageURLs);
+        for (int i = 0; i < imagesData.size(); i++) {
+            String filePath = "images/" + item.getItemID() + "/" + UUID.randomUUID().toString() + ".jpg";
+            imageURLs.add(filePath);
+        }
+        item.setImageUrls(imageURLs);
+        return item;
     }
 
     /**
@@ -494,8 +520,11 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
 
     private void handleAddImageResult(ActivityResult result) {
         if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-            if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                imageData = result.getData().getStringExtra("selectedImageData");
+            // Retrieve the ArrayList of Uri objects
+            ArrayList<Uri> selectedUris = result.getData().getParcelableArrayListExtra("itemImagesData");
+            if (selectedUris != null) {
+                // Add all the Uri objects to your imagesData list
+                imagesData.addAll(selectedUris);
             }
         }
     }

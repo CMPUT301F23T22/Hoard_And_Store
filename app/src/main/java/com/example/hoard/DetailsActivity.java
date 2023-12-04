@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -152,11 +151,8 @@ public class DetailsActivity extends AppCompatActivity {
         // create a chips from tags
         chipGroup.removeAllViews();
 
-
         ImageView itemImageView = findViewById(R.id.itemImage);
         // showing nothing rn
-        Log.d("DetailsActivity", "Image data: " + selectedItem.getImageData());
-
 
         // iterate over the tags and add to chip group
         for (Tag tag : tags) {
