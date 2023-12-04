@@ -53,6 +53,7 @@ import org.junit.Test;
 public class AppTest {
 
     // Please Run the test in the following order: testAddTag(), testAddItem(), testEditItem(), testDeleteItem(), createItems(), testSort(), testFilter(), testBulkDelete()
+    // If anything goes wrong, please run accountDeleteCreate() to reset the account.
     private void signIn() {
         try {
             wait(3000);
@@ -258,6 +259,28 @@ public class AppTest {
         signIn();
     }
 
+    @Test
+    public void accountDeleteCreate() {
+        // Delete account
+        wait(2000);
+        onView(withId(R.id.nav_profile)).perform(click());
+        wait(2000);
+        onView(withText("Delete Account")).perform(click());
+        wait(2000);
+        onView(withText("Yes")).perform(click());
+        wait(2000);
+
+        // Create account
+        onView(withText("Sign up")).perform(click());
+        wait(2000);
+        onView(withId(R.id.usernameInput)).perform(ViewActions.typeText("Test"));
+        onView(withId(R.id.emailInput)).perform(ViewActions.typeText("test@gmail.com"));
+        onView(withId(R.id.passwordInput)).perform(ViewActions.typeText("123456"));
+        onView(withText("Create Account")).perform(click());
+        wait(2000);
+        onView(withId(R.id.signInButton)).perform(click());
+        wait(2000);
+    }
     // This part of the code test add, edit and delete item.
     // Run testAddTag() and testAddItem() before running testEditItem() and testDeleteItem().
     @Test
