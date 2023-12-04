@@ -12,8 +12,11 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +24,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
+import android.net.Uri;
 import android.util.Log;
 
 /**
@@ -176,8 +180,19 @@ public class ItemDBController {
                 }
             }
         }
-        return new Item(dateOfAcquisition, briefDescription, make, model, serialNumber, estimatedValue, comment, itemID, (ArrayList<Tag>) tags);
 
+        List<String> imageUrls = new ArrayList<>();
+        Object urlsObject = data.get("imageUrls");
+        if (urlsObject instanceof List<?>) {
+            List<?> urlsList = (List<?>) urlsObject;
+            for (Object obj : urlsList) {
+                if (obj instanceof String) {
+                    imageUrls.add((String) obj);
+                }
+            }
+        }
+
+        return new Item(dateOfAcquisition, briefDescription, make, model, serialNumber, estimatedValue, comment, itemID, (ArrayList<Tag>) tags,imageUrls);
     }
 
 
@@ -345,5 +360,39 @@ public class ItemDBController {
 
     public CollectionReference getUserCollection(){
         return itemDB.getUserCollection();
+    }
+
+    /**
+     * Uploads images for an item and updates the item document with the image URLs.
+     *
+     * @param itemId             The ID of the item.
+     * @param imageUris          The URIs of the images to be uploaded.
+     * @param onCompleteListener Listener to be called when the operation is complete.
+     */
+    public void uploadImagesAndUpdateItem(String itemId, List<String> imageUrls, List<Uri> imageUris, OnCompleteListener<Void> onCompleteListener) {
+        List<UploadTask> uploadTasks = itemDB.uploadItemImages(imageUris, imageUrls);
+
+        Tasks.whenAllSuccess(uploadTasks).addOnSuccessListener(tasks -> {
+            // After successful upload, get the URLs and update the item document
+            List<String> image = new ArrayList<>();
+            for (Object task : tasks) {
+                UploadTask.TaskSnapshot snapshot = (UploadTask.TaskSnapshot) task;
+                StorageReference ref = snapshot.getStorage();
+                ref.getDownloadUrl().addOnSuccessListener(uri -> {
+                    image.add(uri.toString());
+
+                    if (image.size() == imageUris.size()) {
+                        // All images have been uploaded and URLs retrieved
+                        itemDB.updateItemWithImageUrls(itemId, image, onCompleteListener);
+                    }
+                }).addOnFailureListener(e -> {
+                    // Handle failure in getting download URL
+                    onCompleteListener.onComplete(Tasks.forException(e));
+                });
+            }
+        }).addOnFailureListener(e -> {
+            // Handle failure in uploading images
+            onCompleteListener.onComplete(Tasks.forException(e));
+        });
     }
 }

@@ -1,5 +1,6 @@
 package com.example.hoard;
 
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -25,6 +26,9 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,6 +42,9 @@ import java.util.Map;
  */
 public class ItemDB {
     private final FirebaseFirestore db;
+
+    private FirebaseStorage storage;
+
     private CollectionReference itemsCollection;
     private final CollectionReference userCollection;
     private User loggedInUser = UserManager.getInstance().getLoggedInUser();
@@ -100,6 +107,7 @@ public class ItemDB {
         db = dbConnector.getDatabase();
         userCollection = db.collection("user");
         mAuth = FirebaseAuth.getInstance();
+        storage = FirebaseStorage.getInstance();
     }
 
     /**
@@ -615,6 +623,47 @@ public class ItemDB {
 
     public Task<QuerySnapshot> getItemTags() {
         return itemsCollection.get();
+    }
+
+    public List<UploadTask> uploadItemImages(List<Uri> imageUris, List<String> imageUrls) {
+        List<UploadTask> uploadTasks = new ArrayList<>();
+
+        for (int i = 0; i < imageUris.size(); i++) {
+            Log.d("Firestore", "imageUri: " + imageUris.get(i));
+            Uri uri = imageUris.get(i);
+            String filePath = imageUrls.get(i);
+            StorageReference imageRef = storage.getReference().child(filePath);
+            UploadTask uploadTask = imageRef.putFile(uri);
+            uploadTasks.add(uploadTask);
+        }
+        return uploadTasks;
+    }
+
+    /**
+     * Updates an item document with a list of image URLs.
+     *
+     * @param itemId              The ID of the item to update.
+     * @param imageUrls           The list of image URLs to add to the item.
+     * @param onCompleteListener  The listener to be called when the operation is complete.
+     */
+    public void updateItemWithImageUrls(String itemId, List<String> imageUrls, OnCompleteListener<Void> onCompleteListener) {
+        // Query the collection to find the document with the matching itemId
+        itemsCollection.whereEqualTo("itemId", itemId)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        // Assuming itemId is unique and there's only one document matching
+                        String docId = queryDocumentSnapshots.getDocuments().get(0).getId();
+                        itemsCollection.document(docId).update("imageUrls", imageUrls)
+                                .addOnCompleteListener(onCompleteListener);
+                    } else {
+                        // Handle the case where no document is found
+                        onCompleteListener.onComplete(Tasks.forException(new Exception("No matching document found")));
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    onCompleteListener.onComplete(Tasks.forException(e));
+                });
     }
 
 }

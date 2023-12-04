@@ -51,6 +51,8 @@ dependencies {
     implementation ("androidx.camera:camera-lifecycle:$cameraxversion")
     implementation ("androidx.camera:camera-view:1.0.0-alpha28")
     implementation ("androidx.camera:camera-extensions:1.0.0-alpha28")
+    implementation ("com.google.firebase:firebase-storage:20.0.0")
+    implementation ("com.github.bumptech.glide:glide:4.16.0")
     testImplementation("junit:junit:4.13.2")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.android.gms:play-services-auth:20.7.0")

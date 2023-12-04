@@ -1,65 +1,66 @@
 package com.example.hoard;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.widget.Button;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.camera.core.Camera;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
-import androidx.camera.core.ImageProxy;
 import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.core.content.ContextCompat;
-
 import com.google.common.util.concurrent.ListenableFuture;
 
-import java.io.ByteArrayOutputStream;
-import java.nio.ByteBuffer;
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 
 /**
- * Activity for handling camera operations. This activity starts the camera, shows a preview, and handles image capture.
+ * CameraActivity is responsible for handling camera operations using CameraX library.
+ * It captures a photo, saves it, and returns its URI.
  */
 public class CameraActivity extends AppCompatActivity {
-
-    private static final int IMAGE_CAPTURE_FAILURE_RESULT_CODE = 2; // A distinct result code for capture failure
+    private static final String TAG = "CameraActivity";
+    private static final String PHOTO_EXTENSION = ".jpg";
     private ImageCapture imageCapture;
+    private File outputDirectory;
+
+    private static final int IMAGE_CAPTURE_FAILURE_RESULT_CODE = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
 
-        // Initialize camera preview
+        // Initialize output directory for saving captured images
+        outputDirectory = getOutputDirectory(CameraActivity.this);
+
+        // Initialize camera preview view
         PreviewView previewView = findViewById(R.id.previewView);
         startCamera(previewView);
 
-        // Setup button for capturing photo
+        // Setup capture button to take a photo
         Button captureButton = findViewById(R.id.captureButton);
-        if (getIntent().getBooleanExtra("fromBarcodeScanner", false)) {
-            captureButton.setText("Auto Gen Description");
-        }
         captureButton.setOnClickListener(v -> takePhoto());
 
-        // Button to close the activity
+        // Close button to finish the activity
         Button closeButton = findViewById(R.id.closeButton);
         closeButton.setOnClickListener(v -> finish());
     }
 
     /**
-     * Starts the camera and binds it to the lifecycle of this activity.
-     *
-     * @param previewView The view to display the camera preview.
+     * Starts the camera with CameraX library.
+     * @param previewView The view to render camera preview.
      */
     private void startCamera(PreviewView previewView) {
         ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(this);
@@ -67,96 +68,107 @@ public class CameraActivity extends AppCompatActivity {
         cameraProviderFuture.addListener(() -> {
             try {
                 ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
+
+                // Prepare the preview use case
                 Preview preview = new Preview.Builder().build();
                 preview.setSurfaceProvider(previewView.getSurfaceProvider());
 
+                // Prepare the image capture use case
                 imageCapture = new ImageCapture.Builder().build();
 
+                // Choose the camera by default (usually the back camera)
                 CameraSelector cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA;
+
+                // Unbind use cases before rebinding
                 cameraProvider.unbindAll();
-                Camera camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
+
+                // Bind use cases to camera
+                cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
             } catch (ExecutionException | InterruptedException e) {
-                Log.e("CameraXApp", "Error starting camera: " + e.getMessage(), e);
+                Log.e(TAG, "Error starting camera: " + e.getMessage(), e);
             }
         }, ContextCompat.getMainExecutor(this));
     }
 
     /**
-     * Handles the process of taking a photo.
+     * Captures a photo, saves it in the device storage, and returns its URI.
      */
     private void takePhoto() {
-        if (imageCapture == null) return;
+        if (imageCapture != null) {
+            // Create a timestamped file for the photo
+            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
+            String imageFileName = "JPEG_" + timeStamp + PHOTO_EXTENSION;
+            File photoFile = new File(outputDirectory, imageFileName);
 
-        imageCapture.takePicture(ContextCompat.getMainExecutor(this), new ImageCapture.OnImageCapturedCallback() {
-            @Override
-            public void onCaptureSuccess(@NonNull ImageProxy image) {
-                try {
-                    Bitmap capturedImage = imageProxyToBitmap(image);
-                    // Handling the successful capture of an image
-                    returnCapturedImage(capturedImage);
-                } finally {
-                    image.close();
+            ImageCapture.OutputFileOptions outputOptions = new ImageCapture.OutputFileOptions.Builder(photoFile).build();
+
+            imageCapture.takePicture(outputOptions, ContextCompat.getMainExecutor(this), new ImageCapture.OnImageSavedCallback() {
+                @Override
+                public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
+                    // Create URI from the saved file
+                    Uri savedUri = Uri.fromFile(photoFile);
+                    Log.d(TAG, "Photo capture succeeded: " + savedUri);
+
+                    // Use the URI in the method to handle the captured image
+                    returnCapturedImageUri(savedUri);
                 }
-            }
 
-            @Override
-            public void onError(@NonNull ImageCaptureException exception) {
-                Log.e("CameraXApp", "Photo capture failed: " + exception.getMessage(), exception);
-                Intent failureIntent = new Intent();
-                failureIntent.putExtra("error_message", exception.getMessage());
-                setResult(IMAGE_CAPTURE_FAILURE_RESULT_CODE, failureIntent);
-                finish();
-            }
-        });
+                @Override
+                public void onError(@NonNull ImageCaptureException exception) {
+                    Log.e(TAG, "Photo capture failed: " + exception.getMessage(), exception);
+                    returnErrorResult(exception.getMessage());
+                }
+            });
+        }
     }
 
     /**
-     * Converts an ImageProxy to a Bitmap.
-     *
-     * @param image The ImageProxy to convert.
-     * @return A Bitmap representation of the ImageProxy.
+     * Returns the captured image URI to the calling activity.
+     * @param imageUri The URI of the captured image.
      */
-    private Bitmap imageProxyToBitmap(ImageProxy image) {
-        ByteBuffer buffer = image.getPlanes()[0].getBuffer();
-        byte[] bytes = new byte[buffer.capacity()];
-        buffer.get(bytes);
-        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-    }
-
-    /**
-     * Handles returning the captured image to the calling activity.
-     *
-     * @param capturedImage The captured image as a Bitmap.
-     */
-    private void returnCapturedImage(Bitmap capturedImage) {
-        // Rotate the image for correct orientation
-        capturedImage = rotateImage(capturedImage, 90);
-
-        // Convert Bitmap to byte array
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        capturedImage.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-        byte[] byteArray = stream.toByteArray();
-
-        // Return the image as a result
+    private void returnCapturedImageUri(Uri imageUri) {
         Intent returnIntent = new Intent();
-        returnIntent.putExtra("capturedImage", byteArray);
+        // Put the URI string into the return intent
+        returnIntent.putExtra("imageUri", imageUri != null ? imageUri.toString() : null);
         setResult(Activity.RESULT_OK, returnIntent);
         finish();
     }
 
     /**
-     * Rotates a Bitmap by the specified degrees.
-     *
-     * @param img    The Bitmap to rotate.
-     * @param degree The number of degrees to rotate the image.
-     * @return The rotated Bitmap.
+     * Gets the output directory for saving images.
+     * @param context The application context.
+     * @return The file representing the output directory.
      */
-    private Bitmap rotateImage(Bitmap img, int degree) {
-        // https://stackoverflow.com/questions/63921260/android-camerax-image-rotated
-        Matrix matrix = new Matrix();
-        matrix.postRotate(degree);
-        Bitmap rotatedImg = Bitmap.createBitmap(img, 0, 0, img.getWidth(), img.getHeight(), matrix, true);
-        img.recycle();
-        return rotatedImg;
+    private File getOutputDirectory(Context context) {
+        File mediaStorageDir;
+
+        mediaStorageDir = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "Hoard_And_Store");
+
+        if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()) {
+            Log.e(TAG, "Failed to create directory");
+        }
+
+        return mediaStorageDir;
+    }
+
+    /**
+     * Handles the return of an error result to the calling activity.
+     * This method creates an intent, puts the error message into it,
+     * sets the result code for indicating a failure, and finishes the activity.
+     *
+     * @param errorMessage The error message to be sent back to the calling activity.
+     */
+    private void returnErrorResult(String errorMessage) {
+        // Creating an intent to hold the result data
+        Intent returnIntent = new Intent();
+
+        // Putting the error message into the intent
+        returnIntent.putExtra("error_message", errorMessage);
+
+        // Setting the result with a custom failure code and the intent
+        setResult(IMAGE_CAPTURE_FAILURE_RESULT_CODE, returnIntent);
+
+        // Finishing the activity, returning to the caller
+        finish();
     }
 }

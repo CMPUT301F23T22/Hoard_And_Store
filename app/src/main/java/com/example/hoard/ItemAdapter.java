@@ -3,6 +3,7 @@ package com.example.hoard;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
@@ -12,9 +13,18 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.imageview.ShapeableImageView;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -32,6 +42,10 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
     // used in activity_sort.xml
 
     private List<Item> itemList;
+
+    FirebaseStorage storage = FirebaseStorage.getInstance();
+    StorageReference storageRef = storage.getReference();
+
     private final RecyclerView recyclerView;
     private List<Item> filteredItems;
     private Context context;
@@ -137,6 +151,8 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
         // Correct the type mismatch issue by converting the double to a string
         holder.estimatedValue.setText(String.valueOf(currentItem.getEstimatedValue()));
 
+        loadImage(currentItem,holder);
+
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -172,6 +188,26 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
                 }
                 return true;
             }
+        });
+    }
+
+    private void loadImage(Item currentItem, ViewHolder holder) {
+        List<String> imageUrls = currentItem.getImageUrls();
+        String imagePath = (imageUrls != null && !imageUrls.isEmpty()) ? imageUrls.get(0) : null;
+
+        if (imagePath == null || imagePath.isEmpty()) {
+            holder.itemImage.setImageResource(R.drawable.defultimage); // Default image
+            return;
+        }
+
+        StorageReference imageRef = storageRef.child(imagePath);
+
+        imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+            Glide.with(holder.itemView.getContext())
+                    .load(uri.toString())
+                    .into(holder.itemImage);
+        }).addOnFailureListener(exception -> {
+            Toast.makeText(holder.itemView.getContext(), "Image could not load", Toast.LENGTH_LONG).show();
         });
     }
 
@@ -322,6 +358,8 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
         public TextView estimatedValue;
         public ImageView detailsArrow;
 
+        public ShapeableImageView itemImage;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             itemComment = itemView.findViewById(R.id.commentTextView);
@@ -329,6 +367,8 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
             itemModel = itemView.findViewById(R.id.modelTextView);
             dateOfAcquisition = itemView.findViewById(R.id.dateOfAcquisitionList);
             estimatedValue = itemView.findViewById(R.id.estimatedValueList);
+            itemImage = itemView.findViewById(R.id.imageView);
+
         }
 
         void bind(boolean isSelected) {
