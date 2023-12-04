@@ -2,6 +2,7 @@ package com.example.hoard;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
@@ -131,6 +132,13 @@ public class TestFilterCriteria {
         assertNotNull(filterCriteria.getMakes());
         filterCriteria.clearMakes();
         assertTrue(filterCriteria.getMakes().isEmpty());
+    }
+    @Test
+    public void testClearDescriptionKeyWords() {
+        filterCriteria.setDescriptionKeyWords(new ArrayList<>());
+        assertNotNull(filterCriteria.getDescriptionKeyWords());
+        filterCriteria.clearDescriptionKeyWords();
+        assertNull(filterCriteria.getDescriptionKeyWords());
     }
 
     @Test
