@@ -1,7 +1,11 @@
 # Hoard_And_Store
 
+![image](https://github.com/CMPUT301F23T22/Hoard_And_Store/assets/73729890/3b97d586-58ed-4bda-8308-0ae04c29819f)
+
 ## Overview
 This document outlines the design and implementation of a simple, attractive, and easy-to-use Android application for inventory management. This application aims to help users efficiently record and manage items for various purposes, such as insurance. The design is flexible to allow future developers to extend or migrate it.
+
+## WIKI (https://github.com/CMPUT301F23T22/Hoard_And_Store/wiki)
 
 ## User Stories
 
