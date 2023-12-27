@@ -31,6 +31,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -62,6 +63,7 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
     private FloatingActionButton addItemButton;
     private TextView tvTotalValue;
     private Fragment currentFragment;
+    private Button switchView;
     FrameLayout listScreenFrame;
     private RecyclerView recyclerView;
     private ItemAdapter itemAdapter;
@@ -107,6 +109,8 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
 
 //        itemDB = new ItemDB(new ItemDBConnector());
 
+
+        switchView = findViewById(R.id.switchView);
         addItemButton = findViewById(R.id.addItemButton);
         topBar = findViewById(R.id.topAppBar);
         Menu topBarMenu = topBar.getMenu();
@@ -241,6 +245,15 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
                 }
 
                 return true;
+            }
+        });
+
+        switchView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                boolean isSwitched = itemAdapter.toggleItemViewType();
+                recyclerView.setLayoutManager(isSwitched ? new LinearLayoutManager(ListScreen.this) : new GridLayoutManager(ListScreen.this, 2));
+                itemAdapter.notifyDataSetChanged();
             }
         });
 

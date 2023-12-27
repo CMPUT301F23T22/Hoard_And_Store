@@ -48,6 +48,8 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
     FirebaseStorage storage = FirebaseStorage.getInstance();
     StorageReference storageRef = storage.getReference();
 
+    boolean isSwitchView = true;
+
     private final RecyclerView recyclerView;
     private List<Item> filteredItems;
     private Context context;
@@ -56,6 +58,9 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
     private boolean isSelectionMode = false;
     private ItemAdapterListener itemAdapterListener;
     private final SparseBooleanArray selectedItems = new SparseBooleanArray();
+
+    private static final int LIST_ITEM = 0;
+    private static final int GRID_ITEM = 1;
 
     public void setItemAdapterListener(ItemAdapterListener listener) {
         this.itemAdapterListener = listener;
@@ -159,9 +164,29 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_content, parent, false);
+        View view;
+        if (viewType == LIST_ITEM){
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_content, parent, false);
+        } else {
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.grid_content, parent, false);
+        }
         return new ViewHolder(view);
     }
+
+    @Override
+    public int getItemViewType (int position) {
+        if (isSwitchView){
+            return LIST_ITEM;
+        }else{
+            return GRID_ITEM;
+        }
+    }
+
+    public boolean toggleItemViewType () {
+        isSwitchView = !isSwitchView;
+        return isSwitchView;
+    }
+
     /**
      * Binds the data at the specified position in the itemList to the ViewHolder.
      * Sets the text of the TextViews in the ViewHolder to the corresponding data from the Item object.
