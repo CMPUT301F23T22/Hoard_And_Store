@@ -61,6 +61,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
 
     private static final int LIST_ITEM = 0;
     private static final int GRID_ITEM = 1;
+    private FilterCriteria filterCriteria;
 
     public void setItemAdapterListener(ItemAdapterListener listener) {
         this.itemAdapterListener = listener;
@@ -175,7 +176,11 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
 
     @Override
     public int getItemViewType (int position) {
-        if (isSwitchView){
+        if (filterCriteria == null){
+            filterCriteria = filterCriteria.getInstance();
+        }
+
+        if (filterCriteria.getListType()){
             return LIST_ITEM;
         }else{
             return GRID_ITEM;
@@ -183,8 +188,15 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
     }
 
     public boolean toggleItemViewType () {
-        isSwitchView = !isSwitchView;
-        return isSwitchView;
+        filterCriteria.setListType(!filterCriteria.getListType());
+        return filterCriteria.getListType();
+    }
+
+    public Boolean getListType(){
+        if (filterCriteria == null){
+            filterCriteria.getInstance();
+        }
+        return filterCriteria.getListType();
     }
 
     /**
@@ -200,7 +212,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Item currentItem = filteredItems.get(position);
         holder.bind(selectedItems.get(position, false));
-
+        filterCriteria = FilterCriteria.getInstance();
         String description = currentItem.getBriefDescription();
         int maxLength = 15;
 

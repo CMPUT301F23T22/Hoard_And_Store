@@ -20,12 +20,14 @@ public class FilterCriteria implements Serializable {
     private Map<String, String> sortOptions;
     private String sortOption;
     private String sortBy;
+    private boolean listType;
 
     private static FilterCriteria instance;
     private List<Tag> tagList;
 
     private FilterCriteria() {
         // Initialize the fields as needed
+        this.listType= true;
     }
 
     /**
@@ -122,6 +124,10 @@ public class FilterCriteria implements Serializable {
         return startDate;
     }
 
+    public Boolean getListType() {
+        return listType;
+    }
+
     /**
      * Sets the start date for the filter criteria.
      *
@@ -148,6 +154,7 @@ public class FilterCriteria implements Serializable {
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
+    public void setListType(Boolean bool) { this.listType = bool;}
 
     /**
      * Clears the start date in the filter criteria.

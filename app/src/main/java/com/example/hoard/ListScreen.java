@@ -150,7 +150,6 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
              */
             @Override
             public void onDataLoaded(List<Item> items) {
-
                 itemAdapter = new ItemAdapter(items, recyclerView);
                 itemAdapter.setSumCallback(ListScreen.this);
                 recyclerView.setAdapter(itemAdapter);
@@ -159,6 +158,8 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
 
             }
         }, filterCriteria);
+
+        recyclerView.setLayoutManager(filterCriteria.getListType() ? new LinearLayoutManager(ListScreen.this) : new GridLayoutManager(ListScreen.this, 2));
 
 
         topBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
