@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,6 +29,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -41,6 +43,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -63,7 +66,7 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
     private FloatingActionButton addItemButton;
     private TextView tvTotalValue;
     private Fragment currentFragment;
-    private Button switchView;
+    private MaterialButton switchView;
     FrameLayout listScreenFrame;
     private RecyclerView recyclerView;
     private ItemAdapter itemAdapter;
@@ -252,6 +255,8 @@ public class ListScreen extends AppCompatActivity implements ItemAdapter.Selecti
             @Override
             public void onClick(View view) {
                 boolean isSwitched = itemAdapter.toggleItemViewType();
+                Resources res = getResources();
+                switchView.setIcon(isSwitched ? ResourcesCompat.getDrawable(res, R.drawable.grid_view_24px,null) : ResourcesCompat.getDrawable(res, R.drawable.list_24px,null));
                 recyclerView.setLayoutManager(isSwitched ? new LinearLayoutManager(ListScreen.this) : new GridLayoutManager(ListScreen.this, 2));
                 itemAdapter.notifyDataSetChanged();
             }

@@ -75,28 +75,23 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/switch_view_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp"
-                app:contentPadding="16dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:background="@color/zxing_transparent"
+                    app:icon="@drawable/grid_view_24px"
+                    style="@style/Widget.App.Button.OutlinedButton.IconOnly"
                     android:id="@+id/switchView"/>
 
             </LinearLayout>
 
-            </com.google.android.material.card.MaterialCardView>
 
             <androidx.core.widget.NestedScrollView
                 android:layout_width="match_parent"
