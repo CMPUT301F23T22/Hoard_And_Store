@@ -413,6 +413,8 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
                         } else {
                             Log.e("UploadImages", "Error uploading images: " + task.getException().getMessage());
                         }
+
+
                     }
                 });
             } else {
@@ -449,6 +451,8 @@ public class AddEditItem extends AppCompatActivity implements CustomDatePicker.D
                         } else {
                             Log.e("UploadImages", "Error uploading images: " + task.getException().getMessage());
                         }
+
+
                     }
                 });
             } else {

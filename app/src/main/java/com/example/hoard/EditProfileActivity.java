@@ -224,6 +224,8 @@ public class EditProfileActivity extends AppCompatActivity {
                                         currentPasswordInputLayout.setErrorEnabled(true);
                                         currentPasswordInputLayout.setBoxStrokeColor(Color.RED);
                                     }
+
+
                                 }
                             });
                         }
@@ -279,6 +281,7 @@ public class EditProfileActivity extends AppCompatActivity {
                                     builder.dismiss();
                                     Exception exception = task.getException();
                                 }
+
                             }
                         });
                     }
@@ -366,6 +369,7 @@ public class EditProfileActivity extends AppCompatActivity {
                                         currentPasswordInputLayout.setErrorEnabled(true);
                                         currentPasswordInputLayout.setBoxStrokeColor(Color.RED);
                                     }
+
                                 }
                             });
                         }
@@ -401,6 +405,7 @@ public class EditProfileActivity extends AppCompatActivity {
                         handleAccountSignOut();
                     }
                 }
+
             }
         });
 

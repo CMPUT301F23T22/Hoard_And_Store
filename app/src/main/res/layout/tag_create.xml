@@ -134,6 +134,8 @@
             android:id="@+id/chipGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:closeIcon="@drawable/ic_mtrl_chip_close_circle"
+            app:closeIconVisible="true"
             android:padding="16dp">
 
             <!-- add tags through code -->

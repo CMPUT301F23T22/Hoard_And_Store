@@ -11,8 +11,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.textfield.TextInputLayout;
@@ -20,7 +23,9 @@ import com.skydoves.colorpickerview.ColorEnvelope;
 import com.skydoves.colorpickerview.ColorPickerDialog;
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Activity for adding or editing a tag.
@@ -39,6 +44,7 @@ public class TagAddEdit extends AppCompatActivity {
     private ChipGroup chipGroup;
 
     private TagDBController dbController;
+    private Map<Chip, Tag> chipTagMap = new HashMap<>();
     /**
      * Initializes the activity and sets up the UI for adding or editing a tag.
      *
@@ -61,8 +67,36 @@ public class TagAddEdit extends AppCompatActivity {
                     Chip chip = new Chip(TagAddEdit.this);
                     chip.setText(tag.getTagName());
                     chip.setChipBackgroundColor(ColorStateList.valueOf(Color.parseColor(tag.getTagColor())));
+                    chip.setCloseIconResource(R.drawable.ic_mtrl_chip_close_circle);
+                    chip.setCloseIconVisible(true);
+
+                    // Set the Tag as a tag for the Chip
+                    chip.setTag(tag);
+
                     // Add the chip to the ChipGroup
                     chipGroup.addView(chip);
+
+                    // Associate the Chip with its corresponding Tag in the map
+                    chipTagMap.put(chip, tag);
+
+                    // Set the OnCloseIconClickListener for each chip
+                    chip.setOnCloseIconClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            // Handle close icon click for the corresponding chip
+                            Tag chipTag = chipTagMap.get(chip);
+                            if (chipTag != null) {
+                                dbController.deleteTag(chipTag).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        chipGroup.removeView(chip);
+                                    }
+                                });
+                            }
+
+                            // Add your additional logic as needed
+                        }
+                    });
                 }
             }
         });

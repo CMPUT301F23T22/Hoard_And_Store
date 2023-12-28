@@ -63,14 +63,6 @@
                 android:gravity="center_vertical"/>
         </LinearLayout>
 
-        <!-- Arrow indicating a clickable item-->
-        <ImageView
-            android:id="@+id/detailsArrow"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/arrow_forward"
-            android:contentDescription="@string/arrow_description"/>
-
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

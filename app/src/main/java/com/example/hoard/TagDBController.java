@@ -2,8 +2,10 @@ package com.example.hoard;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -73,6 +75,8 @@ public class TagDBController {
                     // Handle the error when fetching data
                     // You can show an error message or take appropriate action
                 }
+
+
             }
 
         });
@@ -87,6 +91,38 @@ public class TagDBController {
     public void addTag(Tag tag, OnCompleteListener<Void> onCompleteListener) {
         if (tag != null)
             tagDB.addTag(tag, onCompleteListener);
+    }
+
+    public Task<Void> deleteTag(Tag deleteTag) {
+        if (deleteTag != null) {
+            // Find the document ID based on the tag UID
+            return tagDB.findTagDocIdByUid(deleteTag.getTagID()).continueWithTask(new Continuation<QuerySnapshot, Task<Void>>() {
+                @Override
+                public Task<Void> then(@NonNull Task<QuerySnapshot> task) throws Exception {
+                    if (task.isSuccessful()) {
+                        QuerySnapshot querySnapshot = task.getResult();
+                        if (querySnapshot != null && !querySnapshot.isEmpty()) {
+                            // Retrieve the document ID from the query result
+                            String tagIdToDelete = querySnapshot.getDocuments().get(0).getId();
+
+                            // Delete the tag using the document ID
+                            return tagDB.deleteTag(tagIdToDelete);
+                        } else {
+                            // Tag not found based on the provided UID
+                            return Tasks.forException(new Exception("Tag not found"));
+                        }
+                    } else {
+                        // Query failed
+                        Exception e = task.getException();
+                        // Handle the failure
+                        return Tasks.forException(e);
+                    }
+                }
+            });
+        } else {
+            // Handle the case where deleteTag is null
+            return Tasks.forException(new Exception("Tag is null"));
+        }
     }
 
 }

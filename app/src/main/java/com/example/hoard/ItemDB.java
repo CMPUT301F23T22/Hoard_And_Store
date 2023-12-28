@@ -329,6 +329,8 @@ public class ItemDB {
                     // Handle errors
                     Log.w(TAG, "Error getting documents: ", task.getException());
                 }
+
+
             }
         });
     }
@@ -533,6 +535,8 @@ public class ItemDB {
                         } else {
                             tcs.setException(task.getException());  // Set an exception for the Task
                         }
+
+
                     }
                 });
 

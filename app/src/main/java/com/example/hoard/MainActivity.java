@@ -245,6 +245,8 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     signInFailed();
                 }
+
+
             }
         });
 
@@ -308,6 +310,8 @@ public class MainActivity extends AppCompatActivity {
                             showSnackbar("Authentication failed.");
                             updateUI(null);
                         }
+
+
                     }
                 });
     }
@@ -349,6 +353,8 @@ public class MainActivity extends AppCompatActivity {
                                                                     homePage();
                                                                     Log.d(TAG, "User profile updated.");
                                                                 }
+
+
                                                             }
                                                         });
                                             } else {
@@ -356,6 +362,8 @@ public class MainActivity extends AppCompatActivity {
                                                 Exception exception = task.getException();
                                                 handleError(exception);
                                             }
+
+
                                         }
                                     });
                                 }
@@ -365,6 +373,8 @@ public class MainActivity extends AppCompatActivity {
                             // If sign in fails, display a message to the user.
                             handleError(task.getException());
                         }
+
+
                     }
                 });
     }

@@ -54,4 +54,20 @@ public class TagDB {
     public Task<QuerySnapshot> getAllTags() {
         return tagsCollection.get();
     }
+
+    public Task<QuerySnapshot> findTagDocIdByUid(String tagUid) {
+        return tagsCollection
+                .whereEqualTo("tagID", tagUid)
+                .get();
+    }
+
+
+    public Task<Void> deleteTag(String tagDocId) {
+        // Create a reference to the document in the "tags" collection based on the tagId
+        DocumentReference tagRef = tagsCollection.document(tagDocId);
+
+        return tagRef.delete();
+    }
+
+
 }

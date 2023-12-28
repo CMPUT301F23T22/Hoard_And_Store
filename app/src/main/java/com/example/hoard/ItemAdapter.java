@@ -248,27 +248,25 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
 
         loadImage(currentItem,holder);
 
-        holder.detailsArrow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int adapterPosition = holder.getAdapterPosition();
-                if (adapterPosition != RecyclerView.NO_POSITION) {
-                    Item itemAtPosition = itemList.get(adapterPosition);
-                    context = view.getContext();
-                    Intent intent = new Intent(context, DetailsActivity.class);
-                    intent.putExtra("SELECTED_ITEM", itemAtPosition);
-                    context.startActivity(intent);
-                }
-            }
-        });
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 int adapterPosition = holder.getAdapterPosition();
-                if (adapterPosition != RecyclerView.NO_POSITION) {
-                    if (isSelectionMode) {
-                        toggleItemSelection(adapterPosition);
-                        notifyItemChanged(adapterPosition);
+
+                if(!isSelectionMode) {
+                    if (adapterPosition != RecyclerView.NO_POSITION) {
+                        Item itemAtPosition = itemList.get(adapterPosition);
+                        context = view.getContext();
+                        Intent intent = new Intent(context, DetailsActivity.class);
+                        intent.putExtra("SELECTED_ITEM", itemAtPosition);
+                        context.startActivity(intent);
+                    }
+                } else {
+                    if (adapterPosition != RecyclerView.NO_POSITION) {
+                        if (isSelectionMode) {
+                            toggleItemSelection(adapterPosition);
+                            notifyItemChanged(adapterPosition);
+                        }
                     }
                 }
             }
@@ -485,8 +483,6 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
         public TextView briefDescription;
         public TextView dateOfAcquisition;
         public TextView estimatedValue;
-        public ImageView detailsArrow;
-
         public ShapeableImageView itemImage;
 
         /**
@@ -499,7 +495,6 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
             briefDescription = itemView.findViewById(R.id.descriptionList);
             dateOfAcquisition = itemView.findViewById(R.id.dateOfAcquisitionList);
             estimatedValue = itemView.findViewById(R.id.estimatedValueList);
-            detailsArrow = itemView.findViewById(R.id.detailsArrow);
             itemImage = itemView.findViewById(R.id.imageView);
 
         }
